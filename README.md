@@ -21,7 +21,7 @@
 <br />
 
 ### Hi 🙋‍♂️,
-### I'm 22 years old, i am working on Dionysoft 3D Generalist position, from Turkey.
+### I'm 22 years old, working 3D Generalist position, from Turkey.
 
 
 #### - 🥀 Learning C#, Blender, Unity.
