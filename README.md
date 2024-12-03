@@ -21,15 +21,15 @@
 <br />
 
 ### Hi 🙋‍♂️,
-### I'm 22 years old, working 3D Generalist position, from Turkey.
+### I'm 23 years old, working 3D Generalist position, from Turkey.
 
 
-#### - 🥀 Learning C#, Blender, Unity.
+#### - 🥀 Learning C#, Blender, Unity and Shader Graphs.
 
 
 
 
-#### - 🔭 Anime FanBoi, 
+#### - 🔭 Cat Lover, 
 
 #### - 🛸 Into Hight Energy
 
@@ -41,7 +41,7 @@
 
 **I am Into , 🙏**
 
-**Game Developer, Web Development, Graphic Design 😼**
+**Game Developer, Game Animator, 3D Artist 😼**
 <br />
 
 
