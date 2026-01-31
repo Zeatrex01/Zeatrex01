@@ -21,6 +21,7 @@ const App = () => {
                     {CONFIG.name.split(' ')[0]}<span className="text-blue-500">.</span>
                 </div>
                 <div className="flex gap-5 text-sm font-medium">
+                    <a href="#work" className="hover:text-blue-400 transition-colors">Projeler</a>
                     {CONFIG.social.github && (
                         <a href={CONFIG.social.github} target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors">GitHub</a>
                     )}
@@ -44,9 +45,9 @@ const App = () => {
                 </p>
 
                 {/* Scroll Indicator */}
-                <div className="absolute bottom-10 animate-bounce text-slate-600">
+                <a href="#work" className="absolute bottom-10 animate-bounce text-slate-600 hover:text-slate-400 transition-colors" aria-label="Projelere git">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 13l5 5 5-5M7 6l5 5 5-5" /></svg>
-                </div>
+                </a>
             </section>
 
             {/* Projects Grid */}
@@ -97,3 +98,13 @@ const App = () => {
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
+
+// Hide loading screen when React is ready
+setTimeout(() => {
+    const loadingScreen = document.getElementById('loading');
+    if (loadingScreen) {
+        loadingScreen.style.opacity = '0';
+        loadingScreen.style.transition = 'opacity 0.5s ease-out';
+        setTimeout(() => loadingScreen.remove(), 500);
+    }
+}, 100);
