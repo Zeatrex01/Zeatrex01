@@ -4,6 +4,22 @@
 
 const App = () => {
     const [activeTab, setActiveTab] = React.useState('development');
+    const [language, setLanguage] = React.useState(() => {
+        // localStorage'dan dil tercihini al, yoksa tarayıcı dilini kontrol et
+        const saved = localStorage.getItem('preferredLanguage');
+        if (saved) return saved;
+        const browserLang = navigator.language.toLowerCase();
+        return browserLang.startsWith('tr') ? 'tr' : 'en';
+    });
+    
+    // Dil değiştiğinde localStorage'a kaydet
+    React.useEffect(() => {
+        localStorage.setItem('preferredLanguage', language);
+        document.documentElement.lang = language;
+    }, [language]);
+    
+    // Aktif dil verisini al
+    const t = CONFIG.languages[language];
     
     // Veri güvenliği kontrolü
     if (typeof CONFIG === 'undefined') {
@@ -20,18 +36,43 @@ const App = () => {
             {/* Header */}
             <nav className="p-4 md:p-6 max-w-6xl mx-auto w-full flex justify-between items-center z-10">
                 <div className="font-extrabold text-lg md:text-xl tracking-tighter text-white uppercase hover:scale-105 transition-transform duration-300 cursor-default">
-                    {CONFIG.name.split(' ')[0]}<span className="text-blue-500">.</span>
+                    {t.name.split(' ')[0]}<span className="text-blue-500">.</span>
                 </div>
-                <div className="flex gap-3 md:gap-5 text-xs md:text-sm font-medium flex-wrap justify-end">
-                    <a href="#about" className="hover:text-blue-400 transition-colors">Hakkımda</a>
-                    <a href="#work" className="hover:text-blue-400 transition-colors">Projeler</a>
+                <div className="flex gap-3 md:gap-5 text-xs md:text-sm font-medium flex-wrap justify-end items-center">
+                    <a href="#about" className="hover:text-blue-400 transition-colors">{t.nav.about}</a>
+                    <a href="#education" className="hover:text-blue-400 transition-colors">{t.nav.education}</a>
+                    <a href="#work" className="hover:text-blue-400 transition-colors">{t.nav.projects}</a>
                     {CONFIG.social.github && (
                         <a href={CONFIG.social.github} target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors hidden sm:inline">GitHub</a>
                     )}
                     {CONFIG.social.linkedin && (
                         <a href={CONFIG.social.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors hidden sm:inline">LinkedIn</a>
                     )}
-                    <a href={`mailto:${CONFIG.email}`} className="bg-blue-600 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-white hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-600/20 transition-all duration-300">İletişim</a>
+                    <a href={`mailto:${CONFIG.email}`} className="bg-blue-600 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-white hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-600/20 transition-all duration-300">{t.nav.contact}</a>
+                    
+                    {/* Language Switcher */}
+                    <div className="flex gap-1 bg-slate-900/50 rounded-full p-1">
+                        <button 
+                            onClick={() => setLanguage('tr')}
+                            className={`px-2 md:px-3 py-1 rounded-full text-xs font-bold transition-all duration-300 ${
+                                language === 'tr' 
+                                    ? 'bg-blue-600 text-white' 
+                                    : 'text-slate-400 hover:text-slate-300'
+                            }`}
+                        >
+                            TR
+                        </button>
+                        <button 
+                            onClick={() => setLanguage('en')}
+                            className={`px-2 md:px-3 py-1 rounded-full text-xs font-bold transition-all duration-300 ${
+                                language === 'en' 
+                                    ? 'bg-blue-600 text-white' 
+                                    : 'text-slate-400 hover:text-slate-300'
+                            }`}
+                        >
+                            EN
+                        </button>
+                    </div>
                 </div>
             </nav>
 
@@ -41,14 +82,14 @@ const App = () => {
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px] -z-10"></div>
 
                 <h1 className="text-5xl md:text-8xl font-black text-white mb-6 tracking-tight animate-fade-in-up">
-                    <span className="gradient-text">{CONFIG.role}</span>
+                    <span className="gradient-text">{t.role}</span>
                 </h1>
                 <p className="max-w-2xl text-lg md:text-xl text-slate-400 leading-relaxed drop-shadow-sm">
-                    {CONFIG.bio}
+                    {t.bio}
                 </p>
 
                 {/* Scroll Indicator */}
-                <a href="#about" className="absolute bottom-10 animate-bounce text-slate-600 hover:text-slate-400 transition-colors" aria-label="Hakkımda bölümüne git">
+                <a href="#about" className="absolute bottom-10 animate-bounce text-slate-600 hover:text-slate-400 transition-colors" aria-label={language === 'tr' ? "Hakkımda bölümüne git" : "Go to About section"}>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 13l5 5 5-5M7 6l5 5 5-5" /></svg>
                 </a>
             </section>
@@ -57,7 +98,7 @@ const App = () => {
             <section className="max-w-6xl mx-auto w-full px-6 py-20" id="about">
                 <div className="flex items-center gap-4 mb-10">
                     <div className="h-px bg-slate-800 flex-1"></div>
-                    <h2 className="text-slate-500 text-sm font-bold tracking-widest uppercase">Hakkımda</h2>
+                    <h2 className="text-slate-500 text-sm font-bold tracking-widest uppercase">{t.about.title}</h2>
                     <div className="h-px bg-slate-800 flex-1"></div>
                 </div>
 
@@ -71,8 +112,8 @@ const App = () => {
                                 : 'bg-slate-900/50 text-slate-400 hover:bg-slate-800/80 hover:text-slate-300'
                         }`}
                     >
-                        <span className="hidden sm:inline">{CONFIG.about.development.icon} </span>
-                        {CONFIG.about.development.title}
+                        <span className="hidden sm:inline">{t.about.development.icon} </span>
+                        {t.about.development.title}
                     </button>
                     <button 
                         onClick={() => setActiveTab('art')}
@@ -82,8 +123,8 @@ const App = () => {
                                 : 'bg-slate-900/50 text-slate-400 hover:bg-slate-800/80 hover:text-slate-300'
                         }`}
                     >
-                        <span className="hidden sm:inline">{CONFIG.about.art.icon} </span>
-                        {CONFIG.about.art.title}
+                        <span className="hidden sm:inline">{t.about.art.icon} </span>
+                        {t.about.art.title}
                     </button>
                     <button 
                         onClick={() => setActiveTab('animation')}
@@ -93,14 +134,14 @@ const App = () => {
                                 : 'bg-slate-900/50 text-slate-400 hover:bg-slate-800/80 hover:text-slate-300'
                         }`}
                     >
-                        <span className="hidden sm:inline">{CONFIG.about.animation.icon} </span>
-                        {CONFIG.about.animation.title}
+                        <span className="hidden sm:inline">{t.about.animation.icon} </span>
+                        {t.about.animation.title}
                     </button>
                 </div>
 
                 {/* Tab Content */}
-                {Object.keys(CONFIG.about).map((key) => {
-                    const section = CONFIG.about[key];
+                {Object.keys(t.about).filter(key => key !== 'title').map((key) => {
+                    const section = t.about[key];
                     if (activeTab !== key) return null;
                     
                     return (
@@ -118,7 +159,7 @@ const App = () => {
                                             <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition-colors">{skill.name}</h3>
                                             <span className="text-xs font-bold bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full">{skill.level}</span>
                                         </div>
-                                        <p className="text-sm text-slate-500 mb-3">{skill.experience} deneyim</p>
+                                        <p className="text-sm text-slate-500 mb-3">{skill.experience} {language === 'tr' ? 'deneyim' : 'experience'}</p>
                                         <p className="text-slate-400 leading-relaxed text-sm">{skill.description}</p>
                                     </div>
                                 ))}
@@ -128,7 +169,7 @@ const App = () => {
                             <div className="bg-gradient-to-br from-slate-900/50 to-slate-900/30 border border-slate-800 p-8 rounded-3xl">
                                 <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
                                     <span className="text-2xl">✨</span>
-                                    Öne Çıkanlar
+                                    {language === 'tr' ? 'Öne Çıkanlar' : 'Highlights'}
                                 </h3>
                                 <ul className="space-y-3">
                                     {section.highlights.map((highlight, idx) => (
@@ -144,16 +185,45 @@ const App = () => {
                 })}
             </section>
 
+            {/* Education Section */}
+            <section className="max-w-6xl mx-auto w-full px-6 py-20" id="education">
+                <div className="flex items-center gap-4 mb-10">
+                    <div className="h-px bg-slate-800 flex-1"></div>
+                    <h2 className="text-slate-500 text-sm font-bold tracking-widest uppercase">{t.education.title}</h2>
+                    <div className="h-px bg-slate-800 flex-1"></div>
+                </div>
+
+                <div className="bg-gradient-to-br from-slate-900/50 to-slate-900/30 border border-slate-800 p-8 md:p-10 rounded-3xl max-w-3xl mx-auto">
+                    <div className="flex items-start gap-6">
+                        <div className="text-5xl">🎓</div>
+                        <div className="flex-1">
+                            <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
+                                <div>
+                                    <h3 className="text-2xl font-bold text-white mb-2">{t.education.field}</h3>
+                                    <p className="text-lg text-blue-400 font-semibold">{t.education.university}</p>
+                                </div>
+                                <span className="text-sm font-bold bg-blue-500/10 text-blue-400 px-4 py-2 rounded-full">
+                                    {t.education.degree} • {t.education.year}
+                                </span>
+                            </div>
+                            <p className="text-slate-400 leading-relaxed">
+                                {t.education.description}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             {/* Projects Grid */}
             <section className="max-w-6xl mx-auto w-full px-6 py-20" id="work">
                 <div className="flex items-center gap-4 mb-10">
                     <div className="h-px bg-slate-800 flex-1"></div>
-                    <h2 className="text-slate-500 text-sm font-bold tracking-widest uppercase">Select Work</h2>
+                    <h2 className="text-slate-500 text-sm font-bold tracking-widest uppercase">{t.projectsTitle}</h2>
                     <div className="h-px bg-slate-800 flex-1"></div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {CONFIG.projects.map((item, idx) => (
+                    {t.projects.map((item, idx) => (
                         <div key={idx} className="project-card bg-slate-900/50 border border-slate-800 p-8 rounded-3xl transition-all duration-300 group relative overflow-hidden">
                             {/* Hover Gradient */}
                             <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -183,7 +253,7 @@ const App = () => {
             {/* Footer */}
             <footer className="p-10 text-center border-t border-slate-900/50 mt-20 bg-slate-950/30">
                 <p className="text-sm text-slate-600 font-medium tracking-widest uppercase">
-                    © {new Date().getFullYear()} {CONFIG.name} • Built for Industry
+                    © {new Date().getFullYear()} {t.name} • {t.footer}
                 </p>
             </footer>
         </div>
