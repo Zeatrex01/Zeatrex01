@@ -4,6 +4,8 @@
 
 const App = () => {
     const [activeTab, setActiveTab] = React.useState('development');
+    const [isNavSticky, setIsNavSticky] = React.useState(false);
+    const [scrollProgress, setScrollProgress] = React.useState(0);
     const [language, setLanguage] = React.useState(() => {
         // localStorage'dan dil tercihini al, yoksa tarayıcı dilini kontrol et
         const saved = localStorage.getItem('preferredLanguage');
@@ -17,6 +19,22 @@ const App = () => {
         localStorage.setItem('preferredLanguage', language);
         document.documentElement.lang = language;
     }, [language]);
+    
+    // Scroll progress and sticky navigation
+    React.useEffect(() => {
+        const handleScroll = () => {
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight - windowHeight;
+            const scrolled = window.scrollY;
+            const progress = (scrolled / documentHeight) * 100;
+            
+            setScrollProgress(progress);
+            setIsNavSticky(scrolled > 50);
+        };
+        
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
     
     // Aktif dil verisini al
     const t = CONFIG.languages[language];
@@ -32,32 +50,35 @@ const App = () => {
     }
 
     return (
-        <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen flex flex-col relative">
+            {/* Scroll Progress Bar */}
+            <div className="scroll-progress" style={{ width: `${scrollProgress}%` }}></div>
+            
             {/* Header */}
-            <nav className="p-4 md:p-6 max-w-6xl mx-auto w-full flex justify-between items-center z-10">
-                <div className="font-extrabold text-lg md:text-xl tracking-tighter text-white uppercase hover:scale-105 transition-transform duration-300 cursor-default">
-                    {t.name.split(' ')[0]}<span className="text-blue-500">.</span>
+            <nav className={`p-4 md:p-6 max-w-6xl mx-auto w-full flex justify-between items-center z-10 transition-all duration-300 ${isNavSticky ? 'nav-sticky' : ''}`}>
+                <div className="font-extrabold text-lg md:text-xl tracking-tighter text-white uppercase hover:scale-110 transition-all duration-300 cursor-default">
+                    {t.name.split(' ')[0]}<span className="text-blue-500 animate-pulse">.</span>
                 </div>
                 <div className="flex gap-3 md:gap-5 text-xs md:text-sm font-medium flex-wrap justify-end items-center">
-                    <a href="#about" className="hover:text-blue-400 transition-colors">{t.nav.about}</a>
-                    <a href="#education" className="hover:text-blue-400 transition-colors">{t.nav.education}</a>
-                    <a href="#work" className="hover:text-blue-400 transition-colors">{t.nav.projects}</a>
+                    <a href="#about" className="hover:text-blue-400 transition-all duration-300 hover:scale-110">{t.nav.about}</a>
+                    <a href="#education" className="hover:text-blue-400 transition-all duration-300 hover:scale-110">{t.nav.education}</a>
+                    <a href="#work" className="hover:text-blue-400 transition-all duration-300 hover:scale-110">{t.nav.projects}</a>
                     {CONFIG.social.github && (
-                        <a href={CONFIG.social.github} target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors hidden sm:inline">GitHub</a>
+                        <a href={CONFIG.social.github} target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-all duration-300 hover:scale-110 hidden sm:inline">GitHub</a>
                     )}
                     {CONFIG.social.linkedin && (
-                        <a href={CONFIG.social.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors hidden sm:inline">LinkedIn</a>
+                        <a href={CONFIG.social.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-all duration-300 hover:scale-110 hidden sm:inline">LinkedIn</a>
                     )}
-                    <a href={`mailto:${CONFIG.email}`} className="bg-blue-600 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-white hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-600/20 transition-all duration-300">{t.nav.contact}</a>
+                    <a href={`mailto:${CONFIG.email}`} className="bg-gradient-to-r from-blue-600 to-purple-600 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-white hover:shadow-xl hover:shadow-blue-600/30 hover:scale-105 transition-all duration-300">{t.nav.contact}</a>
                     
                     {/* Language Switcher */}
-                    <div className="flex gap-1 bg-slate-900/50 rounded-full p-1">
+                    <div className="flex gap-1 bg-slate-900/50 rounded-full p-1 border border-slate-800">
                         <button 
                             onClick={() => setLanguage('tr')}
                             className={`px-2 md:px-3 py-1 rounded-full text-xs font-bold transition-all duration-300 ${
                                 language === 'tr' 
-                                    ? 'bg-blue-600 text-white' 
-                                    : 'text-slate-400 hover:text-slate-300'
+                                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
+                                    : 'text-slate-400 hover:text-slate-300 hover:bg-slate-800/50'
                             }`}
                         >
                             TR
@@ -66,8 +87,8 @@ const App = () => {
                             onClick={() => setLanguage('en')}
                             className={`px-2 md:px-3 py-1 rounded-full text-xs font-bold transition-all duration-300 ${
                                 language === 'en' 
-                                    ? 'bg-blue-600 text-white' 
-                                    : 'text-slate-400 hover:text-slate-300'
+                                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
+                                    : 'text-slate-400 hover:text-slate-300 hover:bg-slate-800/50'
                             }`}
                         >
                             EN
@@ -77,104 +98,124 @@ const App = () => {
             </nav>
 
             {/* Hero Section */}
-            <section className="flex-1 flex flex-col items-center justify-center px-6 text-center py-20 relative overflow-hidden">
-                {/* Background Glow */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px] -z-10"></div>
+            <section className="flex-1 flex flex-col items-center justify-center px-6 text-center py-20 md:py-32 relative overflow-hidden">
+                {/* Enhanced Background Effects */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-600/20 rounded-full blur-[150px] animate-pulse -z-10"></div>
+                <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-purple-600/10 rounded-full blur-[100px] animate-float -z-10"></div>
+                <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-pink-600/10 rounded-full blur-[100px] animate-float -z-10" style={{ animationDelay: '3s' }}></div>
 
-                <h1 className="text-5xl md:text-8xl font-black text-white mb-6 tracking-tight animate-fade-in-up">
-                    <span className="gradient-text">{t.role}</span>
-                </h1>
-                <p className="max-w-2xl text-lg md:text-xl text-slate-400 leading-relaxed drop-shadow-sm">
-                    {t.bio}
-                </p>
+                {/* Main Content */}
+                <div className="text-reveal max-w-5xl">
+                    <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white mb-8 tracking-tight leading-tight">
+                        <span className="gradient-text block mb-2">{t.role}</span>
+                    </h1>
+                    <p className="max-w-3xl mx-auto text-base md:text-xl lg:text-2xl text-slate-400 leading-relaxed mb-10">
+                        {t.bio}
+                    </p>
+                    
+                    {/* CTA Buttons */}
+                    <div className="flex flex-wrap gap-4 justify-center items-center mt-8">
+                        <a href="#work" className="group bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-4 rounded-full text-white font-bold hover:shadow-2xl hover:shadow-blue-600/40 hover:scale-105 transition-all duration-300 flex items-center gap-2">
+                            {language === 'tr' ? 'Projelerimi Gör' : 'View My Work'}
+                            <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                            </svg>
+                        </a>
+                        <a href={`mailto:${CONFIG.email}`} className="bg-slate-900/50 border border-slate-700 px-8 py-4 rounded-full text-white font-bold hover:bg-slate-800/80 hover:border-slate-600 hover:scale-105 transition-all duration-300 backdrop-blur-sm">
+                            {language === 'tr' ? 'İletişime Geç' : 'Get In Touch'}
+                        </a>
+                    </div>
+                </div>
 
                 {/* Scroll Indicator */}
-                <a href="#about" className="absolute bottom-10 animate-bounce text-slate-600 hover:text-slate-400 transition-colors" aria-label={language === 'tr' ? "Hakkımda bölümüne git" : "Go to About section"}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 13l5 5 5-5M7 6l5 5 5-5" /></svg>
+                <a href="#about" className="absolute bottom-10 animate-bounce text-slate-600 hover:text-blue-400 transition-colors cursor-pointer" aria-label={language === 'tr' ? "Hakkımda bölümüne git" : "Go to About section"}>
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M7 13l5 5 5-5M7 6l5 5 5-5" />
+                    </svg>
                 </a>
             </section>
 
             {/* About Section - Tabbed Interface */}
             <section className="max-w-6xl mx-auto w-full px-6 py-20" id="about">
-                <div className="flex items-center gap-4 mb-10">
-                    <div className="h-px bg-slate-800 flex-1"></div>
-                    <h2 className="text-slate-500 text-sm font-bold tracking-widest uppercase">{t.about.title}</h2>
-                    <div className="h-px bg-slate-800 flex-1"></div>
+                <div className="flex items-center gap-4 mb-16">
+                    <div className="h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent flex-1"></div>
+                    <h2 className="text-slate-400 text-sm md:text-base font-bold tracking-widest uppercase">{t.about.title}</h2>
+                    <div className="h-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent flex-1"></div>
                 </div>
 
                 {/* Tab Navigation */}
-                <div className="flex flex-wrap gap-3 md:gap-4 mb-10 justify-center">
+                <div className="flex flex-wrap gap-3 md:gap-4 mb-12 justify-center">
                     <button 
                         onClick={() => setActiveTab('development')}
-                        className={`px-4 md:px-6 py-2 md:py-3 rounded-full font-bold text-xs md:text-sm tracking-wide transition-all duration-300 ${
+                        className={`group px-6 md:px-8 py-3 md:py-4 rounded-2xl font-bold text-sm md:text-base tracking-wide transition-all duration-300 ${
                             activeTab === 'development' 
-                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' 
-                                : 'bg-slate-900/50 text-slate-400 hover:bg-slate-800/80 hover:text-slate-300'
+                                ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-2xl shadow-blue-600/40 scale-105' 
+                                : 'bg-slate-900/50 text-slate-400 hover:bg-slate-800/80 hover:text-slate-300 border border-slate-800 hover:border-slate-700'
                         }`}
                     >
-                        <span className="hidden sm:inline">{t.about.development.icon} </span>
+                        <span className="text-2xl hidden sm:inline">{t.about.development.icon} </span>
                         {t.about.development.title}
                     </button>
                     <button 
                         onClick={() => setActiveTab('art')}
-                        className={`px-4 md:px-6 py-2 md:py-3 rounded-full font-bold text-xs md:text-sm tracking-wide transition-all duration-300 ${
+                        className={`group px-6 md:px-8 py-3 md:py-4 rounded-2xl font-bold text-sm md:text-base tracking-wide transition-all duration-300 ${
                             activeTab === 'art' 
-                                ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30' 
-                                : 'bg-slate-900/50 text-slate-400 hover:bg-slate-800/80 hover:text-slate-300'
+                                ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-2xl shadow-purple-600/40 scale-105' 
+                                : 'bg-slate-900/50 text-slate-400 hover:bg-slate-800/80 hover:text-slate-300 border border-slate-800 hover:border-slate-700'
                         }`}
                     >
-                        <span className="hidden sm:inline">{t.about.art.icon} </span>
+                        <span className="text-2xl hidden sm:inline">{t.about.art.icon} </span>
                         {t.about.art.title}
                     </button>
                     <button 
                         onClick={() => setActiveTab('animation')}
-                        className={`px-4 md:px-6 py-2 md:py-3 rounded-full font-bold text-xs md:text-sm tracking-wide transition-all duration-300 ${
+                        className={`group px-6 md:px-8 py-3 md:py-4 rounded-2xl font-bold text-sm md:text-base tracking-wide transition-all duration-300 ${
                             activeTab === 'animation' 
-                                ? 'bg-pink-600 text-white shadow-lg shadow-pink-600/30' 
-                                : 'bg-slate-900/50 text-slate-400 hover:bg-slate-800/80 hover:text-slate-300'
+                                ? 'bg-gradient-to-r from-pink-600 to-rose-600 text-white shadow-2xl shadow-pink-600/40 scale-105' 
+                                : 'bg-slate-900/50 text-slate-400 hover:bg-slate-800/80 hover:text-slate-300 border border-slate-800 hover:border-slate-700'
                         }`}
                     >
-                        <span className="hidden sm:inline">{t.about.animation.icon} </span>
+                        <span className="text-2xl hidden sm:inline">{t.about.animation.icon} </span>
                         {t.about.animation.title}
                     </button>
                 </div>
 
                 {/* Tab Content */}
-                {Object.keys(t.about).filter(key => key !== 'title').map((key) => {
+                {Object.keys(t.about).filter(key => key !== 'title' && key !== 'experienceLabel' && key !== 'highlightsTitle').map((key) => {
                     const section = t.about[key];
                     if (activeTab !== key) return null;
                     
                     return (
                         <div key={key} className="animate-fade-in-up">
                             {/* Description */}
-                            <div className="bg-slate-900/30 border border-slate-800 p-8 rounded-3xl mb-8">
-                                <p className="text-lg text-slate-300 leading-relaxed">{section.description}</p>
+                            <div className="bg-gradient-to-br from-slate-900/50 to-slate-900/30 border border-slate-800 p-8 md:p-10 rounded-3xl mb-10 hover:border-slate-700 transition-all duration-300 glow-effect">
+                                <p className="text-lg md:text-xl text-slate-300 leading-relaxed">{section.description}</p>
                             </div>
 
                             {/* Skills Grid */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-10">
                                 {section.skills.map((skill, idx) => (
-                                    <div key={idx} className="bg-slate-900/50 border border-slate-800 p-6 rounded-2xl hover:border-slate-700 transition-all duration-300 group">
-                                        <div className="flex justify-between items-start mb-3">
-                                            <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition-colors">{skill.name}</h3>
-                                            <span className="text-xs font-bold bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full">{skill.level}</span>
+                                    <div key={idx} className="professional-card bg-slate-900/50 border border-slate-800 p-6 md:p-8 rounded-3xl group">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <h3 className="text-xl md:text-2xl font-bold text-white group-hover:text-blue-400 transition-colors">{skill.name}</h3>
+                                            <span className="text-xs font-bold bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-400 px-4 py-2 rounded-full border border-blue-500/30">{skill.level}</span>
                                         </div>
-                                        <p className="text-sm text-slate-500 mb-3">{skill.experience} {t.about.experienceLabel}</p>
-                                        <p className="text-slate-400 leading-relaxed text-sm">{skill.description}</p>
+                                        <p className="text-sm text-slate-500 mb-4 font-semibold">{skill.experience} {t.about.experienceLabel}</p>
+                                        <p className="text-slate-400 leading-relaxed">{skill.description}</p>
                                     </div>
                                 ))}
                             </div>
 
                             {/* Highlights */}
-                            <div className="bg-gradient-to-br from-slate-900/50 to-slate-900/30 border border-slate-800 p-8 rounded-3xl">
-                                <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                                    <span className="text-2xl">✨</span>
+                            <div className="bg-gradient-to-br from-slate-900/70 to-slate-900/40 border border-slate-800 p-8 md:p-10 rounded-3xl hover:border-slate-700 transition-all duration-300 glow-effect">
+                                <h3 className="text-2xl md:text-3xl font-bold text-white mb-8 flex items-center gap-3">
+                                    <span className="text-3xl md:text-4xl">✨</span>
                                     {t.about.highlightsTitle}
                                 </h3>
-                                <ul className="space-y-3">
+                                <ul className="space-y-4">
                                     {section.highlights.map((highlight, idx) => (
-                                        <li key={idx} className="flex items-start gap-3 text-slate-300">
-                                            <span className="text-blue-500 mt-1">▸</span>
+                                        <li key={idx} className="flex items-start gap-4 text-slate-300 text-base md:text-lg group">
+                                            <span className="text-blue-500 mt-1 text-xl group-hover:scale-125 transition-transform">▸</span>
                                             <span className="leading-relaxed">{highlight}</span>
                                         </li>
                                     ))}
@@ -187,26 +228,26 @@ const App = () => {
 
             {/* Education Section */}
             <section className="max-w-6xl mx-auto w-full px-6 py-20" id="education">
-                <div className="flex items-center gap-4 mb-10">
-                    <div className="h-px bg-slate-800 flex-1"></div>
-                    <h2 className="text-slate-500 text-sm font-bold tracking-widest uppercase">{t.education.title}</h2>
-                    <div className="h-px bg-slate-800 flex-1"></div>
+                <div className="flex items-center gap-4 mb-16">
+                    <div className="h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent flex-1"></div>
+                    <h2 className="text-slate-400 text-sm md:text-base font-bold tracking-widest uppercase">{t.education.title}</h2>
+                    <div className="h-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent flex-1"></div>
                 </div>
 
-                <div className="bg-gradient-to-br from-slate-900/50 to-slate-900/30 border border-slate-800 p-8 md:p-10 rounded-3xl max-w-3xl mx-auto">
-                    <div className="flex items-start gap-6">
-                        <div className="text-5xl">🎓</div>
+                <div className="professional-card bg-gradient-to-br from-slate-900/60 to-slate-900/40 border border-slate-800 p-8 md:p-12 rounded-3xl max-w-4xl mx-auto glow-effect">
+                    <div className="flex items-start gap-6 md:gap-8">
+                        <div className="text-5xl md:text-6xl animate-float">🎓</div>
                         <div className="flex-1">
-                            <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
+                            <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
                                 <div>
-                                    <h3 className="text-2xl font-bold text-white mb-2">{t.education.field}</h3>
-                                    <p className="text-lg text-blue-400 font-semibold">{t.education.university}</p>
+                                    <h3 className="text-2xl md:text-3xl font-bold text-white mb-3 leading-tight">{t.education.field}</h3>
+                                    <p className="text-lg md:text-xl text-blue-400 font-semibold">{t.education.university}</p>
                                 </div>
-                                <span className="text-sm font-bold bg-blue-500/10 text-blue-400 px-4 py-2 rounded-full">
+                                <span className="text-sm font-bold bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-400 px-5 py-3 rounded-full border border-blue-500/30">
                                     {t.education.degree} • {t.education.year}
                                 </span>
                             </div>
-                            <p className="text-slate-400 leading-relaxed">
+                            <p className="text-slate-400 leading-relaxed text-base md:text-lg">
                                 {t.education.description}
                             </p>
                         </div>
@@ -216,32 +257,35 @@ const App = () => {
 
             {/* Projects Grid */}
             <section className="max-w-6xl mx-auto w-full px-6 py-20" id="work">
-                <div className="flex items-center gap-4 mb-10">
-                    <div className="h-px bg-slate-800 flex-1"></div>
-                    <h2 className="text-slate-500 text-sm font-bold tracking-widest uppercase">{t.projectsTitle}</h2>
-                    <div className="h-px bg-slate-800 flex-1"></div>
+                <div className="flex items-center gap-4 mb-16">
+                    <div className="h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent flex-1"></div>
+                    <h2 className="text-slate-400 text-sm md:text-base font-bold tracking-widest uppercase">{t.projectsTitle}</h2>
+                    <div className="h-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent flex-1"></div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
                     {t.projects.map((item, idx) => (
-                        <div key={idx} className="project-card bg-slate-900/50 border border-slate-800 p-8 rounded-3xl transition-all duration-300 group relative overflow-hidden">
-                            {/* Hover Gradient */}
-                            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div key={idx} className="professional-card bg-slate-900/50 border border-slate-800 p-8 md:p-10 rounded-3xl group relative overflow-hidden">
+                            {/* Enhanced Hover Gradient */}
+                            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-purple-600/5 to-pink-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                            <div className="absolute -inset-1 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-pink-600/20 rounded-3xl opacity-0 group-hover:opacity-100 blur transition-opacity duration-500"></div>
 
                             <div className="relative z-10">
                                 <div className="flex justify-between items-start mb-6">
-                                    <span className="text-xs font-bold tracking-widest text-blue-500 uppercase bg-blue-500/10 px-3 py-1 rounded-full">{item.tag}</span>
+                                    <span className="text-xs font-bold tracking-widest text-blue-400 uppercase bg-gradient-to-r from-blue-500/20 to-purple-500/20 px-4 py-2 rounded-full border border-blue-500/30 group-hover:from-blue-500/30 group-hover:to-purple-500/30 transition-all duration-300">{item.tag}</span>
                                     {item.link !== "#" && (
-                                        <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-slate-500 group-hover:text-white transition-colors p-2 hover:bg-white/10 rounded-full">
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3" /></svg>
+                                        <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-slate-500 group-hover:text-white transition-all duration-300 p-3 hover:bg-white/10 rounded-full hover:scale-110 hover:rotate-12">
+                                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3" />
+                                            </svg>
                                         </a>
                                     )}
                                 </div>
-                                <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors">{item.title}</h3>
-                                <p className="text-slate-400 leading-relaxed mb-6">{item.description}</p>
+                                <h3 className="text-2xl md:text-3xl font-bold text-white mb-4 group-hover:text-blue-400 transition-colors duration-300">{item.title}</h3>
+                                <p className="text-slate-400 leading-relaxed mb-8 text-base md:text-lg">{item.description}</p>
                                 <div className="flex flex-wrap gap-2">
                                     {item.tech.map((t, i) => (
-                                        <span key={i} className="text-[10px] font-bold bg-slate-800/80 border border-slate-700 px-3 py-1 rounded-full text-slate-300 group-hover:border-slate-600 transition-colors">{t}</span>
+                                        <span key={i} className="text-xs font-semibold bg-slate-800/80 border border-slate-700 px-4 py-2 rounded-full text-slate-300 group-hover:border-slate-600 group-hover:bg-slate-800 transition-all duration-300">{t}</span>
                                     ))}
                                 </div>
                             </div>
@@ -251,10 +295,49 @@ const App = () => {
             </section>
 
             {/* Footer */}
-            <footer className="p-10 text-center border-t border-slate-900/50 mt-20 bg-slate-950/30">
-                <p className="text-sm text-slate-600 font-medium tracking-widest uppercase">
-                    © {new Date().getFullYear()} {t.name} • {t.footer}
-                </p>
+            <footer className="relative mt-20 overflow-hidden">
+                {/* Footer Background */}
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/50 to-transparent"></div>
+                
+                <div className="relative border-t border-slate-800/50 backdrop-blur-sm">
+                    {/* Social Links */}
+                    <div className="max-w-6xl mx-auto px-6 pt-16 pb-8">
+                        <div className="flex flex-col items-center gap-8 mb-12">
+                            <h3 className="text-2xl md:text-3xl font-bold text-white">{language === 'tr' ? 'Birlikte Çalışalım' : "Let's Work Together"}</h3>
+                            <div className="flex gap-4">
+                                {CONFIG.social.github && (
+                                    <a href={CONFIG.social.github} target="_blank" rel="noopener noreferrer" 
+                                       className="p-4 bg-slate-900/50 border border-slate-800 rounded-full hover:bg-slate-800 hover:border-slate-700 hover:scale-110 transition-all duration-300 group">
+                                        <svg className="w-6 h-6 text-slate-400 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                                        </svg>
+                                    </a>
+                                )}
+                                {CONFIG.social.linkedin && (
+                                    <a href={CONFIG.social.linkedin} target="_blank" rel="noopener noreferrer"
+                                       className="p-4 bg-slate-900/50 border border-slate-800 rounded-full hover:bg-slate-800 hover:border-slate-700 hover:scale-110 transition-all duration-300 group">
+                                        <svg className="w-6 h-6 text-slate-400 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                                        </svg>
+                                    </a>
+                                )}
+                                <a href={`mailto:${CONFIG.email}`}
+                                   className="p-4 bg-slate-900/50 border border-slate-800 rounded-full hover:bg-slate-800 hover:border-slate-700 hover:scale-110 transition-all duration-300 group">
+                                    <svg className="w-6 h-6 text-slate-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        {/* Copyright */}
+                        <div className="text-center pt-8 border-t border-slate-800/50">
+                            <p className="text-sm text-slate-600 font-medium tracking-wide">
+                                © {new Date().getFullYear()} {t.name} • {t.footer}
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </footer>
         </div>
     );
