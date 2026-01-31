@@ -18,20 +18,20 @@ const App = () => {
     return (
         <div className="min-h-screen flex flex-col">
             {/* Header */}
-            <nav className="p-6 max-w-6xl mx-auto w-full flex justify-between items-center z-10">
-                <div className="font-extrabold text-xl tracking-tighter text-white uppercase hover:scale-105 transition-transform duration-300 cursor-default">
+            <nav className="p-4 md:p-6 max-w-6xl mx-auto w-full flex justify-between items-center z-10">
+                <div className="font-extrabold text-lg md:text-xl tracking-tighter text-white uppercase hover:scale-105 transition-transform duration-300 cursor-default">
                     {CONFIG.name.split(' ')[0]}<span className="text-blue-500">.</span>
                 </div>
-                <div className="flex gap-5 text-sm font-medium">
+                <div className="flex gap-3 md:gap-5 text-xs md:text-sm font-medium flex-wrap justify-end">
                     <a href="#about" className="hover:text-blue-400 transition-colors">Hakkımda</a>
                     <a href="#work" className="hover:text-blue-400 transition-colors">Projeler</a>
                     {CONFIG.social.github && (
-                        <a href={CONFIG.social.github} target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors">GitHub</a>
+                        <a href={CONFIG.social.github} target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors hidden sm:inline">GitHub</a>
                     )}
                     {CONFIG.social.linkedin && (
-                        <a href={CONFIG.social.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors">LinkedIn</a>
+                        <a href={CONFIG.social.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors hidden sm:inline">LinkedIn</a>
                     )}
-                    <a href={`mailto:${CONFIG.email}`} className="bg-blue-600 px-4 py-2 rounded-full text-white hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-600/20 transition-all duration-300">İletişim</a>
+                    <a href={`mailto:${CONFIG.email}`} className="bg-blue-600 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-white hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-600/20 transition-all duration-300">İletişim</a>
                 </div>
             </nav>
 
@@ -62,36 +62,39 @@ const App = () => {
                 </div>
 
                 {/* Tab Navigation */}
-                <div className="flex flex-wrap gap-4 mb-10 justify-center">
+                <div className="flex flex-wrap gap-3 md:gap-4 mb-10 justify-center">
                     <button 
                         onClick={() => setActiveTab('development')}
-                        className={`px-6 py-3 rounded-full font-bold text-sm tracking-wide transition-all duration-300 ${
+                        className={`px-4 md:px-6 py-2 md:py-3 rounded-full font-bold text-xs md:text-sm tracking-wide transition-all duration-300 ${
                             activeTab === 'development' 
                                 ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' 
                                 : 'bg-slate-900/50 text-slate-400 hover:bg-slate-800/80 hover:text-slate-300'
                         }`}
                     >
-                        {CONFIG.about.development.icon} {CONFIG.about.development.title}
+                        <span className="hidden sm:inline">{CONFIG.about.development.icon} </span>
+                        {CONFIG.about.development.title}
                     </button>
                     <button 
                         onClick={() => setActiveTab('art')}
-                        className={`px-6 py-3 rounded-full font-bold text-sm tracking-wide transition-all duration-300 ${
+                        className={`px-4 md:px-6 py-2 md:py-3 rounded-full font-bold text-xs md:text-sm tracking-wide transition-all duration-300 ${
                             activeTab === 'art' 
                                 ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30' 
                                 : 'bg-slate-900/50 text-slate-400 hover:bg-slate-800/80 hover:text-slate-300'
                         }`}
                     >
-                        {CONFIG.about.art.icon} {CONFIG.about.art.title}
+                        <span className="hidden sm:inline">{CONFIG.about.art.icon} </span>
+                        {CONFIG.about.art.title}
                     </button>
                     <button 
                         onClick={() => setActiveTab('animation')}
-                        className={`px-6 py-3 rounded-full font-bold text-sm tracking-wide transition-all duration-300 ${
+                        className={`px-4 md:px-6 py-2 md:py-3 rounded-full font-bold text-xs md:text-sm tracking-wide transition-all duration-300 ${
                             activeTab === 'animation' 
                                 ? 'bg-pink-600 text-white shadow-lg shadow-pink-600/30' 
                                 : 'bg-slate-900/50 text-slate-400 hover:bg-slate-800/80 hover:text-slate-300'
                         }`}
                     >
-                        {CONFIG.about.animation.icon} {CONFIG.about.animation.title}
+                        <span className="hidden sm:inline">{CONFIG.about.animation.icon} </span>
+                        {CONFIG.about.animation.title}
                     </button>
                 </div>
 
