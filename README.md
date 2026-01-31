@@ -1,70 +1,45 @@
+# Hi there, I'm [Zeatrex (Malik3D)] 👋
 
+> **Game Developer & 3D Generalist**  
+> *3 yıllık bağımsız geliştiricilik ve 2 yıllık sektör tecrübesini birleştiren, kod ve sanat arasında köprü kuran çok yönlü geliştirici.*
 
-### Hi there, I'm [Zeatrex(Malik3D)] 👋. 
-
-
-<br/>
-<a href="[https://twitter.com/8bithemant](https://twitter.com/ZeatrexDev)">
-  <img align="left" alt="Zeatrex| Twitter" width="22px" src="https://cdn.jsdelivr.net/npm/simple-icons@v3/icons/twitter.svg" />
-</a>
-<a href="https://www.linkedin.com/in/enesaksuzeatrex/">
-  <img align="left" alt="Linkedin" width="22px" src="https://cdn.jsdelivr.net/npm/simple-icons@v3/icons/linkedin.svg" />
-</a>
-<a href="(https://www.instagram.com/zeatrex.01/)">
-  <img align="left" alt="Instagram" width="22px" src="https://cdn.jsdelivr.net/npm/simple-icons@v3/icons/instagram.svg" />
-</a>
-
-
-<br />
-
-<img align="right" height="270px" width="450px" alt="GIF" src="https://cdn.dribbble.com/users/6620596/screenshots/14792345/a-cat-gif.gif" />
-<br />
-
-### Hi 🙋‍♂️,
-### I'm 23 years old, working 3D Generalist position, from Turkey.
-
-
-#### - 🥀 Learning C#, Blender, Unity and Shader Graphs.
-
-
-
-
-#### - 🔭 Cat Lover, 
-
-#### - 🛸 Into Hight Energy
-
-#### - 💬 Connect? Here 👉🏼[(https://www.instagram.com/zeatrex.01/)]
-
+<div align="center">
+  <a href="https://linkedin.com/in/enesaksuzeatrex/">
+    <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" />
+  </a>
+  <a href="https://github.com/Zeatrex01">
+    <img src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white" alt="Github" />
+  </a>
+  <a href="mailto:enesaksu9999@gmail.com">
+    <img src="https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Email" />
+  </a>
+</div>
 
 <br />
 
+### 🙋‍♂️ About Me
+I'm a 23-year-old developer from Turkey, passionate about High Energy games and 3D Art.
 
-**I am Into , 🙏**
-
-**Game Developer, Game Animator, 3D Artist 😼**
-<br />
-
-
-  ![Enes Aksu Github Stats](https://github-readme-stats.vercel.app/api?username=Zeatrex01&show_icons=true&title_color=fff&icon_color=79ff97&text_color=9f9f9f&bg_color=151515)
+- 🥀 **Learning:** C#, Blender, Unity, and Shader Graphs.
+- 🔭 **Interests:** Game Development, 3D Animation, Technical Art.
+- 🐈 **Personal:** Cat Lover & High Energy Enthusiast.
 
 <br />
 
-*************
+### 🛠 Languages and Tools
+
+<div align="center">
+  <img src="https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=c-sharp&logoColor=white" alt="C#" />
+  <img src="https://img.shields.io/badge/Unity-100000?style=for-the-badge&logo=unity&logoColor=white" alt="Unity" />
+  <img src="https://img.shields.io/badge/Blender-E87D0D?style=for-the-badge&logo=blender&logoColor=white" alt="Blender" />
+  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
+  <img src="https://img.shields.io/badge/VS_Code-007ACC?style=for-the-badge&logo=visual-studio-code&logoColor=white" alt="VS Code" />
+</div>
 
 <br />
 
-### - Languages and Tools...
+### 📊 GitHub Stats
 
-<p align="center">
- <img src="https://raw.githubusercontent.com/8bithemant/8bithemant/master/svg/dev/languages/csharp.svg"alt="Twitter" style="vertical-align:top; margin:4px"><img src="https://raw.githubusercontent.com/8bithemant/8bithemant/master/svg/dev/languages/python.svg" alt="Twitter" style="vertical-align:top; margin:4px"><img src="https://raw.githubusercontent.com/8bithemant/8bithemant/master/svg/dev/misc/chrome.svg" alt="Twitter" style="vertical-align:top; margin:4px"><img src="https://raw.githubusercontent.com/8bithemant/8bithemant/master/svg/dev/tools/visualstudio_code.svg" alt="Twitter" style="vertical-align:top; margin:4px">
-
-</p>
-
-
-***********************************
-
-#### Thank You-🙏🏼
-
-
-
-⭐️ From [Zeatrex01](https://github.com/Zeatrex01)
+<div align="center">
+  <img src="https://github-readme-stats.vercel.app/api?username=Zeatrex01&show_icons=true&title_color=fff&icon_color=60a5fa&text_color=94a3b8&bg_color=0f172a&hide_border=true" alt="Github Stats" />
+</div>
