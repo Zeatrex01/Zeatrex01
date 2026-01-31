@@ -6,356 +6,210 @@ const CONFIG = {
     languages: {
         tr: {
             name: "Enes Aksu",
-            role: "Oyun Geliştirici & 3D Sanatçı",
-            bio: "3 yıllık bağımsız geliştiricilik ve 2 yıllık sektör tecrübesini birleştiren, kod ve sanat arasında köprü kuran çok yönlü geliştirici.",
+            role: "Oyun geliştiriyor ve 3D üretim yapıyor",
+            bio: "Unity tabanlı mobil ve PC oyunları. Yayınlanmış yapımlar, 3D asset pipeline ve animasyon entegrasyonu.",
             
             // Navigation
             nav: {
-                about: "Hakkımda",
-                education: "Eğitim",
+                about: "Yaklaşım",
                 projects: "Projeler",
                 contact: "İletişim"
             },
             
-            // Education Section
-            education: {
-                title: "Eğitim",
-                degree: "Önlisans",
-                field: "Bilgisayar Destekli Tasarım ve Animasyon",
-                university: "İstanbul Gelişim Üniversitesi",
-                year: "Mezun",
-                description: "Oyun geliştirme, 3D modelleme ve animasyon alanlarında kapsamlı eğitim aldım. Teknik yeteneklerimi sanatsal yaratıcılıkla birleştirmeyi öğrendim."
-            },
-            
-            // About Sections
+            // About Section - Technical Approach
             about: {
-                title: "Hakkımda",
-                experienceLabel: "deneyim",
-                highlightsTitle: "Öne Çıkanlar",
-                development: {
-                    title: "Game Development",
-                    icon: "💻",
-                    description: "Oyun geliştirme süreçlerinde Unity Engine ile profesyonel çözümler üretiyorum. Hem mobil hem de PC platformlarında yayınlanmış projelerde yer aldım.",
-                    skills: [
-                        {
-                            name: "Unity Engine",
-                            level: "İleri",
-                            experience: "3+ yıl",
-                            description: "Mobil ve PC oyun geliştirme, optimizasyon, performans iyileştirme"
-                        },
-                        {
-                            name: "C# Programming",
-                            level: "İleri",
-                            experience: "3+ yıl",
-                            description: "Game logic, gameplay mechanics, design patterns, scriptable objects"
-                        },
-                        {
-                            name: "Mobile Optimization",
-                            level: "İleri",
-                            experience: "2+ yıl",
-                            description: "Android/iOS optimizasyonu, memory management, frame rate optimization"
-                        },
-                        {
-                            name: "Game Design",
-                            level: "Orta",
-                            experience: "3+ yıl",
-                            description: "Level design, gameplay balancing, user experience design"
-                        }
-                    ],
-                    highlights: [
-                        "Steam'de yayınlanmış oyun projesi (OneKind)",
-                        "3+ mobil oyun yayını (Google Play Store)",
-                        "2 yıl profesyonel sektör tecrübesi",
-                        "Indie ve ticari proje deneyimi"
-                    ]
-                },
-                art: {
-                    title: "3D Art & Modeling",
-                    icon: "🎨",
-                    description: "Blender ile karakter modelleme, environment art ve asset creation konularında uzmanım. Oyun ve animasyon projeleri için optimize edilmiş 3D içerikler üretiyorum.",
-                    skills: [
-                        {
-                            name: "Blender",
-                            level: "İleri",
-                            experience: "3+ yıl",
-                            description: "3D modeling, UV unwrapping, texturing, lighting"
-                        },
-                        {
-                            name: "Character Modeling",
-                            level: "İleri",
-                            experience: "2+ yıl",
-                            description: "Low-poly ve mid-poly karakter modelleme, topology optimization"
-                        },
-                        {
-                            name: "Environment Art",
-                            level: "Orta-İleri",
-                            experience: "2+ yıl",
-                            description: "Environment design, prop modeling, scene composition"
-                        },
-                        {
-                            name: "Texturing & Materials",
-                            level: "Orta-İleri",
-                            experience: "2+ yıl",
-                            description: "PBR texturing, material creation, shader basics"
-                        }
-                    ],
-                    highlights: [
-                        "OneKind projesi için tüm 3D asset'lerin üretimi",
-                        "Oyun-ready optimizasyon bilgisi",
-                        "Unity entegrasyonu deneyimi",
-                        "Stylized ve realistic art styles"
-                    ]
-                },
-                animation: {
-                    title: "3D Animation",
-                    icon: "🎬",
-                    description: "Karakter animasyonu ve teknik animasyon alanında çalışıyorum. Oyun içi animasyonlardan cinematic cutscene'lere kadar geniş bir yelpazede deneyimim var.",
-                    skills: [
-                        {
-                            name: "Character Animation",
-                            level: "İleri",
-                            experience: "2+ yıl",
-                            description: "Walk cycles, run cycles, combat animations, idle states"
-                        },
-                        {
-                            name: "Rigging",
-                            level: "Orta-İleri",
-                            experience: "2+ yıl",
-                            description: "Character rigging, IK/FK setup, weight painting"
-                        },
-                        {
-                            name: "Unity Animation",
-                            level: "İleri",
-                            experience: "2+ yıl",
-                            description: "Animation controller, blend trees, state machines"
-                        },
-                        {
-                            name: "Motion Design",
-                            level: "Orta",
-                            experience: "2+ yıl",
-                            description: "Cinematic camera work, timing, animation principles"
-                        }
-                    ],
-                    highlights: [
-                        "Medical XR Lab'da medikal animasyonlar",
-                        "OneKind için karakter ve cutscene animasyonları",
-                        "Game-ready animation pipeline deneyimi",
-                        "Performans optimizasyonu bilgisi"
-                    ]
+                title: "Yaklaşım",
+                sections: [
+                    {
+                        title: "Teknik Rol",
+                        content: "Unity-based oyun geliştirme ve 3D asset production. Mobil ve PC platformları için shipped products."
+                    },
+                    {
+                        title: "Odak",
+                        content: "Gameplay programming, 3D modeling/animation pipeline, Unity entegrasyonu. Optimizasyon ve performance-first approach."
+                    },
+                    {
+                        title: "Çalışma",
+                        content: "Problem → teknik çözüm → iteration. Asset pipeline kurulumu, kod ve art integration, shipping."
+                    }
+                ],
+                stack: {
+                    title: "Araçlar",
+                    items: ["Unity", "C#", "Blender", "Git"]
                 }
             },
             
             // Projects Section
             projectsTitle: "Projeler",
+            filterAll: "Hepsi",
+            filterByTech: "Teknoloji",
+            filterByType: "Tip",
             projects: [
                 {
+                    title: "Snack Stack",
+                    type: "Mobile Game",
+                    platform: "Google Play",
+                    technologies: ["Unity", "C#", "Mobile"],
+                    image: "🎮",
+                    problem: "Hyper-casual market için yüksek performanslı, düşük boyutlu mobil oyun gerekiyordu",
+                    solution: "Unity ile optimize edilmiş gameplay loop, modüler sistem mimarisi, asset pooling ve memory management",
+                    contribution: "Gameplay programlama, optimizasyon, mobil build pipeline",
+                    result: "Google Play'de yayınlandı, stable 60 FPS performans",
+                    link: "https://play.google.com/store/apps/details?id=com.MiyaviGames.SnackStack",
+                    year: "2025"
+                },
+                {
                     title: "OneKind",
-                    tag: "PC / Steam",
-                    description: "3D Generalist ve Animasyon süreçlerinin tamamını yönettiğim, Steam üzerinden yayınlanan bağımsız PC projesi.",
-                    tech: ["Unity", "Blender", "Steam"],
-                    link: "https://store.steampowered.com/app/2978220/OneKind/"
+                    type: "PC Game",
+                    platform: "Steam",
+                    technologies: ["Unity", "Blender", "3D", "Animation"],
+                    image: "🎨",
+                    problem: "Steam için tam kapsamlı 3D oyun - modelleme, animasyon ve Unity entegrasyonu gerekiyordu",
+                    solution: "Blender'da low-poly karakter ve environment modeling, rigging, animasyon, Unity'de asset pipeline kurulumu",
+                    contribution: "3D Generalist - tüm modelleme, rigging, animasyon ve Unity entegrasyon süreçleri",
+                    result: "Steam'de yayınlandı, tam fonksiyonel 3D asset pipeline",
+                    link: "https://store.steampowered.com/app/2978220/OneKind/",
+                    year: "2024"
                 },
                 {
-                    title: "Basrinin Evi",
-                    tag: "Mobile",
-                    description: "Mobil platformlar için geliştirilmiş bir hybrid korku oyunu.",
-                    tech: ["Unity Mobile", "Optimization", "C#"],
-                    link: "https://play.google.com/store/apps/details?id=com.MiyaviGames.Basridenkacis&hl=tr"
-                },
-                {
-                    title: "SnackStack",
-                    tag: "Mobile",
-                    description: "Mobil platformlar için optimize edilmiş, yüksek performanslı hyper-casual oyun projesi.",
-                    tech: ["Unity Mobile", "Optimization", "C#"],
-                    link: "https://play.google.com/store/apps/details?id=com.MiyaviGames.SnackStack"
+                    title: "Basri'nin Evi",
+                    type: "Mobile Game",
+                    platform: "Google Play",
+                    technologies: ["Unity", "C#", "Mobile"],
+                    image: "🏚️",
+                    problem: "Mobil platformda atmosferik korku deneyimi - performans ve dosya boyutu kısıtları",
+                    solution: "Optimized asset usage, efficient lighting, compressed textures, modular level design",
+                    contribution: "Unity geliştirme, mobil optimizasyon, gameplay mechanics",
+                    result: "Google Play'de yayınlandı, hedef cihazlarda stabil performans",
+                    link: "https://play.google.com/store/apps/details?id=com.MiyaviGames.Basridenkacis",
+                    year: "2024"
                 },
                 {
                     title: "Medical XR Lab",
-                    tag: "AR-GE / Research",
-                    description: "İstinye Üniversitesi XR Lab kapsamında medikal simülasyonların 3D animasyon ve teknik sanat süreçleri.",
-                    tech: ["AR/VR", "3D Animation", "Technical Art"],
-                    link: "#"
+                    type: "R&D Project",
+                    platform: "XR/VR",
+                    technologies: ["3D Animation", "Technical Art", "XR"],
+                    image: "🔬",
+                    problem: "Medical simülasyonlar için anatomik doğrulukta 3D animasyon ve asset hazırlığı",
+                    solution: "Teknik animasyon, XR-optimized asset creation, real-time rendering pipeline",
+                    contribution: "3D animasyon üretimi, asset preparation, team pipeline integration",
+                    result: "İstinye Üniversitesi XR Lab projeleri için production-ready animasyonlar",
+                    link: "#",
+                    year: "2025"
                 }
             ],
             
-            footer: "Built for Industry"
+            contact: {
+                title: "İletişim",
+                available: "Proje ve iş birliği için",
+                email: "E-posta"
+            },
+            
+            footer: "Enes Aksu — Game Development"
         },
         
         en: {
             name: "Enes Aksu",
-            role: "Game Developer & 3D Artist",
-            bio: "Versatile developer bridging code and art, combining 3 years of independent development with 2 years of industry experience.",
+            role: "Develops games and produces 3D content",
+            bio: "Unity-based mobile and PC games. Shipped products, 3D asset pipeline, and animation integration.",
             
             // Navigation
             nav: {
-                about: "About",
-                education: "Education",
+                about: "Approach",
                 projects: "Projects",
                 contact: "Contact"
             },
             
-            // Education Section
-            education: {
-                title: "Education",
-                degree: "Associate Degree",
-                field: "Computer-Aided Design and Animation",
-                university: "Istanbul Gelisim University",
-                year: "Graduate",
-                description: "Received comprehensive training in game development, 3D modeling, and animation. Learned to combine technical skills with artistic creativity."
-            },
-            
-            // About Sections
+            // About Section - Technical Approach
             about: {
-                title: "About Me",
-                experienceLabel: "experience",
-                highlightsTitle: "Highlights",
-                development: {
-                    title: "Game Development",
-                    icon: "💻",
-                    description: "I create professional solutions with Unity Engine in game development processes. I have been involved in projects published on both mobile and PC platforms.",
-                    skills: [
-                        {
-                            name: "Unity Engine",
-                            level: "Advanced",
-                            experience: "3+ years",
-                            description: "Mobile and PC game development, optimization, performance improvement"
-                        },
-                        {
-                            name: "C# Programming",
-                            level: "Advanced",
-                            experience: "3+ years",
-                            description: "Game logic, gameplay mechanics, design patterns, scriptable objects"
-                        },
-                        {
-                            name: "Mobile Optimization",
-                            level: "Advanced",
-                            experience: "2+ years",
-                            description: "Android/iOS optimization, memory management, frame rate optimization"
-                        },
-                        {
-                            name: "Game Design",
-                            level: "Intermediate",
-                            experience: "3+ years",
-                            description: "Level design, gameplay balancing, user experience design"
-                        }
-                    ],
-                    highlights: [
-                        "Published game project on Steam (OneKind)",
-                        "3+ mobile game releases (Google Play Store)",
-                        "2 years of professional industry experience",
-                        "Indie and commercial project experience"
-                    ]
-                },
-                art: {
-                    title: "3D Art & Modeling",
-                    icon: "🎨",
-                    description: "I specialize in character modeling, environment art, and asset creation with Blender. I produce optimized 3D content for game and animation projects.",
-                    skills: [
-                        {
-                            name: "Blender",
-                            level: "Advanced",
-                            experience: "3+ years",
-                            description: "3D modeling, UV unwrapping, texturing, lighting"
-                        },
-                        {
-                            name: "Character Modeling",
-                            level: "Advanced",
-                            experience: "2+ years",
-                            description: "Low-poly and mid-poly character modeling, topology optimization"
-                        },
-                        {
-                            name: "Environment Art",
-                            level: "Intermediate-Advanced",
-                            experience: "2+ years",
-                            description: "Environment design, prop modeling, scene composition"
-                        },
-                        {
-                            name: "Texturing & Materials",
-                            level: "Intermediate-Advanced",
-                            experience: "2+ years",
-                            description: "PBR texturing, material creation, shader basics"
-                        }
-                    ],
-                    highlights: [
-                        "Production of all 3D assets for OneKind project",
-                        "Game-ready optimization knowledge",
-                        "Unity integration experience",
-                        "Stylized and realistic art styles"
-                    ]
-                },
-                animation: {
-                    title: "3D Animation",
-                    icon: "🎬",
-                    description: "I work in character animation and technical animation. I have experience in a wide range from in-game animations to cinematic cutscenes.",
-                    skills: [
-                        {
-                            name: "Character Animation",
-                            level: "Advanced",
-                            experience: "2+ years",
-                            description: "Walk cycles, run cycles, combat animations, idle states"
-                        },
-                        {
-                            name: "Rigging",
-                            level: "Intermediate-Advanced",
-                            experience: "2+ years",
-                            description: "Character rigging, IK/FK setup, weight painting"
-                        },
-                        {
-                            name: "Unity Animation",
-                            level: "Advanced",
-                            experience: "2+ years",
-                            description: "Animation controller, blend trees, state machines"
-                        },
-                        {
-                            name: "Motion Design",
-                            level: "Intermediate",
-                            experience: "2+ years",
-                            description: "Cinematic camera work, timing, animation principles"
-                        }
-                    ],
-                    highlights: [
-                        "Medical animations at Medical XR Lab",
-                        "Character and cutscene animations for OneKind",
-                        "Game-ready animation pipeline experience",
-                        "Performance optimization knowledge"
-                    ]
+                title: "Approach",
+                sections: [
+                    {
+                        title: "Technical Role",
+                        content: "Unity-based game development and 3D asset production. Shipped products for mobile and PC platforms."
+                    },
+                    {
+                        title: "Focus",
+                        content: "Gameplay programming, 3D modeling/animation pipeline, Unity integration. Optimization and performance-first approach."
+                    },
+                    {
+                        title: "Working Style",
+                        content: "Problem → technical solution → iteration. Asset pipeline setup, code and art integration, shipping."
+                    }
+                ],
+                stack: {
+                    title: "Tools",
+                    items: ["Unity", "C#", "Blender", "Git"]
                 }
             },
             
             // Projects Section
             projectsTitle: "Projects",
+            filterAll: "All",
+            filterByTech: "Technology",
+            filterByType: "Type",
             projects: [
                 {
+                    title: "Snack Stack",
+                    type: "Mobile Game",
+                    platform: "Google Play",
+                    technologies: ["Unity", "C#", "Mobile"],
+                    image: "🎮",
+                    problem: "High-performance, low-size mobile game needed for hyper-casual market",
+                    solution: "Optimized gameplay loop with Unity, modular system architecture, asset pooling and memory management",
+                    contribution: "Gameplay programming, optimization, mobile build pipeline",
+                    result: "Published on Google Play, stable 60 FPS performance",
+                    link: "https://play.google.com/store/apps/details?id=com.MiyaviGames.SnackStack",
+                    year: "2025"
+                },
+                {
                     title: "OneKind",
-                    tag: "PC / Steam",
-                    description: "Independent PC project published on Steam, where I managed all 3D Generalist and Animation processes.",
-                    tech: ["Unity", "Blender", "Steam"],
-                    link: "https://store.steampowered.com/app/2978220/OneKind/"
+                    type: "PC Game",
+                    platform: "Steam",
+                    technologies: ["Unity", "Blender", "3D", "Animation"],
+                    image: "🎨",
+                    problem: "Full-scope 3D game for Steam - modeling, animation and Unity integration needed",
+                    solution: "Low-poly character and environment modeling in Blender, rigging, animation, Unity asset pipeline setup",
+                    contribution: "3D Generalist - all modeling, rigging, animation and Unity integration processes",
+                    result: "Published on Steam, fully functional 3D asset pipeline",
+                    link: "https://store.steampowered.com/app/2978220/OneKind/",
+                    year: "2024"
                 },
                 {
-                    title: "Basrinin Evi",
-                    tag: "Mobile",
-                    description: "A hybrid horror game developed for mobile platforms.",
-                    tech: ["Unity Mobile", "Optimization", "C#"],
-                    link: "https://play.google.com/store/apps/details?id=com.MiyaviGames.Basridenkacis&hl=tr"
-                },
-                {
-                    title: "SnackStack",
-                    tag: "Mobile",
-                    description: "High-performance hyper-casual game project optimized for mobile platforms.",
-                    tech: ["Unity Mobile", "Optimization", "C#"],
-                    link: "https://play.google.com/store/apps/details?id=com.MiyaviGames.SnackStack"
+                    title: "Basri'nin Evi",
+                    type: "Mobile Game",
+                    platform: "Google Play",
+                    technologies: ["Unity", "C#", "Mobile"],
+                    image: "🏚️",
+                    problem: "Atmospheric horror experience on mobile - performance and file size constraints",
+                    solution: "Optimized asset usage, efficient lighting, compressed textures, modular level design",
+                    contribution: "Unity development, mobile optimization, gameplay mechanics",
+                    result: "Published on Google Play, stable performance on target devices",
+                    link: "https://play.google.com/store/apps/details?id=com.MiyaviGames.Basridenkacis",
+                    year: "2024"
                 },
                 {
                     title: "Medical XR Lab",
-                    tag: "R&D / Research",
-                    description: "3D animation and technical art processes for medical simulations within Istinye University XR Lab.",
-                    tech: ["AR/VR", "3D Animation", "Technical Art"],
-                    link: "#"
+                    type: "R&D Project",
+                    platform: "XR/VR",
+                    technologies: ["3D Animation", "Technical Art", "XR"],
+                    image: "🔬",
+                    problem: "Anatomically accurate 3D animation and asset preparation for medical simulations",
+                    solution: "Technical animation, XR-optimized asset creation, real-time rendering pipeline",
+                    contribution: "3D animation production, asset preparation, team pipeline integration",
+                    result: "Production-ready animations for Istinye University XR Lab projects",
+                    link: "#",
+                    year: "2025"
                 }
             ],
             
-            footer: "Built for Industry"
+            contact: {
+                title: "Contact",
+                available: "For projects and collaboration",
+                email: "Email"
+            },
+            
+            footer: "Enes Aksu — Game Development"
         }
     },
     
