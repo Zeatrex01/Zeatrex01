@@ -159,7 +159,7 @@ const App = () => {
                                             <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition-colors">{skill.name}</h3>
                                             <span className="text-xs font-bold bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full">{skill.level}</span>
                                         </div>
-                                        <p className="text-sm text-slate-500 mb-3">{skill.experience} {language === 'tr' ? 'deneyim' : 'experience'}</p>
+                                        <p className="text-sm text-slate-500 mb-3">{skill.experience} {t.about.experienceLabel}</p>
                                         <p className="text-slate-400 leading-relaxed text-sm">{skill.description}</p>
                                     </div>
                                 ))}
@@ -169,7 +169,7 @@ const App = () => {
                             <div className="bg-gradient-to-br from-slate-900/50 to-slate-900/30 border border-slate-800 p-8 rounded-3xl">
                                 <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
                                     <span className="text-2xl">✨</span>
-                                    {language === 'tr' ? 'Öne Çıkanlar' : 'Highlights'}
+                                    {t.about.highlightsTitle}
                                 </h3>
                                 <ul className="space-y-3">
                                     {section.highlights.map((highlight, idx) => (

@@ -30,6 +30,8 @@ const CONFIG = {
             // About Sections
             about: {
                 title: "Hakkımda",
+                experienceLabel: "deneyim",
+                highlightsTitle: "Öne Çıkanlar",
                 development: {
                     title: "Game Development",
                     icon: "💻",
@@ -205,6 +207,8 @@ const CONFIG = {
             // About Sections
             about: {
                 title: "About Me",
+                experienceLabel: "experience",
+                highlightsTitle: "Highlights",
                 development: {
                     title: "Game Development",
                     icon: "💻",
@@ -345,7 +349,7 @@ const CONFIG = {
                 {
                     title: "Medical XR Lab",
                     tag: "R&D / Research",
-                    description: "3D animation and technical art processes for medical simulations within Istanbul University XR Lab.",
+                    description: "3D animation and technical art processes for medical simulations within Istinye University XR Lab.",
                     tech: ["AR/VR", "3D Animation", "Technical Art"],
                     link: "#"
                 }
