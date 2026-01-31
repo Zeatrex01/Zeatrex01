@@ -124,7 +124,7 @@ const App = () => {
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                             <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
                         </span>
-                        <span className="text-sm font-semibold text-blue-300">{language === 'tr' ? 'Profesyonel Portfolio' : 'Professional Portfolio'}</span>
+                        <span className="text-sm font-semibold text-blue-300">{language === 'tr' ? 'Portfolio' : 'Portfolio'}</span>
                     </div>
                     
                     <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white mb-8 tracking-tight leading-tight">
