@@ -103,15 +103,44 @@ const App = () => {
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-600/20 rounded-full blur-[150px] animate-pulse -z-10"></div>
                 <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-purple-600/10 rounded-full blur-[100px] animate-float -z-10"></div>
                 <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-pink-600/10 rounded-full blur-[100px] animate-float -z-10" style={{ animationDelay: '3s' }}></div>
+                
+                {/* Animated Grid Background */}
+                <div className="absolute inset-0 -z-20 opacity-20">
+                    <div className="absolute inset-0 bg-gradient-to-br from-transparent via-blue-500/5 to-purple-500/5"></div>
+                    <div className="absolute inset-0" style={{
+                        backgroundImage: `
+                            linear-gradient(90deg, rgba(96, 165, 250, 0.05) 1px, transparent 1px),
+                            linear-gradient(rgba(96, 165, 250, 0.05) 1px, transparent 1px)
+                        `,
+                        backgroundSize: '50px 50px'
+                    }}></div>
+                </div>
 
                 {/* Main Content */}
                 <div className="text-reveal max-w-5xl">
+                    {/* Animated Badge */}
+                    <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/30 px-6 py-3 rounded-full mb-8 backdrop-blur-sm animate-fade-in-up">
+                        <span className="relative flex h-3 w-3">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+                        </span>
+                        <span className="text-sm font-semibold text-blue-300">{language === 'tr' ? 'Profesyonel Portfolio' : 'Professional Portfolio'}</span>
+                    </div>
+                    
                     <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white mb-8 tracking-tight leading-tight">
                         <span className="gradient-text block mb-2">{t.role}</span>
                     </h1>
                     <p className="max-w-3xl mx-auto text-base md:text-xl lg:text-2xl text-slate-400 leading-relaxed mb-10">
                         {t.bio}
                     </p>
+                    
+                    {/* Skill Pills */}
+                    <div className="flex flex-wrap gap-3 justify-center mb-10 max-w-3xl mx-auto">
+                        <span className="px-5 py-2 bg-cyan-500/10 border border-cyan-500/30 rounded-full text-cyan-300 text-sm font-semibold hover:bg-cyan-500/20 transition-all cursor-default backdrop-blur-sm">Unity</span>
+                        <span className="px-5 py-2 bg-purple-500/10 border border-purple-500/30 rounded-full text-purple-300 text-sm font-semibold hover:bg-purple-500/20 transition-all cursor-default backdrop-blur-sm">Blender</span>
+                        <span className="px-5 py-2 bg-pink-500/10 border border-pink-500/30 rounded-full text-pink-300 text-sm font-semibold hover:bg-pink-500/20 transition-all cursor-default backdrop-blur-sm">C#</span>
+                        <span className="px-5 py-2 bg-blue-500/10 border border-blue-500/30 rounded-full text-blue-300 text-sm font-semibold hover:bg-blue-500/20 transition-all cursor-default backdrop-blur-sm">3D Animation</span>
+                    </div>
                     
                     {/* CTA Buttons */}
                     <div className="flex flex-wrap gap-4 justify-center items-center mt-8">
@@ -185,37 +214,112 @@ const App = () => {
                     const section = t.about[key];
                     if (activeTab !== key) return null;
                     
+                    // Theme-specific classes and effects
+                    const themeClass = key === 'development' ? 'theme-development' : 
+                                     key === 'art' ? 'theme-3d' : 
+                                     'theme-animation';
+                    
+                    const skillCardClass = key === 'development' ? 'hover:text-cyan-400' : 
+                                          key === 'art' ? 'hover:text-purple-400' : 
+                                          'hover:text-pink-400';
+                    
+                    const badgeColors = key === 'development' ? 'from-cyan-500/20 to-blue-500/20 text-cyan-400 border-cyan-500/30' : 
+                                       key === 'art' ? 'from-purple-500/20 to-pink-500/20 text-purple-400 border-purple-500/30' : 
+                                       'from-pink-500/20 to-orange-500/20 text-pink-400 border-pink-500/30';
+                    
+                    const highlightColor = key === 'development' ? 'text-cyan-500' : 
+                                          key === 'art' ? 'text-purple-500' : 
+                                          'text-pink-500';
+                    
                     return (
                         <div key={key} className="animate-fade-in-up">
                             {/* Description */}
-                            <div className="bg-gradient-to-br from-slate-900/50 to-slate-900/30 border border-slate-800 p-8 md:p-10 rounded-3xl mb-10 hover:border-slate-700 transition-all duration-300 glow-effect">
-                                <p className="text-lg md:text-xl text-slate-300 leading-relaxed">{section.description}</p>
+                            <div className={`${themeClass} p-8 md:p-10 rounded-3xl mb-10 hover:scale-[1.01] transition-all duration-500 relative overflow-hidden`}>
+                                {/* Theme-specific effects */}
+                                {key === 'development' && (
+                                    <div className="matrix-effect">
+                                        {[...Array(8)].map((_, i) => (
+                                            <div 
+                                                key={i} 
+                                                className="matrix-line" 
+                                                style={{
+                                                    left: `${i * 12.5}%`,
+                                                    animationDuration: `${3 + Math.random() * 2}s`,
+                                                    animationDelay: `${Math.random() * 2}s`
+                                                }}
+                                            >
+                                                {Array.from({ length: 20 }, () => String.fromCharCode(33 + Math.floor(Math.random() * 94))).join('')}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                                {key === 'art' && (
+                                    <div className="absolute inset-0 pointer-events-none">
+                                        <div className="absolute top-0 left-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl animate-float"></div>
+                                        <div className="absolute bottom-0 right-0 w-40 h-40 bg-pink-500/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
+                                    </div>
+                                )}
+                                {key === 'animation' && (
+                                    <>
+                                        <div className="wave-background"></div>
+                                        <div className="liquid-blob" style={{ top: '10%', left: '10%', width: '100px', height: '100px' }}></div>
+                                        <div className="liquid-blob" style={{ bottom: '10%', right: '10%', width: '120px', height: '120px', animationDelay: '2s' }}></div>
+                                    </>
+                                )}
+                                
+                                <p className="text-lg md:text-xl text-slate-300 leading-relaxed relative z-10">{section.description}</p>
                             </div>
 
                             {/* Skills Grid */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-10">
                                 {section.skills.map((skill, idx) => (
-                                    <div key={idx} className="professional-card bg-slate-900/50 border border-slate-800 p-6 md:p-8 rounded-3xl group">
-                                        <div className="flex justify-between items-start mb-4">
-                                            <h3 className="text-xl md:text-2xl font-bold text-white group-hover:text-blue-400 transition-colors">{skill.name}</h3>
-                                            <span className="text-xs font-bold bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-400 px-4 py-2 rounded-full border border-blue-500/30">{skill.level}</span>
+                                    <div 
+                                        key={idx} 
+                                        className={`professional-card bg-slate-900/50 border border-slate-800 p-6 md:p-8 rounded-3xl group relative overflow-hidden ${
+                                            key === 'art' ? 'perspective-card card-3d' : ''
+                                        } ${
+                                            key === 'animation' ? 'ripple-effect' : ''
+                                        }`}
+                                    >
+                                        {/* Skill card theme effects */}
+                                        {key === 'development' && (
+                                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                        )}
+                                        {key === 'art' && (
+                                            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                        )}
+                                        
+                                        <div className="flex justify-between items-start mb-4 relative z-10">
+                                            <h3 className={`text-xl md:text-2xl font-bold text-white ${skillCardClass} transition-colors`}>{skill.name}</h3>
+                                            <span className={`text-xs font-bold bg-gradient-to-r ${badgeColors} px-4 py-2 rounded-full border`}>{skill.level}</span>
                                         </div>
-                                        <p className="text-sm text-slate-500 mb-4 font-semibold">{skill.experience} {t.about.experienceLabel}</p>
-                                        <p className="text-slate-400 leading-relaxed">{skill.description}</p>
+                                        <p className="text-sm text-slate-500 mb-4 font-semibold relative z-10">{skill.experience} {t.about.experienceLabel}</p>
+                                        <p className="text-slate-400 leading-relaxed relative z-10">{skill.description}</p>
                                     </div>
                                 ))}
                             </div>
 
                             {/* Highlights */}
-                            <div className="bg-gradient-to-br from-slate-900/70 to-slate-900/40 border border-slate-800 p-8 md:p-10 rounded-3xl hover:border-slate-700 transition-all duration-300 glow-effect">
-                                <h3 className="text-2xl md:text-3xl font-bold text-white mb-8 flex items-center gap-3">
+                            <div className={`${themeClass} p-8 md:p-10 rounded-3xl hover:scale-[1.01] transition-all duration-500 relative overflow-hidden`}>
+                                {/* Theme-specific effects for highlights */}
+                                {key === 'development' && (
+                                    <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl"></div>
+                                )}
+                                {key === 'art' && (
+                                    <div className="absolute -top-20 -right-20 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl animate-float"></div>
+                                )}
+                                {key === 'animation' && (
+                                    <div className="wave-background"></div>
+                                )}
+                                
+                                <h3 className="text-2xl md:text-3xl font-bold text-white mb-8 flex items-center gap-3 relative z-10">
                                     <span className="text-3xl md:text-4xl">✨</span>
                                     {t.about.highlightsTitle}
                                 </h3>
-                                <ul className="space-y-4">
+                                <ul className="space-y-4 relative z-10">
                                     {section.highlights.map((highlight, idx) => (
                                         <li key={idx} className="flex items-start gap-4 text-slate-300 text-base md:text-lg group">
-                                            <span className="text-blue-500 mt-1 text-xl group-hover:scale-125 transition-transform">▸</span>
+                                            <span className={`${highlightColor} mt-1 text-xl group-hover:scale-125 transition-transform`}>▸</span>
                                             <span className="leading-relaxed">{highlight}</span>
                                         </li>
                                     ))}
