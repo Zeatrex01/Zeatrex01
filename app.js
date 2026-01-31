@@ -3,6 +3,8 @@
 // =========================================================
 
 const App = () => {
+    const [activeTab, setActiveTab] = React.useState('development');
+    
     // Veri güvenliği kontrolü
     if (typeof CONFIG === 'undefined') {
         return (
@@ -21,6 +23,7 @@ const App = () => {
                     {CONFIG.name.split(' ')[0]}<span className="text-blue-500">.</span>
                 </div>
                 <div className="flex gap-5 text-sm font-medium">
+                    <a href="#about" className="hover:text-blue-400 transition-colors">Hakkımda</a>
                     <a href="#work" className="hover:text-blue-400 transition-colors">Projeler</a>
                     {CONFIG.social.github && (
                         <a href={CONFIG.social.github} target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors">GitHub</a>
@@ -45,9 +48,97 @@ const App = () => {
                 </p>
 
                 {/* Scroll Indicator */}
-                <a href="#work" className="absolute bottom-10 animate-bounce text-slate-600 hover:text-slate-400 transition-colors" aria-label="Projelere git">
+                <a href="#about" className="absolute bottom-10 animate-bounce text-slate-600 hover:text-slate-400 transition-colors" aria-label="Hakkımda bölümüne git">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 13l5 5 5-5M7 6l5 5 5-5" /></svg>
                 </a>
+            </section>
+
+            {/* About Section - Tabbed Interface */}
+            <section className="max-w-6xl mx-auto w-full px-6 py-20" id="about">
+                <div className="flex items-center gap-4 mb-10">
+                    <div className="h-px bg-slate-800 flex-1"></div>
+                    <h2 className="text-slate-500 text-sm font-bold tracking-widest uppercase">Hakkımda</h2>
+                    <div className="h-px bg-slate-800 flex-1"></div>
+                </div>
+
+                {/* Tab Navigation */}
+                <div className="flex flex-wrap gap-4 mb-10 justify-center">
+                    <button 
+                        onClick={() => setActiveTab('development')}
+                        className={`px-6 py-3 rounded-full font-bold text-sm tracking-wide transition-all duration-300 ${
+                            activeTab === 'development' 
+                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' 
+                                : 'bg-slate-900/50 text-slate-400 hover:bg-slate-800/80 hover:text-slate-300'
+                        }`}
+                    >
+                        {CONFIG.about.development.icon} {CONFIG.about.development.title}
+                    </button>
+                    <button 
+                        onClick={() => setActiveTab('art')}
+                        className={`px-6 py-3 rounded-full font-bold text-sm tracking-wide transition-all duration-300 ${
+                            activeTab === 'art' 
+                                ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30' 
+                                : 'bg-slate-900/50 text-slate-400 hover:bg-slate-800/80 hover:text-slate-300'
+                        }`}
+                    >
+                        {CONFIG.about.art.icon} {CONFIG.about.art.title}
+                    </button>
+                    <button 
+                        onClick={() => setActiveTab('animation')}
+                        className={`px-6 py-3 rounded-full font-bold text-sm tracking-wide transition-all duration-300 ${
+                            activeTab === 'animation' 
+                                ? 'bg-pink-600 text-white shadow-lg shadow-pink-600/30' 
+                                : 'bg-slate-900/50 text-slate-400 hover:bg-slate-800/80 hover:text-slate-300'
+                        }`}
+                    >
+                        {CONFIG.about.animation.icon} {CONFIG.about.animation.title}
+                    </button>
+                </div>
+
+                {/* Tab Content */}
+                {Object.keys(CONFIG.about).map((key) => {
+                    const section = CONFIG.about[key];
+                    if (activeTab !== key) return null;
+                    
+                    return (
+                        <div key={key} className="animate-fade-in-up">
+                            {/* Description */}
+                            <div className="bg-slate-900/30 border border-slate-800 p-8 rounded-3xl mb-8">
+                                <p className="text-lg text-slate-300 leading-relaxed">{section.description}</p>
+                            </div>
+
+                            {/* Skills Grid */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                                {section.skills.map((skill, idx) => (
+                                    <div key={idx} className="bg-slate-900/50 border border-slate-800 p-6 rounded-2xl hover:border-slate-700 transition-all duration-300 group">
+                                        <div className="flex justify-between items-start mb-3">
+                                            <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition-colors">{skill.name}</h3>
+                                            <span className="text-xs font-bold bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full">{skill.level}</span>
+                                        </div>
+                                        <p className="text-sm text-slate-500 mb-3">{skill.experience} deneyim</p>
+                                        <p className="text-slate-400 leading-relaxed text-sm">{skill.description}</p>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Highlights */}
+                            <div className="bg-gradient-to-br from-slate-900/50 to-slate-900/30 border border-slate-800 p-8 rounded-3xl">
+                                <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                                    <span className="text-2xl">✨</span>
+                                    Öne Çıkanlar
+                                </h3>
+                                <ul className="space-y-3">
+                                    {section.highlights.map((highlight, idx) => (
+                                        <li key={idx} className="flex items-start gap-3 text-slate-300">
+                                            <span className="text-blue-500 mt-1">▸</span>
+                                            <span className="leading-relaxed">{highlight}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+                    );
+                })}
             </section>
 
             {/* Projects Grid */}
