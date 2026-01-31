@@ -118,15 +118,6 @@ const App = () => {
 
                 {/* Main Content */}
                 <div className="text-reveal max-w-5xl">
-                    {/* Animated Badge */}
-                    <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/30 px-6 py-3 rounded-full mb-8 backdrop-blur-sm animate-fade-in-up">
-                        <span className="relative flex h-3 w-3">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
-                        </span>
-                        <span className="text-sm font-semibold text-blue-300">{language === 'tr' ? 'Portfolio' : 'Portfolio'}</span>
-                    </div>
-                    
                     <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white mb-8 tracking-tight leading-tight">
                         <span className="gradient-text block mb-2">{t.role}</span>
                     </h1>
@@ -275,7 +266,7 @@ const App = () => {
                                 {section.skills.map((skill, idx) => (
                                     <div 
                                         key={idx} 
-                                        className={`professional-card bg-slate-900/50 border border-slate-800 p-6 md:p-8 rounded-3xl group relative overflow-hidden ${
+                                        className={`bg-slate-900/50 border border-slate-800 p-6 md:p-8 rounded-3xl group relative overflow-hidden transition-all duration-300 hover:border-slate-700 hover:bg-slate-900/70 ${
                                             key === 'art' ? 'perspective-card card-3d' : ''
                                         } ${
                                             key === 'animation' ? 'ripple-effect' : ''
@@ -338,7 +329,7 @@ const App = () => {
                     <div className="h-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent flex-1"></div>
                 </div>
 
-                <div className="professional-card bg-gradient-to-br from-slate-900/60 to-slate-900/40 border border-slate-800 p-8 md:p-12 rounded-3xl max-w-4xl mx-auto glow-effect">
+                <div className="bg-gradient-to-br from-slate-900/60 to-slate-900/40 border border-slate-800 p-8 md:p-12 rounded-3xl max-w-4xl mx-auto glow-effect">
                     <div className="flex items-start gap-6 md:gap-8">
                         <div className="text-5xl md:text-6xl animate-float">🎓</div>
                         <div className="flex-1">
@@ -369,7 +360,7 @@ const App = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
                     {t.projects.map((item, idx) => (
-                        <div key={idx} className="professional-card bg-slate-900/50 border border-slate-800 p-8 md:p-10 rounded-3xl group relative overflow-hidden">
+                        <div key={idx} className="bg-slate-900/50 border border-slate-800 p-8 md:p-10 rounded-3xl group relative overflow-hidden transition-all duration-300 hover:border-slate-700 hover:bg-slate-900/70">
                             {/* Enhanced Hover Gradient */}
                             <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-purple-600/5 to-pink-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                             <div className="absolute -inset-1 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-pink-600/20 rounded-3xl opacity-0 group-hover:opacity-100 blur transition-opacity duration-500"></div>
