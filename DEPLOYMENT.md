@@ -1,10 +1,30 @@
 # 🚀 Deployment Guide
 
-## GitHub Pages Deployment
+## GitHub Pages Deployment (Önerilen: GitHub Actions)
 
-Bu portfolio sitesi GitHub Pages üzerinde kolayca yayınlanabilir.
+Bu portfolio sitesi **GitHub Actions** ile otomatik olarak deploy edilebilir! 🎉
 
-### Adımlar:
+### 🚀 Hızlı Başlangıç (GitHub Actions ile):
+
+1. **GitHub Pages'i Aktifleştirin**
+   - GitHub repository'nizde `Settings` > `Pages` bölümüne gidin
+   - `Source` kısmından **`GitHub Actions`** seçin
+   
+2. **Main Branch'e Merge Edin**
+   - Bu PR'ı merge edin veya değişiklikleri `main` branch'ine alın
+   
+3. **Otomatik Deployment**
+   - GitHub Actions otomatik olarak çalışacak
+   - Site deploy edilecek: **`https://zeatrex01.github.io/`**
+   - Her `main` branch'e push'ta otomatik güncellenir!
+
+📖 **Detaylı Türkçe Rehber**: [`GITHUB_PAGES_SETUP.md`](GITHUB_PAGES_SETUP.md) dosyasına bakın
+
+---
+
+## Alternatif: Manuel Branch Deployment
+
+Eğer GitHub Actions kullanmak istemiyorsanız:
 
 1. **GitHub Repository Ayarları**
    - GitHub repository'nizde `Settings` > `Pages` bölümüne gidin
@@ -13,8 +33,7 @@ Bu portfolio sitesi GitHub Pages üzerinde kolayca yayınlanabilir.
    - `Save` butonuna tıklayın
 
 2. **Site URL'niz**
-   - Site şu adreste yayınlanacak: `https://[kullanıcı-adınız].github.io/[repo-adı]/`
-   - Eğer repo adı kullanıcı adınızla aynıysa: `https://[kullanıcı-adınız].github.io/`
+   - Bu özel repository için: **`https://zeatrex01.github.io/`**
 
 3. **Özel Domain (Opsiyonel)**
    - `Settings` > `Pages` > `Custom domain` kısmından kendi domain'inizi ekleyebilirsiniz
