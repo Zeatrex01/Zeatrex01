@@ -18,7 +18,7 @@
 <br />
 
 ### 🙋‍♂️ About Me
-I'm a 23-year-old developer from Turkey, passionate about High Energy games and 3D Art.
+I'm a 24-year-old developer from Turkey, passionate about High Energy games and 3D Art.
 
 - 🥀 **Learning:** C#, Blender, Unity, and Shader Graphs.
 - 🔭 **Interests:** Game Development, 3D Animation, Technical Art.
