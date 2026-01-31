@@ -99,12 +99,15 @@ const App = () => {
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
 
-// Hide loading screen when React is ready
-setTimeout(() => {
-    const loadingScreen = document.getElementById('loading');
-    if (loadingScreen) {
-        loadingScreen.style.opacity = '0';
-        loadingScreen.style.transition = 'opacity 0.5s ease-out';
-        setTimeout(() => loadingScreen.remove(), 500);
-    }
-}, 100);
+// Hide loading screen after React has rendered
+// Using requestAnimationFrame to ensure DOM has updated
+window.requestAnimationFrame(() => {
+    setTimeout(() => {
+        const loadingScreen = document.getElementById('loading');
+        if (loadingScreen) {
+            loadingScreen.style.opacity = '0';
+            loadingScreen.style.transition = 'opacity 0.5s ease-out';
+            setTimeout(() => loadingScreen.remove(), 500);
+        }
+    }, 200);
+});
