@@ -5,25 +5,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Oyun Geliştirici ve 3D Sanatçı Portfolio. Unity, Blender, C# Projeleri.">
-    <meta name="keywords" content="Game Developer, 3D Generalist, Unity, Blender, C#, Game Development, Portfolio, Oyun Geliştirici">
+    <meta name="keywords"
+        content="Game Developer, 3D Generalist, Unity, Blender, C#, Game Development, Portfolio, Oyun Geliştirici">
     <meta name="author" content="Enes Aksu">
     <meta name="theme-color" content="#0b0c10">
-    
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="Enes Aksu | Technical Game Developer">
     <meta property="og:description" content="Building immersive worlds with Unity & Blender.">
     <meta property="og:url" content="https://github.com/Zeatrex01">
-    
+
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Enes Aksu | Technical Game Developer">
     <meta name="twitter:description" content="Building immersive worlds with Unity & Blender.">
-    
+
     <title>Enes Aksu | Game Dev Portfolio</title>
-    
+
     <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100%25' height='100%25' fill='%230f172a'/%3E%3Ctext y='.9em' font-size='90'%3E⚡%3C/text%3E%3C/svg%3E">
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100%25' height='100%25' fill='%230f172a'/%3E%3Ctext y='.9em' font-size='90'%3E⚡%3C/text%3E%3C/svg%3E">
 
     <!-- React & ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -75,7 +77,9 @@
     </script>
 
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;700&family=Rajdhani:wght@500;600;700&display=swap"
+        rel="stylesheet">
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -88,31 +92,131 @@
             overflow-x: hidden;
         }
 
+        /* Loading Screen */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0b0c10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        #loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loading-logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #66fcf1, #45a29e);
+            transform: rotate(45deg);
+            animation: pulse-rotate 2s ease-in-out infinite;
+            margin-bottom: 2rem;
+        }
+
+        @keyframes pulse-rotate {
+
+            0%,
+            100% {
+                transform: rotate(45deg) scale(1);
+            }
+
+            50% {
+                transform: rotate(225deg) scale(1.1);
+            }
+        }
+
+        .loading-text {
+            font-family: 'JetBrains Mono', monospace;
+            color: #66fcf1;
+            font-size: 0.875rem;
+            letter-spacing: 0.2em;
+            animation: blink 1.5s step-end infinite;
+        }
+
+        /* Page Entrance Animations */
+        .fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+            opacity: 0;
+        }
+
+        .slide-up {
+            animation: slideUp 0.6s ease-out forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Stagger delays for sections */
+        .delay-1 {
+            animation-delay: 0.1s;
+        }
+
+        .delay-2 {
+            animation-delay: 0.2s;
+        }
+
+        .delay-3 {
+            animation-delay: 0.3s;
+        }
+
+        .delay-4 {
+            animation-delay: 0.4s;
+        }
+
         /* Technical Grid Background */
         .bg-grid {
             background-size: 40px 40px;
             background-image: linear-gradient(to right, rgba(102, 252, 241, 0.03) 1px, transparent 1px),
-                              linear-gradient(to bottom, rgba(102, 252, 241, 0.03) 1px, transparent 1px);
+                linear-gradient(to bottom, rgba(102, 252, 241, 0.03) 1px, transparent 1px);
         }
 
         /* Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
         }
+
         ::-webkit-scrollbar-track {
             background: #0b0c10;
         }
+
         ::-webkit-scrollbar-thumb {
             background: #1f2833;
             border-radius: 2px;
         }
+
         ::-webkit-scrollbar-thumb:hover {
             background: #45a29e;
         }
 
         /* Utility Classes */
-        .font-tech { font-family: 'Rajdhani', sans-serif; }
-        .font-code { font-family: 'JetBrains Mono', monospace; }
+        .font-tech {
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        .font-code {
+            font-family: 'JetBrains Mono', monospace;
+        }
 
         .glass-panel {
             background: rgba(31, 40, 51, 0.6);
@@ -133,14 +237,17 @@
         .scanline-overlay {
             pointer-events: none;
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.1));
             background-size: 100% 4px;
             z-index: 9999;
             opacity: 0.15;
             mix-blend-mode: overlay;
         }
-        
+
         .card-hover:hover {
             transform: translateY(-4px);
             border-color: #66fcf1;
@@ -156,14 +263,28 @@
             height: 40px;
             animation: spin 1s linear infinite;
         }
-        
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 
 <body class="bg-[#0b0c10] antialiased selection:bg-[#66fcf1] selection:text-[#0b0c10]">
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loading-logo"></div>
+        <div class="loading-text">INITIALIZING SYSTEM...</div>
+    </div>
+
     <div class="scanline-overlay"></div>
-    
+
     <div id="root"></div>
 
     <!-- 1️⃣ DATA (Configuration) -->
