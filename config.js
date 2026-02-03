@@ -40,7 +40,7 @@ const CONFIG = {
             platform: "MOBILE / HYPERCASUAL",
             tech: ["Unity", "C#", "Level Design"],
             link: "https://play.google.com/store/apps/details?id=com.MiyaviGames.SnackStack",
-            imageUrl: "https://play-lh.googleusercontent.com/GH8W0p1UgF2nM145Hr-N0sk2B8p2hZpYe-_PyQaa3OB9aNz0oWaU0i0mqPcBQhcSoNS3CPD70gv2vIPJrvEwcUc=s96-rw",
+            imageUrl: "https://img.itch.zone/aW1nLzI1MDExNjE2LnBuZw==/original/rmlwJp.png",
             imagePlaceholder: "linear-gradient(45deg, #1a2a2a, #1a1a1a)"
         },
         {
