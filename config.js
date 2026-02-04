@@ -15,7 +15,7 @@ const CONFIG = {
         itch: "https://zeatrex.itch.io/"
     },
 
-    email: "enesakin3500@gmail.com",
+    email: "enesaksu9999@gmail.com",
 
     // Games (Common metadata)
     games: [
@@ -85,7 +85,7 @@ const CONFIG = {
     translations: {
         tr: {
             // Personal Info
-            name: "Enes Akın",
+            name: "Enes Aksu",
             role: "Game Developer & 3D Artist",
             bio: "Unity ile kod, Blender ile sanat. Oyunlar yapıyorum, assetler tasarlıyorum.",
 
@@ -166,7 +166,7 @@ const CONFIG = {
 
         en: {
             // Personal Info
-            name: "Enes Akın",
+            name: "Enes Aksu",
             role: "Game Developer & 3D Artist",
             bio: "Code with Unity, art with Blender. I make games and design assets.",
 
