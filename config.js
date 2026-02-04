@@ -10,7 +10,7 @@ const CONFIG = {
 
     social: {
         github: "https://github.com/Zeatrex",
-        linkedin: "https://www.linkedin.com/in/enes-ak%C4%B1n-1a2877227/",
+        linkedin: "https://www.linkedin.com/in/enesaksuzeatrex/",
         artstation: "https://www.artstation.com/zeatrex",
         itch: "https://zeatrex.itch.io/"
     },
