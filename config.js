@@ -9,7 +9,7 @@ const CONFIG = {
     // ========================================
 
     social: {
-        github: "https://github.com/Zeatrex",
+        github: "https://github.com/Zeatrex01",
         linkedin: "https://www.linkedin.com/in/enesaksuzeatrex/",
         artstation: "https://www.artstation.com/zeatrex",
         itch: "https://zeatrex.itch.io/",
