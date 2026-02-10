@@ -1,14 +1,14 @@
-# Hi there, I'm [Zeatrex (Malik3D)] 👋
+# Hi there, I'm [Zeatrex (Malik3D)]
 
 > **Game Developer & 3D Generalist**  
-> *3 yıllık bağımsız geliştiricilik ve 2 yıllık sektör tecrübesini birleştiren, kod ve sanat arasında köprü kuran çok yönlü geliştirici.*
+> *3 years of indie development and 2 years of industry experience, bridging code and art as a versatile developer.*
 
 <div align="center">
   <a href="https://linkedin.com/in/enesaksuzeatrex/">
     <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" />
   </a>
   <a href="https://github.com/Zeatrex01">
-    <img src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white" alt="Github" />
+    <img src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white" alt="GitHub" />
   </a>
   <a href="mailto:enesaksu9999@gmail.com">
     <img src="https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Email" />
@@ -17,16 +17,16 @@
 
 <br />
 
-### 🙋‍♂️ About Me
-I'm a 24-year-old developer from Turkey, passionate about High Energy games and 3D Art.
+### About Me
+I'm a 24-year-old developer from Turkey, passionate about high-energy games and 3D art.
 
-- 🥀 **Learning:** C#, Blender, Unity, and Shader Graphs.
-- 🔭 **Interests:** Game Development, 3D Animation, Technical Art.
-- 🐈 **Personal:** Cat Lover & High Energy Enthusiast.
+- **Learning:** C#, Blender, Unity, and Shader Graphs.
+- **Interests:** Game Development, 3D Animation, Technical Art.
+- **Personal:** Cat Lover and High Energy Enthusiast.
 
 <br />
 
-### 🛠 Languages and Tools
+### Languages and Tools
 
 <div align="center">
   <img src="https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=c-sharp&logoColor=white" alt="C#" />
@@ -38,8 +38,8 @@ I'm a 24-year-old developer from Turkey, passionate about High Energy games and 
 
 <br />
 
-### 📊 GitHub Stats
+### GitHub Stats
 
 <div align="center">
-  <img src="https://github-readme-stats.vercel.app/api?username=Zeatrex01&show_icons=true&title_color=fff&icon_color=60a5fa&text_color=94a3b8&bg_color=0f172a&hide_border=true" alt="Github Stats" />
+  <img src="https://github-readme-stats.vercel.app/api?username=Zeatrex01&show_icons=true&title_color=fff&icon_color=60a5fa&text_color=94a3b8&bg_color=0f172a&hide_border=true" alt="GitHub Stats" />
 </div>
