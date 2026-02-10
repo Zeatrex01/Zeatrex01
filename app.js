@@ -1,5 +1,5 @@
 // =========================================================
-// ⚙️ ENGINE CORE (Logic) - Updated for new config structure
+// ENGINE CORE (Logic) - Updated for new config structure
 // =========================================================
 
 const App = () => {
@@ -210,7 +210,7 @@ const App = () => {
             {/* 3. DEVELOPMENT PROJECTS SECTION */}
             <section id="work" className="py-20 bg-dark-800/50 relative">
                 <div className="max-w-7xl mx-auto px-6">
-                    <SectionHeader title={t.sectionTitles.games} subtitle="CODE • MECHANICS • GAMEPLAY" />
+                    <SectionHeader title={t.sectionTitles.games} subtitle="CODE - MECHANICS - GAMEPLAY" />
 
                     <div className="grid gap-12">
                         {CONFIG.games.map((gameCommon, idx) => {
@@ -261,10 +261,20 @@ const App = () => {
                                             ))}
                                         </div>
 
-                                        <div className="mt-auto">
+                                        <div className="mt-auto space-y-3">
                                             <a href={game.link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white font-bold hover:text-neon-cyan transition-colors group/link">
                                                 VIEW PROJECT <i className="fas fa-arrow-right group-hover/link:translate-x-1 transition-transform"></i>
                                             </a>
+                                            
+                                            {game.videos && game.videos.length > 0 && (
+                                                <div className="flex flex-wrap gap-2">
+                                                    {game.videos.map((video, idx) => (
+                                                        <a key={idx} href={video.url} target="_blank" rel="noopener noreferrer" className="text-xs px-3 py-2 border border-neon-orange/30 text-neon-orange hover:bg-neon-orange hover:text-dark-900 transition-all inline-flex items-center gap-1.5 font-semibold">
+                                                            <i className="fab fa-youtube"></i> {video.title}
+                                                        </a>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -277,7 +287,7 @@ const App = () => {
             {/* 4. 3D ART PORTFOLIO SECTION */}
             <section id="assets" className="py-20 relative">
                 <div className="max-w-7xl mx-auto px-6">
-                    <SectionHeader title={t.sectionTitles.assets} subtitle="MODELING • TEXTURING • RIGGING" accent="orange" />
+                    <SectionHeader title={t.sectionTitles.assets} subtitle="MODELING - TEXTURING - RIGGING" accent="orange" />
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {CONFIG.assets.map((_, idx) => {
@@ -305,6 +315,27 @@ const App = () => {
                         <p className="text-lg text-gray-400 leading-relaxed mb-8 border-l-2 border-gray-700 pl-6 slide-up delay-2">
                             {t.about.description}
                         </p>
+
+                        <div className="mb-8 slide-up delay-2">
+                            <a
+                                href={CONFIG.social.youtube}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 text-sm font-semibold text-neon-orange hover:text-white transition-colors"
+                            >
+                                <i className="fab fa-youtube"></i>
+                                YouTube: Tutorials and Modeling
+                            </a>
+                        </div>
+
+                        <div className="mb-8 slide-up delay-2">
+                            <img
+                                src="https://yt3.googleusercontent.com/NQ4bk9N2xJyTMlXFcFJuh06GMOCRlMSRak8o49Uhe9G9tYxPPoCvvsIB1198dn02IgLfFymc=w1707-fcrop64=1,00005a57ffffa5a8-k-c0xffffffff-no-nd-rj"
+                                alt="Malik3D channel banner"
+                                className="w-full rounded border border-white/10"
+                                loading="lazy"
+                            />
+                        </div>
 
                         {/* Stats Grid */}
                         <div className="grid grid-cols-3 gap-4 mb-8">
