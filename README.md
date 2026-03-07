@@ -34,7 +34,6 @@ I specialize in the bridge between raw code and visual fidelity:
 <div align="center">
   <img src="https://img.shields.io/badge/Unity-100000?style=for-the-badge&logo=unity&logoColor=white" alt="Unity" />
   <img src="https://img.shields.io/badge/Blender-E87D0D?style=for-the-badge&logo=blender&logoColor=white" alt="Blender" />
-  <img src="https://img.shields.io/badge/Maya-37A5E4?style=for-the-badge&logo=autodeskmaya&logoColor=white" alt="Maya" />
   <img src="https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=c-sharp&logoColor=white" alt="C#" />
   <img src="https://img.shields.io/badge/Substance_Painter-8D1F25?style=for-the-badge&logo=substance&logoColor=white" alt="Substance" />
   <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
