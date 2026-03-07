@@ -1,31 +1,13 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en" class="scroll-smooth bg-[#050505] text-white">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Oyun Geli�tirici ve 3D Sanat�� Portfolio. Unity, Blender, C# Projeleri.">
-    <meta name="keywords"
-        content="Game Developer, 3D Generalist, Unity, Blender, C#, Game Development, Portfolio, Oyun Geli�tirici">
+    <meta name="description" content="Technical Animator & 3D Generalist Portfolio. Unity, Blender, C# Projects.">
     <meta name="author" content="Enes Aksu">
-    <meta name="theme-color" content="#0b0c10">
 
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="Enes Aksu | Technical Game Developer">
-    <meta property="og:description" content="Building immersive worlds with Unity & Blender.">
-    <meta property="og:url" content="https://github.com/Zeatrex01">
-
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Enes Aksu | Technical Game Developer">
-    <meta name="twitter:description" content="Building immersive worlds with Unity & Blender.">
-
-    <title>Enes Aksu | Game Dev Portfolio</title>
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml"
-        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100%25' height='100%25' fill='%230f172a'/%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%A1%3C/text%3E%3C/svg%3E">
+    <title>Enes Aksu | Technical Animator</title>
 
     <!-- React & ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -34,112 +16,87 @@
     <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <!-- TailwindCSS -->
+    <!-- Fonts: Anton (Headers) & Manrope (Body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@300;400;600;800&display=swap"
+        rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Rajdhani', 'Noto Sans', 'sans-serif'],
-                        mono: ['"JetBrains Mono"', 'monospace'],
-                        body: ['"Noto Sans"', 'Inter', 'sans-serif'],
+                        anton: ['Anton', 'sans-serif'],
+                        manrope: ['Manrope', 'sans-serif'],
                     },
                     colors: {
-                        dark: {
-                            900: '#0b0c10',
-                            800: '#1f2833',
-                            700: '#2d3e50'
-                        },
-                        neon: {
-                            blue: '#45a29e',
-                            cyan: '#66fcf1',
-                            orange: '#ff6b35'
-                        }
-                    },
-                    animation: {
-                        'scanline': 'scanline 8s linear infinite',
-                        'blink': 'blink 1s step-end infinite',
-                    },
-                    keyframes: {
-                        scanline: {
-                            '0%': { transform: 'translateY(-100%)' },
-                            '100%': { transform: 'translateY(100%)' }
-                        },
-                        blink: {
-                            '0%, 100%': { opacity: '1' },
-                            '50%': { opacity: '0' }
-                        }
+                        dark: '#050505',
+                        light: '#f5f5f5',
+                        accent: '#ff3366',
                     }
                 }
             }
         }
     </script>
 
-    <!-- Fonts -->
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;700&family=Noto+Sans:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap"
-        rel="stylesheet">
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Custom Styles -->
     <style>
+        /* Base Resets */
         body {
-            background-color: #0b0c10;
-            color: #c5c6c7;
-            font-family: 'Noto Sans', 'Inter', sans-serif;
+            font-family: 'Manrope', sans-serif;
             overflow-x: hidden;
+            background-color: #050505;
         }
 
-        /* Loading Screen */
-        #loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #0b0c10;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
+        h1,
+        h2,
+        h3,
+        h4,
+        .font-anton {
+            font-family: 'Anton', sans-serif;
+            text-transform: uppercase;
         }
 
-        #loading-screen.hidden {
-            opacity: 0;
-            visibility: hidden;
+        /* Mix Blend Navigation Overlay */
+        .nav-overlay {
+            mix-blend-mode: difference;
+            z-index: 50;
         }
 
-        .loading-logo {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #66fcf1, #45a29e);
-            transform: rotate(45deg);
-            animation: pulse-rotate 2s ease-in-out infinite;
-            margin-bottom: 2rem;
+        /* Edge-to-Edge utilities */
+        .edge-section {
+            width: 100vw;
+            min-height: 100vh;
         }
 
-        @keyframes pulse-rotate {
-
-            0%,
-            100% {
-                transform: rotate(45deg) scale(1);
-            }
-
-            50% {
-                transform: rotate(225deg) scale(1.1);
-            }
+        /* Image Placeholder Gradients */
+        .bg-placeholder-1 {
+            background: linear-gradient(45deg, #1a1a2e, #16213e);
         }
 
-        .loading-text {
-            font-family: 'JetBrains Mono', monospace;
-            color: #66fcf1;
-            font-size: 0.875rem;
-            letter-spacing: 0.2em;
-            animation: blink 1.5s step-end infinite;
+        .bg-placeholder-2 {
+            background: linear-gradient(45deg, #2c1a1a, #1a1a1a);
+        }
+
+        /* Hide scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #050505;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
         }
 
         /* Page Entrance Animations */
@@ -167,7 +124,7 @@
             }
         }
 
-        /* Stagger delays for sections */
+        /* Staggers */
         .delay-1 {
             animation-delay: 0.1s;
         }
@@ -179,111 +136,10 @@
         .delay-3 {
             animation-delay: 0.3s;
         }
-
-        .delay-4 {
-            animation-delay: 0.4s;
-        }
-
-        /* Technical Grid Background */
-        .bg-grid {
-            background-size: 40px 40px;
-            background-image: linear-gradient(to right, rgba(102, 252, 241, 0.03) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(102, 252, 241, 0.03) 1px, transparent 1px);
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #0b0c10;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #1f2833;
-            border-radius: 2px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #45a29e;
-        }
-
-        /* Utility Classes */
-        .font-tech {
-            font-family: 'Rajdhani', sans-serif;
-        }
-
-        .font-code {
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .glass-panel {
-            background: rgba(31, 40, 51, 0.6);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(102, 252, 241, 0.1);
-        }
-
-        .section-header::after {
-            content: '';
-            display: block;
-            width: 60px;
-            height: 4px;
-            background: #66fcf1;
-            margin-top: 0.5rem;
-        }
-
-        /* CRT/Scanline Effect (Subtle) */
-        .scanline-overlay {
-            pointer-events: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.1));
-            background-size: 100% 4px;
-            z-index: 9999;
-            opacity: 0.15;
-            mix-blend-mode: overlay;
-        }
-
-        .card-hover:hover {
-            transform: translateY(-4px);
-            border-color: #66fcf1;
-            box-shadow: 0 10px 30px -10px rgba(102, 252, 241, 0.2);
-        }
-
-        /* Loader */
-        .loader {
-            border: 2px solid #1f2833;
-            border-top: 2px solid #66fcf1;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
     </style>
 </head>
 
-<body class="bg-[#0b0c10] antialiased selection:bg-[#66fcf1] selection:text-[#0b0c10]">
-    <!-- Loading Screen -->
-    <div id="loading-screen">
-        <div class="loading-logo"></div>
-        <div class="loading-text">INITIALIZING SYSTEM...</div>
-    </div>
-
-    <div class="scanline-overlay"></div>
+<body class="antialiased selection:bg-white selection:text-black">
 
     <div id="root"></div>
 
@@ -292,6 +148,7 @@
 
     <!-- 2) LOGIC (Application) -->
     <script type="text/babel" src="app.js"></script>
+
 </body>
 
 </html>
