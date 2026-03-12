@@ -50,15 +50,27 @@ const CONFIG = {
         },
         {
             id: "vr_farming",
+            type: "animation",
             platform: "VR / INTERNSHIP",
             tech: ["Unity VR", "Animation", "Medical Sim"],
             link: "https://www.youtube.com/watch?v=vWzRECn6t0Y&pp=0gcJCZQKAYcqIYzv",
             videos: [
-                { title: "VR Farming Demo", url: "https://www.youtube.com/watch?v=vWzRECn6t0Y&pp=0gcJCZQKAYcqIYzv" },
-                { title: "Medical VR Project", url: "https://www.youtube.com/watch?v=XRSi_3fxAws&pp=0gcJCZQKAYcqIYzv" }
+                { title: "VR Farming Demo", url: "https://www.youtube.com/watch?v=vWzRECn6t0Y&pp=0gcJCZQKAYcqIYzv" }
             ],
             imageUrl: "",
             imagePlaceholder: "linear-gradient(45deg, #2c3e50, #4ca1af)"
+        },
+        {
+            id: "puslu_kitalar",
+            type: "animation",
+            platform: "ANIMATION / GRADUATION",
+            tech: ["Blender", "Adobe Premiere", "Krita", "Photoshop"],
+            link: "https://youtu.be/7VFmraZxs8k",
+            videos: [
+                { title: "Puslu Kıtalar Atlası — Jenerik", url: "https://youtu.be/7VFmraZxs8k" }
+            ],
+            imageUrl: "",
+            imagePlaceholder: "linear-gradient(45deg, #1a1a2e, #3d1a78)"
         }
     ],
 
@@ -109,21 +121,44 @@ const CONFIG = {
         tr: {
             // Personal Info
             name: "Enes Aksu",
-            role: "Game Developer & 3D Artist",
-            bio: "Unity ile kod, Blender ile sanat. Oyunlar yapiyorum, assetler tasarliyorum.",
+            role: "Technical Animator & 3D Artist",
+            bio: "Unity' de teknik animasyon, Blender' da 3D sanat. Model tasarlıyorum, sahneleri canlandırıyorum.",
+
+            // Hero
+            heroLabel: "3D Artist & Technical Animator",
+            heroCta: "Çalışmalarımı Gör",
 
             // Navigation
             nav: {
-                work: "Isler",
-                about: "Hakkimda",
-                contact: "Iletisim"
+                showreel: "Showreel",
+                work: "Portföy",
+                projects: "Projeler",
+                about: "Hakkımda"
             },
 
             // Section Titles
             sectionTitles: {
-                games: "Gelistirdigim Oyunlar",
-                assets: "3D Asset Portfoyu",
-                education: "Egitim"
+                showreel: "Animasyon Showreeli",
+                games: "Çalıştığım Projeler",
+                assets: "3D Portföy",
+                education: "Eğitim"
+            },
+
+            // Misc labels
+            portfolioSub: "Modelleme · Doku · Rigging · Animasyon",
+            seeAll: "Tümünü Gör",
+            moreWorks: "Daha fazla eser için...",
+            projectsLabel: "Oyun Projeleri",
+            viewProject: "Projeye Git",
+            aboutLabel: "Ben Kimim",
+            platformsLabel: "Platformlar & İletişim",
+            emailLabel: "E-posta",
+            links: {
+                artstation: "3D Eserlerim · Modeller",
+                youtube: "Videolar & Showreel",
+                github: "Kod Projeleri",
+                linkedin: "Profesyonel Profil",
+                itch: "Oyun Projeleri"
             },
 
             // Game Translations
@@ -147,6 +182,11 @@ const CONFIG = {
                     title: "VR Farming & Medical VR",
                     role: "Developer & Animator (Intern)",
                     description: "Istinye Universitesi XR Lab stajinda ekip olarak gelistirilen VR ciftcilik demosu (Kod & Animasyon: Ben, Model: Ekip Arkadasim) ve cesitli medikal animasyon projeleri."
+                },
+                puslu_kitalar: {
+                    title: "Puslu Kıtalar Atlası",
+                    role: "Animatör & Motion Designer (Mezuniyet Projesi)",
+                    description: "Türk fantastiğinin başyapıtı Puslu Kıtalar Atlası için hazırlanmış kitap jeneriği. Blender ile 3D, Krita & Photoshop ile illüstrasyon, Premiere ile kurgu."
                 }
             },
 
@@ -176,11 +216,11 @@ const CONFIG = {
 
             // About Section
             about: {
-                description: "Oyun gelistirme sadece kod yazmak degil; bir deneyim tasarlamaktir. Teknik altyapi (C#/Unity) ile sanatsal vizyonu (Blender/Animation) birlestirerek, tek basina tam tesekkullu projeler uretebilen bir 'Technical Artist' bakis acisina sahibim.",
+                description: "Teknik animasyon ve 3D sanatı bir arada yürütüyor, oyun deneyimlerini başından sonuna şekillendiriyorum. Rigging'den sahne animasyonuna, low-poly modelden tam teşekküllü asset pakete uzanan geniş bir alanda çalışıyorum.",
                 stats: [
-                    { label: "YIL DENEYIM", value: "3+" },
-                    { label: "YAYINLANAN OYUN", value: "4" },
-                    { label: "ASSET PAKETI", value: "20+" }
+                    { label: "Yıl Deneyim", value: "3+" },
+                    { label: "Yayınlanan Oyun", value: "4" },
+                    { label: "Asset Paketi", value: "20+" }
                 ]
             },
 
@@ -192,27 +232,50 @@ const CONFIG = {
             },
 
             // Footer
-            footer: "Ziyaretiniz icin tesekkurler!"
+            footer: "Ziyaretiniz için teşekkürler!"
         },
 
         en: {
             // Personal Info
             name: "Enes Aksu",
-            role: "Game Developer & 3D Artist",
-            bio: "Code with Unity, art with Blender. I make games and design assets.",
+            role: "Technical Animator & 3D Artist",
+            bio: "Technical animation in Unity, 3D art in Blender. I design models and bring scenes to life.",
+
+            // Hero
+            heroLabel: "3D Artist & Technical Animator",
+            heroCta: "View My Work",
 
             // Navigation
             nav: {
-                work: "Work",
-                about: "About",
-                contact: "Contact"
+                showreel: "Showreel",
+                work: "Portfolio",
+                projects: "Projects",
+                about: "About"
             },
 
             // Section Titles
             sectionTitles: {
-                games: "Development Projects",
-                assets: "3D Art Portfolio",
+                showreel: "Animation Showreel",
+                games: "Projects I Worked On",
+                assets: "3D Portfolio",
                 education: "Education"
+            },
+
+            // Misc labels
+            portfolioSub: "Modeling · Texturing · Rigging · Animation",
+            seeAll: "See All",
+            moreWorks: "More works...",
+            projectsLabel: "Game Projects",
+            viewProject: "View Project",
+            aboutLabel: "About Me",
+            platformsLabel: "Platforms & Contact",
+            emailLabel: "Email",
+            links: {
+                artstation: "3D Artwork · Models",
+                youtube: "Videos & Showreel",
+                github: "Code Projects",
+                linkedin: "Professional Profile",
+                itch: "Game Projects"
             },
 
             // Game Translations
@@ -236,6 +299,11 @@ const CONFIG = {
                     title: "VR Farming & Medical VR",
                     role: "Developer & Animator (Intern)",
                     description: "Team-developed VR farming demo at Istinye University XR Lab (Code & Anim: Me, Models: Teammate). Also worked on various medical animation projects."
+                },
+                puslu_kitalar: {
+                    title: "Puslu Kıtalar Atlası",
+                    role: "Animator & Motion Designer (Graduation Project)",
+                    description: "A book intro sequence for Puslu Kıtalar Atlası, a cornerstone of Turkish fantasy literature. 3D in Blender, illustration in Krita & Photoshop, edited in Premiere."
                 }
             },
 
@@ -265,11 +333,11 @@ const CONFIG = {
 
             // About Section
             about: {
-                description: "Game development is not just writing code; it's designing an experience. I possess a 'Technical Artist' perspective, combining technical infrastructure (C#/Unity) with artistic vision (Blender/Animation) to produce full-fledged projects solo.",
+                description: "I drive technical animation and 3D art simultaneously, shaping game experiences from start to finish. My range spans rigging to scene animation, low-poly modeling to full asset packs.",
                 stats: [
-                    { label: "YEARS EXP", value: "3+" },
-                    { label: "SHIPPED GAMES", value: "4" },
-                    { label: "ASSET PACKS", value: "20+" }
+                    { label: "Years Exp", value: "3+" },
+                    { label: "Shipped Games", value: "4" },
+                    { label: "Asset Packs", value: "20+" }
                 ]
             },
 
