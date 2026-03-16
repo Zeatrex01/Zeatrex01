@@ -43,7 +43,7 @@ I specialize in the bridge between raw code and visual fidelity:
 
 ### 🎮 Selected Tech Art Integrations
 - **Mobile Optimizations (Case Studies)**: Lighting setups, render optimizations, and custom URP Shader Graphs for high-performance low-end device rendering.
-- **20+ 3D Asset Packs**: High-quality, game-ready models and animations available on [Fab](https://www.fab.com/sellers/Zeatrex) and [Unity Asset Store](https://assetstore.unity.com/publishers/91973)
+- **8+ 3D Asset Packs**: High-quality, game-ready models and animations available on [Fab](https://www.fab.com/sellers/Zeatrex) and [Unity Asset Store](https://assetstore.unity.com/publishers/91973)
 
 ---
 *Connecting the art pipeline with engine infrastructure.*
