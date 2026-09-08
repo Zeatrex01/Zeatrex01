@@ -25,6 +25,18 @@ const CONFIG = {
     // ========================================
     prototypes: [
         {
+            id: "power_block_jam",
+            path: "games/PowerBlockJam/",
+            year: "2026",
+            status: "playable",
+            engine: "Canvas 2D",
+            tech: ["JavaScript", "Canvas 2D", "WebAudio", "Puzzle mechanics"],
+            frame: "portrait",
+            accent: "#ff4d8d",
+            art: "power-block-jam",
+            image: ""
+        },
+        {
             id: "royal_guard",
             path: "games/royal-guard/",       // must contain an index.html
             year: "2026",
@@ -160,6 +172,16 @@ const CONFIG = {
                 wip: "Geliştiriliyor"
             },
             games: {
+                power_block_jam: {
+                    title: "Power Jam",
+                    tagline: "Boya, topla, tek hamlede patlat.",
+                    description: "9×9 ızgarada geçen, klasik blok yerleştirme mekaniğini dinamik güç bloklarıyla birleştiren bulmaca prototipi. Parçaları tahtaya yerleştirerek sıraları, sütunları ya da 3×3 bölgeleri temizle; çevresini renklendiren Boyacı ve boyaları kendine çeken Mıknatıs bloklarıyla zincirleme patlamalar oluştur.",
+                    controls: [
+                        "Parçaları tepsiden 9×9 tahtaya sürükle ve yerleştir",
+                        "Sıra, sütun veya 3×3 bölgeleri doldurarak temizle",
+                        "Boyacı ile boya, Mıknatıs ile topla, kombolarla patlat"
+                    ]
+                },
                 royal_guard: {
                     title: "Royal Guard",
                     tagline: "Barikatını kur, kralını koru.",
@@ -264,6 +286,16 @@ const CONFIG = {
                 wip: "Work in progress"
             },
             games: {
+                power_block_jam: {
+                    title: "Power Jam",
+                    tagline: "Paint, pull, blast in a single move.",
+                    description: "A 9×9 grid block puzzle prototype fusing classic polyomino placement with active power blocks. Drag shapes to clear lines, columns, or 3×3 zones. Unleash Painter blocks that color neighboring cells and Magnet blocks that pull paint together to trigger massive chain blasts.",
+                    controls: [
+                        "Drag pieces from the tray onto the 9×9 board",
+                        "Fill rows, columns, or 3×3 regions to clear them",
+                        "Dye with Painter, gather with Magnet, chain blasts for high scores"
+                    ]
+                },
                 royal_guard: {
                     title: "Royal Guard",
                     tagline: "Build the barricade, protect your king.",

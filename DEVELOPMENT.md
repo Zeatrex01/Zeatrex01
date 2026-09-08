@@ -11,6 +11,7 @@ Notes for the site in this repo (`index.html`, `styles.css`, `config.js`, `app.j
 
 | Prototype | Tech | Frame | Status |
 |---|---|---|---|
+| **Power Jam** — paint, pull, blast in a single move | Canvas 2D | portrait | Playable |
 | **Royal Guard** — build a barricade, protect your king | Three.js, cannon-es, WebGL | portrait | Playable |
 | **Corn Bucket** — aim, cut it loose, fill the bucket | Canvas 2D | portrait | Playable |
 | **Traffic Detective** — patrol the neighbourhood, catch the rule breaker | Canvas 2D | portrait | Playable |

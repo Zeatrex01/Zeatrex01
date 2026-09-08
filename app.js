@@ -211,6 +211,87 @@
                 '</svg>';
         },
 
+        "power-block-jam": function (uid) {
+            var block = function (x, y, s, c1, c2) {
+                return '<g transform="translate(' + x + ' ' + y + ')">' +
+                    '<rect width="' + s + '" height="' + s + '" rx="5" fill="' + c2 + '"/>' +
+                    '<rect x="2" y="2" width="' + (s - 4) + '" height="' + (s - 4) + '" rx="4" fill="' + c1 + '"/>' +
+                    '<ellipse cx="' + (s * 0.38) + '" cy="' + (s * 0.3) + '" rx="' + (s * 0.22) + '" ry="' + (s * 0.12) + '" fill="#fff" opacity=".38"/>' +
+                    '</g>';
+            };
+            var emptyCell = function (x, y, s) {
+                return '<rect x="' + x + '" y="' + y + '" width="' + s + '" height="' + s + '" rx="4" fill="#ffffff" fill-opacity="0.05"/>';
+            };
+
+            var cs = 26, gap = 4, step = cs + gap;
+            var bx = 265, by = 48;
+            var cells = "";
+            for (var r = 0; r < 9; r++) {
+                for (var c = 0; c < 9; c++) {
+                    cells += emptyCell(bx + c * step, by + r * step, cs);
+                }
+            }
+
+            var bPink = function (c, r) { return block(bx + c * step, by + r * step, cs, "#FF4D8D", "#BE123C"); };
+            var bTeal = function (c, r) { return block(bx + c * step, by + r * step, cs, "#2DD4BF", "#0F766E"); };
+            var bLime = function (c, r) { return block(bx + c * step, by + r * step, cs, "#A3E635", "#4D7C0F"); };
+            var bGold = function (c, r) { return block(bx + c * step, by + r * step, cs, "#FBBF24", "#B45309"); };
+            var bBlue = function (c, r) { return block(bx + c * step, by + r * step, cs, "#38BDF8", "#0284C7"); };
+
+            var placed = bPink(1, 2) + bPink(2, 2) + bPink(2, 3) +
+                bTeal(4, 3) + bTeal(4, 4) + bTeal(5, 3) + bTeal(5, 4) +
+                bLime(6, 1) + bLime(7, 1) + bLime(8, 1) +
+                bGold(0, 6) + bGold(1, 6) + bGold(2, 6) + bGold(3, 6) + bGold(4, 6) + bGold(5, 6) + bGold(6, 6) + bGold(7, 6) + bGold(8, 6) +
+                bPink(3, 2) + bBlue(6, 4);
+
+            var painterSym = '<g transform="translate(' + (bx + 3 * step + cs / 2) + " " + (by + 2 * step + cs / 2) + ')">' +
+                '<circle r="15" fill="#FF4D8D" opacity=".35"/>' +
+                '<path d="M0 -7 L2 -2 L7 0 L2 2 L0 7 L-2 2 L-7 0 L-2 -2 Z" fill="#fff"/>' +
+                '</g>';
+
+            var magnetSym = '<g transform="translate(' + (bx + 6 * step + cs / 2) + " " + (by + 4 * step + cs / 2) + ')">' +
+                '<path d="M-6 -6 v5 a6 6 0 0 0 12 0 v-5 h-3 v5 a3 3 0 0 1 -6 0 v-5 z" fill="#fff"/>' +
+                '<rect x="-6" y="-7" width="3" height="2" fill="#ef4444"/>' +
+                '<rect x="3" y="-7" width="3" height="2" fill="#3b82f6"/>' +
+                '</g>';
+
+            var trayPieces = '<g transform="translate(230 362)">' +
+                block(0, 0, 18, "#FF4D8D", "#BE123C") + block(21, 0, 18, "#FF4D8D", "#BE123C") + block(42, 0, 18, "#FF4D8D", "#BE123C") +
+                '</g>' +
+                '<g transform="translate(375 352)">' +
+                block(0, 0, 18, "#2DD4BF", "#0F766E") + block(21, 0, 18, "#2DD4BF", "#0F766E") +
+                block(0, 21, 18, "#2DD4BF", "#0F766E") + block(21, 21, 18, "#2DD4BF", "#0F766E") +
+                '</g>' +
+                '<g transform="translate(515 352)">' +
+                block(0, 0, 18, "#A3E635", "#4D7C0F") +
+                block(0, 21, 18, "#A3E635", "#4D7C0F") + block(21, 21, 18, "#A3E635", "#4D7C0F") +
+                '</g>';
+
+            return "" +
+                '<svg viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" role="img">' +
+                '<defs>' +
+                '<linearGradient id="pjbg-' + uid + '" x1="0" y1="0" x2="0" y2="1">' +
+                '<stop offset="0" stop-color="#1e0e33"/><stop offset="1" stop-color="#0b0414"/></linearGradient>' +
+                '<linearGradient id="fade-' + uid + '" x1="0" y1="0" x2="0" y2="1">' +
+                '<stop offset=".58" stop-color="#06060a" stop-opacity="0"/>' +
+                '<stop offset="1" stop-color="#06060a" stop-opacity=".9"/></linearGradient>' +
+                '</defs>' +
+                '<rect width="800" height="500" fill="url(#pjbg-' + uid + ')"/>' +
+                '<circle cx="400" cy="180" r="220" fill="#6b21a8" opacity=".18"/>' +
+                '<circle cx="340" cy="210" r="120" fill="#ec4899" opacity=".12"/>' +
+                '<rect x="250" y="34" width="300" height="300" rx="16" fill="#1b0c30" stroke="#4c1d95" stroke-width="3"/>' +
+                '<path d="M348 34 v300 M448 34 v300 M250 132 h300 M250 232 h300" stroke="#6b21a8" stroke-width="2" opacity=".5"/>' +
+                cells + placed + painterSym + magnetSym +
+                '<g transform="translate(570 80)">' +
+                '<rect width="104" height="30" rx="15" fill="#be123c" stroke="#ff4d8d" stroke-width="1.5"/>' +
+                '<text x="52" y="20" fill="#ffffff" font-family="system-ui,sans-serif" font-size="12" font-weight="800" text-anchor="middle" letter-spacing="1">KOMBO ×4</text>' +
+                '</g>' +
+                '<rect x="200" y="344" width="400" height="68" rx="14" fill="#140726" stroke="#3b1566" stroke-width="1.5"/>' +
+                trayPieces +
+                '<rect width="800" height="500" fill="url(#fade-' + uid + ')"/>' +
+                "</svg>";
+        },
+
         // Popcorn Pop Sort shares one scene; the two ad variants change the
         // opening beat rather than the theme.
         "popcorn-conveyor": function (uid) { return popcornArt(uid, "conveyor"); },
