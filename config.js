@@ -72,10 +72,16 @@ const CONFIG = {
             id: "popcorn_pop_sort",
             accent: "#f0b429",
             art: "popcorn-icon",
-            store: {
-                label: "App Store",
-                url: "https://apps.apple.com/us/app/popcorn-pop-sort/id6762401537"
-            },
+            stores: [
+                {
+                    label: "App Store",
+                    url: "https://apps.apple.com/us/app/popcorn-pop-sort/id6762401537"
+                },
+                {
+                    label: "Google Play",
+                    url: "https://play.google.com/store/apps/details?id=games.dawnbright.popsort"
+                }
+            ],
             variants: [
                 {
                     id: "pcs_conveyor",
@@ -128,8 +134,7 @@ const CONFIG = {
                 ads: "Oynanabilir reklamlar"
             },
             ads: {
-                live: "App Store'da yayında",
-                store: "App Store'da gör",
+                live: "Mağazalarda yayında",
                 variantLabel: "Varyant"
             },
             campaigns: {
@@ -233,8 +238,7 @@ const CONFIG = {
                 ads: "Playable ads"
             },
             ads: {
-                live: "Live on the App Store",
-                store: "View on the App Store",
+                live: "Live on the stores",
                 variantLabel: "Variant"
             },
             campaigns: {

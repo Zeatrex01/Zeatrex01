@@ -9,6 +9,17 @@
 (function () {
     "use strict";
 
+    // The grid and the campaigns are rendered by JS, so on a refresh the browser
+    // restores the old scroll offset against a page that is still thousands of
+    // pixels shorter — the cards appear and the view immediately slides off them.
+    // Take restoration over: land at the top, or on the section the hash names.
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+
+    // Smooth scrolling only after load, so the jump above is never animated.
+    window.addEventListener("load", function () {
+        document.documentElement.classList.add("is-ready");
+    });
+
     // ---------------------------------------------------------
     // Icons (16x16 viewBox)
     // ---------------------------------------------------------
@@ -391,7 +402,7 @@
         var tags = (g.tech || []).map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("");
 
         return '' +
-            '<article class="card reveal" style="--accent:' + esc(g.accent) + ';animation-delay:' + (i * 90) + 'ms">' +
+            '<article class="card reveal" style="--accent:' + esc(g.accent) + ';animation-delay:' + (Math.min(i, 4) * 70) + 'ms">' +
             '<div class="card__art">' + coverHTML(g) +
             '<span class="card__badge' + (live ? "" : " card__badge--wip") + '">' +
             esc(live ? T.status.playable : T.status.wip) + "</span>" +
@@ -428,7 +439,7 @@
             var vc = T.games[v.id] || {};
             return '' +
                 '<article class="card card--ad reveal" style="--accent:' + esc(v.accent) +
-                ';animation-delay:' + (i * 90) + 'ms">' +
+                ';animation-delay:' + (Math.min(i, 4) * 70) + 'ms">' +
                 '<div class="card__art">' + coverHTML(v) +
                 '<span class="card__badge">' + esc(T.status.playable) + '</span>' +
                 '<div class="card__head"><h3>' + esc(vc.title) + '</h3><p>' + esc(vc.tagline) + '</p></div>' +
@@ -449,8 +460,10 @@
             '<div class="camp__icon">' + icon + '</div>' +
             '<div class="camp__meta"><h3>' + esc(copy.title) + '</h3>' +
             '<span class="camp__live">' + esc(T.ads.live) + '</span></div>' +
-            '<a class="btn btn--play camp__store" href="' + esc(c.store.url) +
-            '" target="_blank" rel="noopener noreferrer">' + esc(T.ads.store) + '</a>' +
+            '<div class="camp__stores">' + (c.stores || []).map(function (st) {
+                return '<a class="btn btn--play camp__store" href="' + esc(st.url) +
+                    '" target="_blank" rel="noopener noreferrer">' + esc(st.label) + '</a>';
+            }).join("") + '</div>' +
             '</header>' +
             '<p class="camp__blurb">' + esc(copy.blurb) + '</p>' +
             '<div class="camp__grid">' + variants + '</div>' +
@@ -598,4 +611,19 @@
     syncFsButton();
 
     syncFromHash();   // deep link: /#play-<id> opens straight into the game
+
+    // With manual restoration the browser no longer honours #section links on
+    // load, so do it here — after the sections actually have content.
+    (function () {
+        var id = (location.hash || "").slice(1);
+        var settle = function () {
+            if (!id || id.indexOf("play-") === 0) { window.scrollTo({ top: 0, behavior: "auto" }); return; }
+            var el = document.getElementById(id);
+            if (el) el.scrollIntoView({ behavior: "auto" });
+        };
+        settle();
+        // Fonts and key art land after this script, so run it once more when the
+        // page is fully loaded — otherwise a late reflow drags the view along.
+        window.addEventListener("load", settle);
+    })();
 })();
