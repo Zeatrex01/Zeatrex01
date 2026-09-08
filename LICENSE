@@ -1,0 +1,36 @@
+Copyright (c) 2026 Enes Aksu. All rights reserved.
+
+This repository and everything in it — the site source (index.html, styles.css,
+app.js, config.js), the artwork, the written copy, and every game build under
+games/ — is the proprietary work of Enes Aksu.
+
+PERMITTED
+
+  - Viewing the site and playing the prototypes in your browser.
+  - Reading the source for personal, non-commercial study.
+  - Linking to the site or to an individual prototype.
+
+NOT PERMITTED without prior written permission
+
+  - Copying, redistributing, mirroring or re-hosting any part of this
+    repository, including saving a game build and serving it elsewhere.
+  - Publishing a prototype, in whole or in part, on any store or portal
+    (itch.io, Google Play, App Store, web game portals, ad networks).
+  - Reusing the game code, artwork, level layouts, balance data or design
+    in another product, commercial or otherwise.
+  - Creating derivative works, or removing or altering the copyright
+    notices embedded in the builds.
+
+THIRD-PARTY COMPONENTS
+
+  The game builds under games/ bundle third-party libraries that keep their
+  own licenses, including Three.js (MIT) and cannon-es (MIT). Those licenses
+  cover those libraries only, not the game built on top of them.
+
+NO WARRANTY
+
+  The prototypes are provided "as is", without warranty of any kind, express
+  or implied. The author is not liable for any claim or damage arising from
+  their use.
+
+Permission requests and licensing enquiries: enesaksu9999@gmail.com

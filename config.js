@@ -1,355 +1,315 @@
 // =========================================================
-// PORTFOLIO CONFIG - Refactored Structure
-// Common metadata + Language-specific translations only
+// PROTOTYPE LIBRARY — CONFIG
+// Copyright (c) 2026 Enes Aksu. All rights reserved.
+//
+// Add a new prototype:
+//   1) drop its build in  games/<slug>/index.html
+//   2) add one entry to CONFIG.prototypes below
+//   3) add its texts to translations.tr.games / translations.en.games
 // =========================================================
 
 const CONFIG = {
-    // ========================================
-    // COMMON METADATA (Language-Independent)
-    // ========================================
 
     social: {
-        github: "https://github.com/Zeatrex01",
-        linkedin: "https://www.linkedin.com/in/enesaksuzeatrex/",
-        artstation: "https://www.artstation.com/zeatrex",
         itch: "https://zeatrex.itch.io/",
-        youtube: "https://www.youtube.com/@Zeatrex"
+        github: "https://github.com/Zeatrex01",
+        artstation: "https://www.artstation.com/zeatrex",
+        youtube: "https://www.youtube.com/@Zeatrex",
+        linkedin: "https://www.linkedin.com/in/enesaksuzeatrex/"
     },
 
     email: "enesaksu9999@gmail.com",
 
-    // Games (Common metadata)
-    games: [
+    // ========================================
+    // PROTOTYPES (playable in the browser)
+    // ========================================
+    prototypes: [
         {
-            id: "onekind",
-            platform: "PC / STEAM",
-            tech: ["Unity", "Blender", "C#", "Steamworks"],
-            link: "https://store.steampowered.com/app/2978220/OneKind/",
-            videos: [
-                { title: "Animation Showreel #1", url: "https://youtu.be/J5jENaRt61k?si=QAPSW3rcPmtIRlAf" },
-                { title: "Animation Showreel #2", url: "https://youtu.be/EEF9HunwCls?si=VGpvYI1utPXJal3L" }
-            ],
-            imageUrl: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2978220/header.jpg?t=1732304168",
-            imagePlaceholder: "linear-gradient(45deg, #1a1a1a, #2a2a2a)"
+            id: "royal_guard",
+            path: "games/royal-guard/",       // must contain an index.html
+            year: "2026",
+            status: "playable",               // "playable" | "wip"
+            engine: "Three.js",
+            tech: ["Three.js", "cannon-es", "WebGL", "Vite"],
+            frame: "portrait",                // "portrait" | "landscape"
+            accent: "#54c39a",
+            // art: key art drawn in app.js (ART map). Set `image` to override
+            // it with a real screenshot, e.g. "assets/covers/royal-guard.jpg".
+            art: "royal-guard",
+            image: ""
         },
         {
-            id: "basrinin_evi",
-            platform: "MOBILE",
-            tech: ["Unity Mobile", "Optimization", "URP"],
-            link: "https://play.google.com/store/apps/details?id=com.MiyaviGames.Basridenkacis&hl=tr",
-            imageUrl: "https://play-lh.googleusercontent.com/Yz1CrKmkQHBarXkakI4MTfS7BrPzUTWsVvM0gfgJyjZsX944C9mLWZB_HMMqzCHsuoJH78-FvaN4e64FNSF5pw=w480-h960-rw",
-            imagePlaceholder: "linear-gradient(45deg, #2c1a1a, #1a1a1a)"
+            id: "misir_kovasi",
+            path: "games/misir-kovasi/",
+            year: "2026",
+            status: "playable",
+            engine: "Canvas 2D",
+            tech: ["JavaScript", "Canvas", "Level design"],
+            frame: "portrait",
+            accent: "#f5c640",
+            art: "misir-kovasi",
+            image: ""
         },
         {
-            id: "snackstack",
-            platform: "MOBILE / HYPERCASUAL",
-            tech: ["Unity", "C#", "Level Design"],
-            link: "https://play.google.com/store/apps/details?id=com.MiyaviGames.SnackStack",
-            imageUrl: "https://img.itch.zone/aW1nLzI1MDExNjE2LnBuZw==/original/rmlwJp.png",
-            imagePlaceholder: "linear-gradient(45deg, #1a2a2a, #1a1a1a)"
-        },
-        {
-            id: "vr_farming",
-            type: "animation",
-            platform: "VR / INTERNSHIP",
-            tech: ["Unity VR", "Animation", "Medical Sim"],
-            link: "https://www.youtube.com/watch?v=vWzRECn6t0Y&pp=0gcJCZQKAYcqIYzv",
-            videos: [
-                { title: "VR Farming Demo", url: "https://www.youtube.com/watch?v=vWzRECn6t0Y&pp=0gcJCZQKAYcqIYzv" }
-            ],
-            imageUrl: "",
-            imagePlaceholder: "linear-gradient(45deg, #2c3e50, #4ca1af)"
-        },
-        {
-            id: "puslu_kitalar",
-            type: "animation",
-            platform: "ANIMATION / GRADUATION",
-            tech: ["Blender", "Adobe Premiere", "Krita", "Photoshop"],
-            link: "https://youtu.be/7VFmraZxs8k",
-            videos: [
-                { title: "Puslu Kıtalar Atlası — Jenerik", url: "https://youtu.be/7VFmraZxs8k" }
-            ],
-            imageUrl: "",
-            imagePlaceholder: "linear-gradient(45deg, #1a1a2e, #3d1a78)"
-        }
-    ],
-
-    // Assets (Common metadata)
-    assets: [
-        {
-            id: "medieval_weapons",
-            type: "3D MODEL",
-            tech: ["Blender", "Substance"],
-            link: "https://fab.com/s/c62caceb1036",
-            imageUrl: "https://media.fab.com/image_previews/gallery_images/2709e9e8-ca13-4021-8007-7468460bd2a4/3095f69d-1226-4b74-830d-ed26e2ac7f49.jpg"
-        },
-        {
-            id: "sweet_pack",
-            type: "3D MODEL",
-            tech: ["Blender", "Affinity"],
-            link: "https://fab.com/s/8269bcee33b9",
-            imageUrl: "https://media.fab.com/image_previews/gallery_images/0f7b233e-9d54-4324-a9e5-14954afae02d/63857f35-154c-4f86-94ad-57b4d213adc9.jpg"
-        },
-        {
-            id: "pirate_gun",
-            type: "3D MODEL",
-            tech: ["Blender", "Substance 3D Painter"],
-            link: "https://fab.com/s/1b8ba1232d41",
-            imageUrl: "https://media.fab.com/image_previews/gallery_images/882955a9-71c8-4b06-95fa-5499741c00a3/f3d80a9a-66ed-4175-b8fc-f8f05caab57e.jpg"
-        },
-        {
-            id: "animated_chest",
-            type: "3D MODEL",
-            tech: ["Blender", "Substance 3D Painter", "Unity"],
-            link: "https://assetstore.unity.com/packages/3d/props/stylised-animated-chest-352396",
-            imageUrl: "https://assetstorev1-prd-cdn.unity3d.com/package-screenshot/c4ba163f-d75d-4738-aaa1-31b4d304fb6b.webp"
-        },
-        {
-            id: "stylised_sword",
-            type: "3D MODEL",
-            tech: ["Blender", "Substance 3D Painter", "Unity"],
-            link: "https://assetstore.unity.com/packages/3d/props/weapons/stylised-sword-284498",
-            imageUrl: "https://assetstorev1-prd-cdn.unity3d.com/key-image/791f56df-a99d-4523-95ad-95ce23235c9c.webp"
+            id: "trafik_dedektifi",
+            path: "games/trafik-dedektifi/",
+            year: "2026",
+            status: "playable",
+            engine: "Canvas 2D",
+            tech: ["JavaScript", "Canvas", "Onboarding design"],
+            frame: "portrait",
+            accent: "#ffd04b",
+            art: "trafik-dedektifi",
+            image: ""
         }
     ],
 
     // ========================================
-    // TRANSLATIONS (Text-only)
+    // CAMPAIGNS — playable ads built for a shipped app
     // ========================================
+    campaigns: [
+        {
+            id: "popcorn_pop_sort",
+            accent: "#f0b429",
+            art: "popcorn-icon",
+            store: {
+                label: "App Store",
+                url: "https://apps.apple.com/us/app/popcorn-pop-sort/id6762401537"
+            },
+            variants: [
+                {
+                    id: "pcs_conveyor",
+                    path: "games/popcorn-sort-conveyor/",
+                    status: "playable",
+                    frame: "portrait",
+                    accent: "#e0552f",
+                    art: "popcorn-conveyor"
+                },
+                {
+                    id: "pcs_rush",
+                    path: "games/popcorn-sort-rush/",
+                    status: "playable",
+                    frame: "portrait",
+                    accent: "#f0b429",
+                    art: "popcorn-rush"
+                }
+            ]
+        }
+    ],
 
+    // ========================================
+    // TRANSLATIONS
+    // ========================================
     translations: {
+
         tr: {
-            // Personal Info
-            name: "Enes Aksu",
-            role: "Technical Animator & 3D Artist",
-            bio: "Unity' de teknik animasyon, Blender' da 3D sanat. Model tasarlıyorum, sahneleri canlandırıyorum.",
-
-            // Hero
-            heroLabel: "3D Artist & Technical Animator",
-            heroCta: "Çalışmalarımı Gör",
-
-            // Navigation
+            meta: {
+                title: "Prototip Kütüphanesi",
+                description: "Tarayıcıda oynanabilir oyun prototipleri kütüphanesi. Kurulum yok, mağaza yok."
+            },
+            a11y: { skip: "Kütüphaneye geç" },
             nav: {
-                showreel: "Showreel",
-                work: "Portföy",
-                projects: "Projeler",
-                about: "Hakkımda"
+                library: "Kütüphane",
+                ads: "Reklamlar",
+                contact: "İletişim",
+                langLabel: "EN"
             },
-
-            // Section Titles
-            sectionTitles: {
-                showreel: "Animasyon Showreeli",
-                games: "Çalıştığım Projeler",
-                assets: "3D Portföy",
-                education: "Eğitim"
+            hero: {
+                title: "Prototip Kütüphanesi",
+                subtitle: "Kurulum yok, mağaza yok. Her prototip tek dosya build olarak burada duruyor ve doğrudan bu sayfanın içinde açılıyor."
             },
-
-            // Misc labels
-            portfolioSub: "Modelleme · Doku · Rigging · Animasyon",
-            seeAll: "Tümünü Gör",
-            moreWorks: "Daha fazla eser için...",
-            projectsLabel: "Oyun Projeleri",
-            viewProject: "Projeye Git",
-            aboutLabel: "Ben Kimim",
-            platformsLabel: "Platformlar & İletişim",
-            emailLabel: "E-posta",
-            links: {
-                artstation: "3D Eserlerim · Modeller",
-                youtube: "Videolar & Showreel",
-                github: "Kod Projeleri",
-                linkedin: "Profesyonel Profil",
-                itch: "Oyun Projeleri"
+            stats: {
+                playable: "Oynanabilir prototip",
+                install: "Kurulum gerekir",
+                engines: "Motor"
             },
-
-            // Game Translations
+            sections: {
+                all: "Tüm prototipler",
+                ads: "Oynanabilir reklamlar"
+            },
+            ads: {
+                live: "App Store'da yayında",
+                store: "App Store'da gör",
+                variantLabel: "Varyant"
+            },
+            campaigns: {
+                popcorn_pop_sort: {
+                    title: "Popcorn Pop Sort",
+                    blurb: "Yayınlanmış oyun için üretilen oynanabilir reklamlar. Playable ad, kullanıcının indirmeden önce oyunun özünü birkaç saniyede denediği reklam formatı — bu yüzden döngü en sade haline indirgenir. Aynı oyunun iki farklı açılışı denendi."
+                }
+            },
+            labels: {
+                play: "Oyna",
+                newTab: "Yeni sekme",
+                close: "Kapat",
+                fullscreen: "Tam ekran",
+                exitFullscreen: "Tam ekrandan çık",
+                controls: "Kontroller",
+                tech: "Teknoloji",
+                year: "Yıl",
+                engine: "Motor",
+                escHint: "Kapatmak için ESC"
+            },
+            status: {
+                playable: "Tarayıcıda oynanır",
+                wip: "Geliştiriliyor"
+            },
             games: {
-                onekind: {
-                    title: "OneKind",
-                    role: "3D Generalist (DionySoft)",
-                    description: "OGEM destegiyle DionySoft ekibi tarafindan gelistirilen, GIST 2024'te tanitilan ciftlik temali multiplayer sosyal cikarim oyunu. Modelleme ve animasyonlarini ustlendim."
+                royal_guard: {
+                    title: "Royal Guard",
+                    tagline: "Barikatını kur, kralını koru.",
+                    description: "Fizik tabanlı bir savunma prototipi. Kaleye giden yolda üç durak var; her durakta önce akıncıları ağaçlara ve kayalara fırlatıp tahta ile taş topluyor, sonra topladığın malzemeyle kralın önüne bir barikat kuruyorsun. Savunma başlayınca siperin gerçek çarpışmalarla sınanıyor.",
+                    controls: [
+                        "Akıncıları ağaca ve kayaya fırlat, tahta ve taş topla",
+                        "Topladığın parçaları tepsiden yola sürükle, ÇEVİR ile döndür",
+                        "SAVUNMAYA BAŞLA ile dalgayı çağır, üç durağı da geç"
+                    ]
                 },
-                basrinin_evi: {
-                    title: "Basrinin Evi",
-                    role: "Developer",
-                    description: "Mobil icin optimize edilmis, yerel kulturel ogeler barindiran hybrid korku-bulmaca oyunu."
+                misir_kovasi: {
+                    title: "Mısır Kovası",
+                    tagline: "Nişan al, koçandan kopar, kovayı doldur.",
+                    description: "Atış tabanlı bir eşleştirme prototipi. Koçana mısır tanesi fırlatıyorsun; aynı renkler birleşince bağlantısı kopan tüm taneler aşağı düşüp kovaya giriyor. Sadece düşenler siparişe yazılıyor, patlayanlar sayılmıyor — bu yüzden nereye ateş edeceğin kadar neyi kopardığın da önemli. Sınırlı atış, seviye başına üç yıldız.",
+                    controls: [
+                        "Nişan almak için sürükle, bırakınca ateşle",
+                        "Aynı renkleri birleştir, kopan taneleri kovaya düşür",
+                        "Bomba ve karıştırma yardımcılarını sıkıştığında kullan"
+                    ]
                 },
-                snackstack: {
-                    title: "SnackStack",
-                    role: "Developer",
-                    description: "Yuksek performansli, bagimlilik yapici hyper-casual mekanikleri. Genis kitleler icin optimize edildi."
+                pcs_conveyor: {
+                    title: "Conveyor",
+                    tagline: "Bantta gelen paketi doğru kovaya patlat.",
+                    description: "Sakin açılış. Paketler banttan geliyor, oyuncu dokunup patlatıyor ve mısır uygun kovaya doluyor. Amaç, mekaniği baskı yaratmadan tek dokunuşta öğretmek.",
+                    controls: ["Patlatmak için pakete dokun", "Her kovayı doldur"]
                 },
-                vr_farming: {
-                    title: "VR Farming & Medical VR",
-                    role: "Developer & Animator (Intern)",
-                    description: "Istinye Universitesi XR Lab stajinda ekip olarak gelistirilen VR ciftcilik demosu (Kod & Animasyon: Ben, Model: Ekip Arkadasim) ve cesitli medikal animasyon projeleri."
+                pcs_rush: {
+                    title: "Rush",
+                    tagline: "Açık kovayla eşleşen paketi yakala.",
+                    description: "Baskılı açılış. Aynı mekanik ama tempo yüksek: açık kovaya uyan paketi bulup dokunuyorsun, sayaç akıyor. Aynı oyunun daha çok kışkırtan ikinci varyantı.",
+                    controls: ["Açık kovayla eşleşen pakete dokun", "15 kovayı süre bitmeden doldur"]
                 },
-                puslu_kitalar: {
-                    title: "Puslu Kıtalar Atlası",
-                    role: "Animatör & Motion Designer (Mezuniyet Projesi)",
-                    description: "Türk fantastiğinin başyapıtı Puslu Kıtalar Atlası için hazırlanmış kitap jeneriği. Blender ile 3D, Krita & Photoshop ile illüstrasyon, Premiere ile kurgu."
+                trafik_dedektifi: {
+                    title: "Trafik Dedektifi",
+                    tagline: "Mahalleni devriye gez, kuralı çiğneyeni yakala.",
+                    description: "Oyuncak bir mahallede geçen, öğretme odaklı bir devriye prototipi. Her adımda tek bir trafik kuralı tanıtılıyor, sonra o kuralı çiğneyen aracı bulup dokunman isteniyor. Kurallar üst üste biniyor, tabelalar açık kalıyor ve devriye zorlaşıyor. Acele ettiren bir sayaç yok — amaç öğretmek.",
+                    controls: [
+                        "Kuralı çiğneyen araca dokun",
+                        "Tabelalar açık kalır, önceki kurallar geçerliliğini sürdürür",
+                        "Üç hakkın var; telsiz görevleri isteğe bağlı bonus"
+                    ]
                 }
             },
-
-            // Asset Translations
-            assets: {
-                medieval_weapons: {
-                    title: "Low Poly Medieval Weapon Pack",
-                    description: "Oyun icin hazir, low-poly silah seti."
-                },
-                sweet_pack: {
-                    title: "Stylized Sweet Pack",
-                    description: "Low poly stilize tatli paketi."
-                },
-                pirate_gun: {
-                    title: "Stylized Pirate Hand Gun",
-                    description: "Low poly stilize korsan tabancasi."
-                },
-                animated_chest: {
-                    title: "Stilize Animasyonlu Sandik",
-                    description: "Detayli doku ve animasyonlu sandik modeli."
-                },
-                stylised_sword: {
-                    title: "Stilize Kilic",
-                    description: "Low poly stilize kilic modeli."
-                }
+            soon: {
+                title: "Sıradakiler",
+                body: "Yeni prototipler tamamlandıkça buraya eklenecek."
             },
-
-            // About Section
-            about: {
-                description: "Teknik animasyon ve 3D sanatı bir arada yürütüyor, oyun deneyimlerini başından sonuna şekillendiriyorum. Rigging'den sahne animasyonuna, low-poly modelden tam teşekküllü asset pakete uzanan geniş bir alanda çalışıyorum.",
-                stats: [
-                    { label: "Yıl Deneyim", value: "3+" },
-                    { label: "Yayınlanan Oyun", value: "4" },
-                    { label: "Asset Paketi", value: "20+" }
-                ]
-            },
-
-            // Education
-            education: {
-                field: "Bilgisayar Destekli Tasarim ve Animasyon",
-                school: "Istanbul Gelisim Universitesi",
-                degree: "On Lisans"
-            },
-
-            // Footer
-            footer: "Ziyaretiniz için teşekkürler!"
+            footer: {
+                rights: "Tüm prototipler kişisel çalışmadır. Kopyalanamaz, yeniden yayınlanamaz."
+            }
         },
 
         en: {
-            // Personal Info
-            name: "Enes Aksu",
-            role: "Technical Animator & 3D Artist",
-            bio: "Technical animation in Unity, 3D art in Blender. I design models and bring scenes to life.",
-
-            // Hero
-            heroLabel: "3D Artist & Technical Animator",
-            heroCta: "View My Work",
-
-            // Navigation
+            meta: {
+                title: "Prototype Library",
+                description: "A library of game prototypes playable straight in the browser. No installs, no store pages."
+            },
+            a11y: { skip: "Skip to the library" },
             nav: {
-                showreel: "Showreel",
-                work: "Portfolio",
-                projects: "Projects",
-                about: "About"
+                library: "Library",
+                ads: "Ads",
+                contact: "Contact",
+                langLabel: "TR"
             },
-
-            // Section Titles
-            sectionTitles: {
-                showreel: "Animation Showreel",
-                games: "Projects I Worked On",
-                assets: "3D Portfolio",
-                education: "Education"
+            hero: {
+                title: "Prototype Library",
+                subtitle: "No installs, no store pages. Every prototype is a single-file build kept here and launched right inside this page."
             },
-
-            // Misc labels
-            portfolioSub: "Modeling · Texturing · Rigging · Animation",
-            seeAll: "See All",
-            moreWorks: "More works...",
-            projectsLabel: "Game Projects",
-            viewProject: "View Project",
-            aboutLabel: "About Me",
-            platformsLabel: "Platforms & Contact",
-            emailLabel: "Email",
-            links: {
-                artstation: "3D Artwork · Models",
-                youtube: "Videos & Showreel",
-                github: "Code Projects",
-                linkedin: "Professional Profile",
-                itch: "Game Projects"
+            stats: {
+                playable: "Playable prototypes",
+                install: "Installs required",
+                engines: "Engines"
             },
-
-            // Game Translations
+            sections: {
+                all: "All prototypes",
+                ads: "Playable ads"
+            },
+            ads: {
+                live: "Live on the App Store",
+                store: "View on the App Store",
+                variantLabel: "Variant"
+            },
+            campaigns: {
+                popcorn_pop_sort: {
+                    title: "Popcorn Pop Sort",
+                    blurb: "Playable ads built for a shipped game. A playable ad is the format where a player tries the core of a game for a few seconds before installing, so the loop gets stripped back to its simplest form. Two different openings were tried for the same game."
+                }
+            },
+            labels: {
+                play: "Play",
+                newTab: "New tab",
+                close: "Close",
+                fullscreen: "Fullscreen",
+                exitFullscreen: "Exit fullscreen",
+                controls: "Controls",
+                tech: "Tech",
+                year: "Year",
+                engine: "Engine",
+                escHint: "Press ESC to close"
+            },
+            status: {
+                playable: "Playable in browser",
+                wip: "Work in progress"
+            },
             games: {
-                onekind: {
-                    title: "OneKind",
-                    role: "3D Generalist (DionySoft)",
-                    description: "Farm-themed multiplayer social deduction game developed by DionySoft with OGEM support. Showcased at GIST 2024. I handled 3D modeling and animation."
+                royal_guard: {
+                    title: "Royal Guard",
+                    tagline: "Build the barricade, protect your king.",
+                    description: "A physics-driven defense prototype. Three stops stand between you and the castle; at each one you first hurl raiders into trees and rocks to harvest wood and stone, then spend that material building a barricade in front of your king. Once the defense starts, the wall is tested by real collisions.",
+                    controls: [
+                        "Throw raiders into trees and rocks to harvest wood and stone",
+                        "Drag harvested pieces from the tray onto the road, ROTATE to turn them",
+                        "START DEFENSE to call the wave and clear all three stops"
+                    ]
                 },
-                basrinin_evi: {
-                    title: "Basrinin Evi",
-                    role: "Developer",
-                    description: "Hybrid horror-puzzle game optimized for mobile, featuring local cultural elements."
+                misir_kovasi: {
+                    title: "Corn Bucket",
+                    tagline: "Aim, cut it loose, fill the bucket.",
+                    description: "A shooter-flavoured matching prototype. You fire kernels at the cob; matching colours pop, and every kernel that loses its connection falls into the bucket below. Only what falls counts towards the order — what pops does not — so what you cut loose matters as much as what you hit. Limited shots, three stars per level.",
+                    controls: [
+                        "Drag to aim, release to fire",
+                        "Match colours and drop the disconnected kernels into the bucket",
+                        "Save the bomb and shuffle helpers for when you are stuck"
+                    ]
                 },
-                snackstack: {
-                    title: "SnackStack",
-                    role: "Developer",
-                    description: "High-performance, addictive hyper-casual mechanics. Optimized for broad device compatibility."
+                pcs_conveyor: {
+                    title: "Conveyor",
+                    tagline: "Pop the package coming down the belt into the right tub.",
+                    description: "The calm opening. Packages arrive on a conveyor, the player taps to pop one, and the popcorn fills a matching tub. The goal is to teach the mechanic in a single tap, with no pressure.",
+                    controls: ["Tap a package to pop it", "Fill every tub"]
                 },
-                vr_farming: {
-                    title: "VR Farming & Medical VR",
-                    role: "Developer & Animator (Intern)",
-                    description: "Team-developed VR farming demo at Istinye University XR Lab (Code & Anim: Me, Models: Teammate). Also worked on various medical animation projects."
+                pcs_rush: {
+                    title: "Rush",
+                    tagline: "Grab the package that matches an open tub.",
+                    description: "The pressured opening. Same mechanic, higher tempo: find the package matching an open tub and tap it while the meter drains. The more provoking of the two variants.",
+                    controls: ["Tap the package matching an open tub", "Fill 15 tubs before time runs out"]
                 },
-                puslu_kitalar: {
-                    title: "Puslu Kıtalar Atlası",
-                    role: "Animator & Motion Designer (Graduation Project)",
-                    description: "A book intro sequence for Puslu Kıtalar Atlası, a cornerstone of Turkish fantasy literature. 3D in Blender, illustration in Krita & Photoshop, edited in Premiere."
+                trafik_dedektifi: {
+                    title: "Traffic Detective",
+                    tagline: "Patrol the neighbourhood, catch the rule breaker.",
+                    description: "A teaching-first patrol prototype set in a toy neighbourhood. Each step introduces exactly one traffic rule, then asks you to find and tap the vehicle breaking it. Rules stack up, the signs stay posted, and the patrol gets harder. There is no clock rushing you — the point is to teach.",
+                    controls: [
+                        "Tap the vehicle breaking the rule",
+                        "Signs stay posted; earlier rules keep applying",
+                        "Three lives; the radio missions are an optional bonus"
+                    ]
                 }
             },
-
-            // Asset Translations
-            assets: {
-                medieval_weapons: {
-                    title: "Low Poly Medieval Weapon Pack",
-                    description: "Game-ready, low-poly weapon set."
-                },
-                sweet_pack: {
-                    title: "Stylized Sweet Pack",
-                    description: "Low poly stylized sweet pack."
-                },
-                pirate_gun: {
-                    title: "Stylized Pirate Hand Gun",
-                    description: "Low poly stylized pirate hand gun."
-                },
-                animated_chest: {
-                    title: "Stylised Animated Chest",
-                    description: "Animated chest model with detailed textures."
-                },
-                stylised_sword: {
-                    title: "Stylised Sword",
-                    description: "Low poly stylized sword model."
-                }
+            soon: {
+                title: "Up next",
+                body: "New prototypes land here as they are finished."
             },
-
-            // About Section
-            about: {
-                description: "I drive technical animation and 3D art simultaneously, shaping game experiences from start to finish. My range spans rigging to scene animation, low-poly modeling to full asset packs.",
-                stats: [
-                    { label: "Years Exp", value: "3+" },
-                    { label: "Shipped Games", value: "4" },
-                    { label: "Asset Packs", value: "20+" }
-                ]
-            },
-
-            // Education
-            education: {
-                field: "Computer-Aided Design and Animation",
-                school: "Istanbul Gelisim University",
-                degree: "Associate Degree"
-            },
-
-            // Footer
-            footer: "Thanks for visiting!"
+            footer: {
+                rights: "All prototypes are personal work. No copying or republishing."
+            }
         }
     }
 };
