@@ -1,0 +1,2674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#05090F">
+<title>Power Jam 3D — concept</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:100%;height:100%;background:#05090F;overflow:hidden;
+    -webkit-tap-highlight-color:transparent;overscroll-behavior:none;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  #gl,#hud{position:absolute;inset:0;width:100%;height:100%;display:block;
+    touch-action:none;-webkit-user-select:none;user-select:none}
+  #hud{pointer-events:none}
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<canvas id="hud"></canvas>
+<script>
+"use strict";
+// ─── core/pieces.js ───────────────────────────────────────────
+// POWER JAM — core logic. NO BROWSER APIs.
+// Matches docs/SPEC.md + docs/GDD.md exactly.
+//
+// Piece set, weights and the deterministic RNG.
+// WARNING: changing PIECE_ORDER or WEIGHTS invalidates EVERY existing level seed.
+
+// 9×9 with 3×3 regions — the Blockudoku/Woodoku formula.
+// Why not 8×8: there a line is 8 cells and no region size balances it (4×4=16 is far too hard,
+// 2×2=4 far too easy). On 9×9 a row is 9, a column is 9, a region is 9 — all three are EQUALLY
+// hard and feed each other. Measured (80 runs): clears 10.8 → 26.5/run, run 37 → 85 moves,
+// regions accounting for 54% of all clears.
+const GRID_W = 9;
+const GRID_H = 9;
+const REGION = 3;                    // 3×3 region edge (0 disables the region rule)
+const FULL = (1 << GRID_W) - 1;
+
+// ---------------------------------------------------------------- pieces
+
+// O3 — the 3×3 cube — IS LOAD-BEARING. It was removed on 3 August and put back the same day, and
+// the reason is worth the space, because the piece looks like the most obviously cuttable thing in
+// the table and it is the opposite.
+//
+// The case against it was real: it is exactly the size of a region and there are nine aligned
+// regions, so nine of its 49 placements clear with no setup at all. Measured over 60 runs, 85.3% of
+// the cubes actually played were that move — the biggest piece in the game was also the easiest.
+// Pricing it down was tried first and failed: a score-seeking bot still buried the cube on an empty
+// region 77.9% of the time when that clear paid ZERO. The move is not a reward, it is disposal —
+// nine cells in, nine cells out, net zero board occupancy — so score was never what made it best.
+//
+// Then removing it was measured, and it has a SECOND role nobody had counted: **it is the game's
+// primary loss condition.** A 3×3 cube needs a completely empty 3×3 area, and when it cannot find
+// one the run is over. With the cube in the pool, 40 of 60 seeded runs ended with a cube sitting in
+// the tray — 67% of all deaths — and the number of cubes drawn but never played was also exactly 40.
+// Take it out and runs go 91.4 → 178.8 moves, score 18.4K → 40.6K. Mean piece size barely moves
+// (3.45 → 3.31), so it is not about material at all: it is about the piece that could not be placed.
+//
+// So the owner's report — "the cube has no purpose, I place it and it clears" — was half the story.
+// It has two: a free clear when there is room, and the thing that ends the run when there is not.
+// The second half is invisible, because a player attributes that death to running out of space
+// rather than to the cube. The reward is legible and the cost is not, which is exactly why it feels
+// purposeless. Full workings: docs/ELESTIRI-VE-DENGE.md §8.7-B.
+//
+// **If the cube annoys a player, the fix is to make its cost visible, not to delete it.** Deleting
+// it removes the difficulty, not the annoyance.
+const PIECE_ORDER = [
+  "I1","I2H","I2V","L3_NW","L3_NE","L3_SE","L3_SW",   // weight 3
+  "I3H","I3V","O2","L5_NW","L5_NE","L5_SE","L5_SW",   // weight 2
+  "I4H","I4V","I5H","I5V","O3"                        // weight 1
+];
+
+const WEIGHTS = [3,3,3,3,3,3,3, 2,2,2,2,2,2,2, 1,1,1,1,1];
+const TOTAL_WEIGHT = 40;
+
+const SHAPES = {
+  I1:    [[0,0]],
+  I2H:   [[0,0],[1,0]],
+  I2V:   [[0,0],[0,1]],
+  L3_NW: [[0,0],[1,0],[0,1]],
+  L3_NE: [[0,0],[1,0],[1,1]],
+  L3_SE: [[1,0],[0,1],[1,1]],
+  L3_SW: [[0,0],[0,1],[1,1]],
+  I3H:   [[0,0],[1,0],[2,0]],
+  I3V:   [[0,0],[0,1],[0,2]],
+  O2:    [[0,0],[1,0],[0,1],[1,1]],
+  L5_NW: [[0,0],[1,0],[2,0],[0,1],[0,2]],
+  L5_NE: [[0,0],[1,0],[2,0],[2,1],[2,2]],
+  L5_SE: [[2,0],[2,1],[0,2],[1,2],[2,2]],
+  L5_SW: [[0,0],[0,1],[0,2],[1,2],[2,2]],
+  I4H:   [[0,0],[1,0],[2,0],[3,0]],
+  I4V:   [[0,0],[0,1],[0,2],[0,3]],
+  I5H:   [[0,0],[1,0],[2,0],[3,0],[4,0]],
+  I5V:   [[0,0],[0,1],[0,2],[0,3],[0,4]],
+  O3:    [[0,0],[1,0],[2,0],[0,1],[1,1],[2,1],[0,2],[1,2],[2,2]],
+};
+
+const PIECES = PIECE_ORDER.map((name, id) => {
+  const cells = SHAPES[name];
+  let w = 0, h = 0;
+  for (const [x, y] of cells) { if (x + 1 > w) w = x + 1; if (y + 1 > h) h = y + 1; }
+  const masks = new Array(h).fill(0);
+  for (const [x, y] of cells) masks[y] |= (1 << x);
+  return { id, name, cells, w, h, size: cells.length, masks };
+});
+
+// ---------------------------------------------------------------- rng
+
+function makeRng(seed) { return { state: seed >>> 0 }; }
+
+function rngNext(rng) {
+  rng.state = (rng.state + 0x6D2B79F5) >>> 0;
+  let t = rng.state;
+  t = Math.imul(t ^ (t >>> 15), t | 1) >>> 0;
+  t = (t ^ (t + Math.imul(t ^ (t >>> 7), t | 61))) >>> 0;
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+}
+
+function drawPiece(rng) {
+  let r = Math.floor(rngNext(rng) * TOTAL_WEIGHT);
+  for (let i = 0; i < WEIGHTS.length; i++) {
+    r -= WEIGHTS[i];
+    if (r < 0) return i;
+  }
+  return WEIGHTS.length - 1;
+}
+
+// ─── core/board.js ────────────────────────────────────────────
+// Board: bitmask rows + power-block layers. Pure data, no game rules.
+
+// ---------------------------------------------------------------- board
+
+
+// The final `& 0xFF` is not decoration. Without it the byte-summing multiply leaves the high
+// byte in the result, so every value with bit 8 set — that is, every row holding a block in the
+// 9th column — came back 256 too high: popcount(0x100) returned 257, popcount(FULL) returned 265.
+// It went unnoticed because the run mode never calls this with a non-zero value (its `targets`
+// layer is always empty) and because no invariant asserts a cell count.
+function popcount(v) {
+  v = v - ((v >> 1) & 0x5555);
+  v = (v & 0x3333) + ((v >> 2) & 0x3333);
+  return ((((v + (v >> 4)) & 0x0F0F) * 0x0101) >> 8) & 0xFF;
+}
+
+function newBoard(opts = {}) {
+  return {
+    rows: new Uint16Array(GRID_H),
+    blockers: new Uint16Array(GRID_H),
+    targets: new Uint16Array(GRID_H),
+    // power-block layers — always 0 in level mode
+    painted: new Uint16Array(GRID_H),
+    broken: new Uint16Array(GRID_H),
+    owner: new Uint8Array(GRID_W * GRID_H),  // cell → placement no (block membership for partial blasts)
+    piece: new Uint8Array(GRID_W * GRID_H),  // cell → color no+1 · color belongs to the BLOCK, not the cell
+    // EXPERIMENTAL rule, per board rather than global: does a 3×3 have to sit on the sudoku grid
+    // (0,3,6) or does any 3×3 count? A property of the game being played, so the normal mode and
+    // the experimental one can exist in the same build without a flag either of them can see.
+    regionFree: !!opts.regionFree,
+  };
+}
+
+// Clone the board — the only place to touch when a layer is added.
+// (blockers is shared: it is never mutated)
+function cloneBoard(b) {
+  return {
+    rows: new Uint16Array(b.rows),
+    blockers: b.blockers,
+    targets: new Uint16Array(b.targets),
+    painted: new Uint16Array(b.painted),
+    broken: new Uint16Array(b.broken),
+    owner: new Uint8Array(b.owner),
+    piece: new Uint8Array(b.piece),
+    // Must be copied. A bot probes moves on clones; if the flag were dropped here every
+    // lookahead would silently evaluate the NORMAL rules while the real board used the
+    // experimental ones, and the mode would look broken for reasons nothing could explain.
+    regionFree: b.regionFree,
+  };
+}
+
+function isRowClearable(b, y) {
+  return (((b.rows[y] | b.blockers[y]) & FULL) === FULL) && (b.rows[y] !== 0);
+}
+
+function isColClearable(b, x) {
+  const bit = 1 << x;
+  let hasNormal = false;
+  for (let y = 0; y < GRID_H; y++) {
+    if (((((b.rows[y] | b.blockers[y]) >> x) & 1)) === 0) return false;
+    if ((b.rows[y] & bit) !== 0) hasNormal = true;
+  }
+  return hasNormal;
+}
+
+// Can this 3×3 region be cleared? Same rule as rows/columns: every cell filled (blockers count)
+// and at least one normal block inside.
+function isRegionClearable(b, bx, by) {
+  let hasNormal = false;
+  for (let dy = 0; dy < REGION; dy++) {
+    const y = by + dy;
+    for (let dx = 0; dx < REGION; dx++) {
+      const x = bx + dx;
+      if (!(((b.rows[y] | b.blockers[y]) >> x) & 1)) return false;
+      if ((b.rows[y] >> x) & 1) hasNormal = true;
+    }
+  }
+  return hasNormal;
+}
+
+// Every 3×3 the rules will look at. Aligned to the sudoku grid (0,3,6) normally; on a board with
+// `regionFree` every position counts, so a 3×3 clump clears wherever the player builds it.
+// Pass the board so the answer follows the game being played — no argument means aligned, which
+// is what every caller that predates the experimental mode means.
+//
+// One pass, all of them at once. Overlapping 3×3s are not a problem: clearLines unions their
+// cells into a single mask, so no cell is removed or scored twice, and because clearing only
+// ever REMOVES cells no new full 3×3 can appear afterwards — the "nothing clearable survives"
+// invariant still holds with no cascade step.
+//
+// `n` is a different matter: each 3×3 found counts as one clear, so a filled 4×4 reports four.
+// Measured on the free rule, the biggest single clear went from 3 to 9 and score rose 208% — the
+// reason the mode is kept separate rather than tuned into the main game.
+function regionOrigins(b) {
+  const out = [];
+  if (!REGION) return out;
+  const step = (b && b.regionFree) ? 1 : REGION;
+  for (let by = 0; by + REGION <= GRID_H; by += step)
+    for (let bx = 0; bx + REGION <= GRID_W; bx += step) out.push([bx, by]);
+  return out;
+}
+
+function canPlace(b, piece, x, y) {
+  if (x < 0 || y < 0 || x + piece.w > GRID_W || y + piece.h > GRID_H) return false;
+  for (let i = 0; i < piece.h; i++) {
+    const shifted = (piece.masks[i] << x) & 0xFFFF;
+    if ((shifted & (b.rows[y + i] | b.blockers[y + i])) !== 0) return false;
+  }
+  return true;
+}
+
+function applyPiece(b, piece, x, y) {
+  for (let i = 0; i < piece.h; i++) b.rows[y + i] |= (piece.masks[i] << x);
+}
+
+function clearLines(b) {
+  const fullRows = [], fullCols = [], fullRegions = [];
+  for (let y = 0; y < GRID_H; y++) if (isRowClearable(b, y)) fullRows.push(y);
+  for (let x = 0; x < GRID_W; x++) if (isColClearable(b, x)) fullCols.push(x);
+  for (const [bx, by] of regionOrigins(b)) if (isRegionClearable(b, bx, by)) fullRegions.push([bx, by]);
+
+  const n = fullRows.length + fullCols.length + fullRegions.length;
+  if (n === 0) return { n: 0, targetsCleared: 0, rows: [], cols: [], regions: [], cells: [] };
+
+  let colMask = 0;
+  for (const x of fullCols) colMask |= (1 << x);
+
+  const mask = new Uint16Array(GRID_H);
+  for (let y = 0; y < GRID_H; y++) mask[y] = colMask;
+  for (const y of fullRows) mask[y] = FULL;
+  // regions: overlapping cells merge into the same mask, so nothing is counted twice
+  for (const [bx, by] of fullRegions) {
+    let rm = 0;
+    for (let dx = 0; dx < REGION; dx++) rm |= (1 << (bx + dx));
+    for (let dy = 0; dy < REGION; dy++) mask[by + dy] |= rm;
+  }
+
+  let targetsCleared = 0;
+  const cells = [];
+  for (let y = 0; y < GRID_H; y++) {
+    targetsCleared += popcount(b.targets[y] & mask[y]);
+    const removed = b.rows[y] & mask[y];
+    for (let x = 0; x < GRID_W; x++) if ((removed >> x) & 1) cells.push([x, y]);
+  }
+
+  for (let y = 0; y < GRID_H; y++) {
+    b.rows[y] &= ~mask[y] & 0xFFFF;
+    b.targets[y] &= ~mask[y] & 0xFFFF;
+    b.painted[y] &= ~mask[y] & 0xFFFF;
+    b.broken[y] &= ~mask[y] & 0xFFFF;
+    for (let x = 0; x < GRID_W; x++) if ((mask[y] >> x) & 1) { b.owner[y*GRID_W+x]=0; b.piece[y*GRID_W+x]=0; }
+  }
+  return { n, targetsCleared, rows: fullRows, cols: fullCols, regions: fullRegions, cells };
+}
+
+// Preview the result without running clearLines (for highlighting) — regions included,
+// otherwise the player cannot see a region completing before they drop the piece
+function previewClear(b, piece, x, y) {
+  const rows = new Uint16Array(b.rows);
+  const tmp = { rows, blockers: b.blockers, targets: b.targets };
+  for (let i = 0; i < piece.h; i++) rows[y + i] |= (piece.masks[i] << x);
+  const fullRows = [], fullCols = [], fullRegions = [];
+  for (let yy = 0; yy < GRID_H; yy++) if (isRowClearable(tmp, yy)) fullRows.push(yy);
+  for (let xx = 0; xx < GRID_W; xx++) if (isColClearable(tmp, xx)) fullCols.push(xx);
+  for (const [bx, by] of regionOrigins(b)) if (isRegionClearable(tmp, bx, by)) fullRegions.push([bx, by]);
+  return { rows: fullRows, cols: fullCols, regions: fullRegions,
+           n: fullRows.length + fullCols.length + fullRegions.length };
+}
+
+// ─── core/level.js ────────────────────────────────────────────
+// Level mode: designed puzzles, goals, undo, stars.
+// Power blocks do NOT work here — that layer lives in power.js.
+
+// ---------------------------------------------------------------- level loading
+
+
+
+function parseBoard(lines) {
+  const b = newBoard();
+  let targetCount = 0;
+  for (let y = 0; y < GRID_H; y++) {
+    for (let x = 0; x < GRID_W; x++) {
+      const c = lines[y][x];
+      if (c === 'X') b.rows[y] |= (1 << x);
+      else if (c === '#') b.blockers[y] |= (1 << x);
+      else if (c === 'T') { b.rows[y] |= (1 << x); b.targets[y] |= (1 << x); targetCount++; }
+    }
+  }
+  return { board: b, targetCount };
+}
+
+function newGame(level) {
+  const { board, targetCount } = parseBoard(level.board);
+  const st = {
+    levelId: level.id,
+    cfg: {
+      goalType: level.goal.type,
+      goalTotal: level.goal.type === 'tiles' ? targetCount : level.goal.count,
+      moveLimit: level.moveLimit ?? null,
+      noLose: !!level.noLose,
+      par: level.par,
+      mode: 'LEVEL',
+    },
+    board,
+    tray: [null, null, null],
+    rng: makeRng(level.pieceSeed),
+    score: 0, combo: 0, moves: 0, goalProgress: 0,
+    undoStack: [], undoLeft: 3,
+    phase: 'PLAYING', lossReason: null,
+  };
+  refillTray(st);
+  return st;
+}
+
+function refillTray(st) {
+  if (st.cfg.mode === 'LEVEL') {
+    st.tray = [drawPiece(st.rng), drawPiece(st.rng), drawPiece(st.rng)];
+    return;
+  }
+  for (let attempt = 0; attempt < 20; attempt++) {
+    const probe = { state: st.rng.state };
+    const cand = [drawPiece(probe), drawPiece(probe), drawPiece(probe)];
+    if (cand.some(id => anyFit(st.board, PIECES[id]))) {
+      st.rng.state = probe.state; st.tray = cand; return;
+    }
+    st.rng.state = probe.state;
+    st.tray = cand;
+  }
+}
+
+function anyFit(b, piece) {
+  for (let y = 0; y <= GRID_H - piece.h; y++)
+    for (let x = 0; x <= GRID_W - piece.w; x++)
+      if (canPlace(b, piece, x, y)) return true;
+  return false;
+}
+
+function isDead(st) {
+  for (const id of st.tray) {
+    if (id === null) continue;
+    if (anyFit(st.board, PIECES[id])) return false;
+  }
+  return true;
+}
+
+function snapshot(st) {
+  return {
+    rows: new Uint16Array(st.board.rows),
+    targets: new Uint16Array(st.board.targets),
+    tray: st.tray.slice(),
+    rngState: st.rng.state,
+    score: st.score, combo: st.combo, moves: st.moves,
+    goalProgress: st.goalProgress, phase: st.phase, lossReason: st.lossReason,
+  };
+}
+
+function rescue(st) {
+  let best = -1, bestCount = 0;
+  for (let y = 0; y < GRID_H; y++) {
+    const c = popcount(st.board.rows[y]);
+    if (c > bestCount) { bestCount = c; best = y; }
+  }
+  if (best >= 0) {
+    st.board.rows[best] = 0;
+    st.board.targets[best] = 0;
+    return best;
+  }
+  return -1;
+}
+
+// Returns: an event object (the renderer turns it into animation) or null (illegal move)
+function place(st, trayIdx, x, y) {
+  if (st.phase !== 'PLAYING') return null;
+  const id = st.tray[trayIdx];
+  if (id === null || id === undefined) return null;
+  const piece = PIECES[id];
+  if (!canPlace(st.board, piece, x, y)) return null;
+
+  st.undoStack.push(snapshot(st));
+  if (st.undoStack.length > 3) st.undoStack.shift();
+
+  const ev = { placed: { piece, x, y }, cleared: null, combo: 0, gained: 0, refilled: false, rescued: -1 };
+
+  applyPiece(st.board, piece, x, y);
+  st.tray[trayIdx] = null;
+  st.moves += 1;
+  st.score += piece.size;
+  ev.gained += piece.size;
+
+  const res = clearLines(st.board);
+  if (res.n > 0) {
+    st.combo += 1;
+    const mult = Math.min(1 + 0.5 * (st.combo - 1), 4.0);
+    const pts = Math.round(10 * res.n * res.n * mult);
+    st.score += pts;
+    ev.gained += pts;
+    ev.cleared = res;
+    ev.combo = st.combo;
+    st.goalProgress += (st.cfg.goalType === 'lines') ? res.n : res.targetsCleared;
+  } else {
+    st.combo = 0;
+  }
+
+  if (st.tray.every(t => t === null)) { refillTray(st); ev.refilled = true; }
+
+  if (st.goalProgress >= st.cfg.goalTotal) { st.phase = 'WON'; return ev; }
+  if (st.cfg.moveLimit && st.moves >= st.cfg.moveLimit) {
+    st.phase = 'LOST'; st.lossReason = 'MOVE_LIMIT'; return ev;
+  }
+  if (isDead(st)) {
+    if (st.cfg.noLose) ev.rescued = rescue(st);
+    else { st.phase = 'LOST'; st.lossReason = 'NO_SPACE'; }
+  }
+  return ev;
+}
+
+function undo(st) {
+  if (st.undoLeft <= 0) return false;
+  if (st.undoStack.length === 0) return false;
+  if (st.phase === 'WON') return false;
+  const s = st.undoStack.pop();
+  st.board.rows.set(s.rows);
+  st.board.targets.set(s.targets);
+  st.tray = s.tray.slice();
+  st.rng.state = s.rngState;
+  st.score = s.score; st.combo = s.combo; st.moves = s.moves;
+  st.goalProgress = s.goalProgress; st.phase = s.phase; st.lossReason = s.lossReason;
+  st.undoLeft -= 1;
+  return true;
+}
+
+function starsFor(level, moves) {
+  if (moves <= level.par) return 3;
+  if (moves <= level.par + 5) return 2;
+  return 1;
+}
+
+// ─── core/power.js ────────────────────────────────────────────
+// POWER JAM — power blocks: Painter, Magnet, chaining, streaks, multi-line reward.
+// Every balance value lives in the single POWER_CFG object (spec §7).
+
+// ============================================================ POWER JAM — power blocks
+// docs/SPEC.md · block jam base + the Painter and Magnet powers.
+// Not a separate "mode" — this is the game. All progression happens inside the run (spec §4):
+// no meta, no upgrade screen — the combo multiplier accrues, powers get denser, timers shrink.
+
+
+
+
+const POWERS = {
+  PAINTER: 'PAINTER',   // setup: paints its surroundings; when a painted line fills, they all blast
+  MAGNET:  'MAGNET',    // arrangement: pulls painted cells toward itself, gathering a scattered setup
+};
+
+const POWER_CFG = {
+  paintRadius: 1,          // Chebyshev — 8 directions, 1 cell (spec §2)
+  paintSelf: true,         // the Painter's own cells count as painted too
+  painterLife: 6,          // base lifetime — shrinks as the run advances, see painterLife()
+  paintLimit: 10,          // how many cells can be painted at once
+  // Magnet radius is 2: the spec says "1 cell", but at 1 a directly adjacent cell would move
+  // into the Magnet's own (occupied) cell, so the mechanic never fires at all.
+  magnetRadius: 2,
+  specialEveryTrays: 3,    // base interval — shrinks as the run advances, see specialGap()
+  firstTraySpecial: true,  // guaranteed power in tray 1 (so the mechanic shows up early)
+  // Chance a SINGLE power is a Painter. Paired powers are always 1-1 (Painter+Magnet), so the
+  // overall 60/40 split required by spec §3 only holds if this is 0.8:
+  //   P = (0.5·1 + 0.5·0.8) / 1.5 = 60%
+  painterChance: 0.8,
+  // --- synergy: with both off, Painter and Magnet practically NEVER meet — the Painter lives
+  //     ~2 trays while the next power arrives 5 trays later. Across 60 runs × 8 configurations,
+  //     tuning interval/lifetime alone never passed 10%; paired powers took it from 0% to 39%.
+  synergyWindow: false,    // true: while a Painter is active, the next power is always a Magnet
+  pairChance: 0.5,         // chance a power tray carries TWO slots at once: Painter + Magnet
+  // Should the Painter stay on the board after a blast? If true it spends its paint but does
+  // not die: with its remaining time it REPAINTS its surroundings → one Painter can chain blasts.
+  // The cheapest answer to "waiting for a power to show up is boring".
+  painterSurvivesBlast: true,
+  // Does a blast refresh the Painter's timer? If true the reward EXTENDS the streak:
+  // blast and it lives, fail and it dies. Skill decides its lifetime, not the clock — the combo
+  // becomes a streak.
+  refillLifeOnBlast: true,
+  refillLifeAmount: 0,     // 0 = full refresh, >0 = add this many moves (capped at painterLife)
+  // Can the Painter survive a blast made on its LAST move? The survive test used to require
+  // remaining > 1, so a blast on the final placement paid its score and then killed the Painter
+  // and reset the streak. That contradicts the pillar refillLifeOnBlast exists for
+  // (ELESTIRI-VE-DENGE.md §8.6-A): "blast and it lives, fail and it dies — skill decides its
+  // lifetime, not the clock." At remaining 1 the clock was deciding.
+  // There was no mechanical reason for it: tickPainter runs AFTER the blast and refillLifeOnBlast
+  // resets remaining to painterLife, so the tick lands on painterLife-1 and the chain continues.
+  // It reads as a guard written before refillLifeOnBlast existed.
+  // Note it only matters while refillLifeOnBlast is on. With that off, surviving at remaining 1
+  // means surviving for zero further moves — the tick expires it immediately.
+  // MEASURED AND TURNED OFF. `ab.mjs survivesAtLastMove=false,true`, 60 runs: moves -10.1%,
+  // clears -10.2%, blasts -12.7%, multi-line rewards -24.0%, score -15.4% — four metrics outside
+  // their band — and the streak it was built to lift moved -1.4%. It costs a tenth of the run and
+  // buys nothing. The mechanism: a surviving Painter's body is protected from its own blast, so
+  // keeping it alive longer keeps a permanent obstruction on the board for longer.
+  // Left in place, off, like synergyWindow. The narrow fix below is the one that shipped.
+  survivesAtLastMove: false,
+  // The complaint this card came from was the STREAK resetting, not the body persisting. This
+  // keeps the streak when the Painter dies on the very move it blasted — the reward without the
+  // obstruction. Measured separately; see docs/OZELLIK-HARITASI.md.
+  streakSurvivesBlastDeath: true,
+  tierEvery: 10,           // one difficulty tier per N line clears (spec §4)
+  // MULTI-LINE REWARD: clearing n lines in a single move is the hardest thing in the game, yet
+  // it only paid score. Measured at 0.8 times per run — rare, so the reward has to be strong.
+  multiClearReward: 2,     // reward from this many lines upward (0 = disabled)
+  multiClearLimitBonus: 3, // permanent paint-cap bonus when a Painter is already out
+
+  minSpecialGap: 2,        // interval bottoms out at 2 (base starts at 3)
+  minPainterLife: 4,       // lifetime bottoms out at 4 (6 → 5 → 4)
+  lineScore: 100,          // per cleared line/column/region
+  // A `soloRegionScore` dial lived here: a region filled by ONE placement paid a fraction, to stop
+  // the 3×3 cube being a full-price clear with no setup. It was measured (balance-safe, but a
+  // score-seeking bot still buried the cube 77.9% of the time when that clear paid zero) and then
+  // made unreachable by the decision that followed — O3 left the draw pool, and no remaining piece
+  // has nine cells, so no single placement can fill a region. The dial and its detection were
+  // removed rather than left as code that can never run. The reasoning is kept in
+  // docs/ELESTIRI-VE-DENGE.md §8.7-B, which is where it is useful.
+  paintedCellScore: 50,    // per painted cell blasted
+  comboStart: 1.0,
+  comboStep: 0.5,          // each mass blast raises the multiplier by this much
+  comboMax: 4.0,           // cap — with chaining on, the multiplier ran to ×6.5 and score lost meaning
+
+  // COMBO CHAIN — consecutive clears.
+  // It used to reset on the first move that cleared nothing, and it paid no score at all: a
+  // badge, not a reward. Measured over 120 bot runs, ~70% of all moves clear nothing (true on
+  // 8×8 and 9×9 alike — the grid size never was the problem), so the chain averaged 1.37 and
+  // reached 3+ in only 5% of cases. The combo could not exist.
+  // A grace window fixes it. Chain average by grace: 0 → 1.37 · 1 → 1.84 · 2 → 3.47 · 3 → 4.66.
+  // 2 is the pick: 55% of chains reach 3, 26% reach 5, and there are still ~7.5 separate chains
+  // per run — rarer than before, but each one is real. At 3 the chain almost never dies.
+  comboGrace: 2,           // dead moves the chain survives (0 = old behaviour)
+  comboLineBonus: 0.25,    // line score gains this much per chain step past the first
+  comboLineMax: 3.0,       // cap on that factor (chain 9+)
+
+  // ANCHOR — the blast eats its own fuel. It removes 8-9 cells, so the board around the Painter
+  // empties and the next line gets harder to finish; measured, the streak plateaus at 3.3
+  // (docs/ELESTIRI-VE-DENGE.md §8.6-A). The Anchor gathers the debris a blast leaves behind one
+  // cell toward the Painter and the Painter paints what arrives — so a blast now FEEDS the next
+  // one instead of starving it.
+  //
+  // Deliberately NOT a tray power. Measured over 60 seeded runs: a third power sharing the tray
+  // channel drops Painter+Magnet co-occurrence from 49.8% to 16.7% (-67%), spending two thirds
+  // of what pairChance was added to buy (IDEAS.md §9 warned about this without a number). It is
+  // earned from the streak instead — the same off-tray channel multiClearReward already uses —
+  // so the synergy rate is untouched. It also adds no on-board counter, which is what keeps it
+  // inside the casual budget of ~2 variables (ELESTIRI-VE-DENGE.md §4).
+  // MEASURED AND TURNED OFF. At 2 it fired 3.42 times per run and made every metric worse:
+  // clears 28.5 -> 25.5/run (-10.6%, outside its band), moves 94 -> 86, score 18.4K -> 16.3K,
+  // and the streak it was built to lift went DOWN, 2.43 -> 2.30. Two structural reasons:
+  //   1. the paint cap was already binding — mean 9.25 painted per blast against a cap of 10,
+  //      34% of blasts exactly at it — so "more fuel" has under one cell of room to become a
+  //      bigger blast. paintedPerBlast did not move at all: 8.5363 -> 8.5330.
+  //   2. a row, column or region needs cells SPREAD along it. Pulling debris toward the Painter
+  //      concentrates them, which costs placement room and line chances at the same time.
+  // The general lesson is bigger than this dial: anything that amplifies the blast shortens the
+  // streak, because the blast's own output is an emptier board. Lifting the plateau needs
+  // material ADDED to the board, and the tray is the only thing that adds material.
+  // Left in place, off, like synergyWindow: one dial re-runs the experiment.
+  anchorMinStreak: 0,      // fires from this streak upward (0 = disabled; measured at 2, see above)
+  anchorRadius: 3,         // Chebyshev reach when looking for debris
+  anchorMaxPulls: 6,       // cap — one blast must not rearrange the whole board
+
+  // SWEEPER — a partial blast leaves the rest of the block behind as an orphan cell. In a puzzle
+  // with no gravity a scattered single cell is pure poison (ELESTIRI-VE-DENGE.md §2), but nobody
+  // knew whether the fragments were poison or material, and both §2 and §7 asked for exactly
+  // this switch so the two could be compared instead of argued. true = the blast takes the whole
+  // block. Passive: no tray slot, no counter, no decision — it just happens on a blast.
+  //
+  // OWNER'S DECISION (3 Aug): OFF. Three balance points were measured and the choice was run
+  // length, because that is the target the game was already missing:
+  //   off  — 91.4 moves/run, the closest to the 50-90 target of ELESTIRI-VE-DENGE.md §8
+  //   on   — 99.3 moves/run, and median score +36.2%, outside its band
+  //   on + sweepOnlyIsolated — 105.9 moves/run, clears and multi-line rewards outside their bands
+  // Sweeping did buy real things (clears +4.7%, chain +6.5%) and they were given up on purpose:
+  // a run already above its target getting longer is worse than fragments on the board.
+  // The fragments themselves are still poison in principle — that part of §2 was answered — but
+  // the cure cost more than the disease.
+  sweepBroken: false,
+  // Sweep only the cells that are floating alone (no orthogonal neighbour), keeping clusters.
+  // The wide version removed the rest of the block whatever its shape, and §2's actual claim was
+  // narrower: *scattered SINGLE cells* are poison. A two-cell fragment is not litter, it is the
+  // material a line still needs — and the owner's report after playing the wide version was that
+  // the board empties too much.
+  //
+  // MEASURED, AND IT DOES NOT FIX THAT. Board fill is unchanged (last third 28.1 either way) and
+  // the dry spell got slightly worse (8.45 → 8.68 moves), because fill is an EQUILIBRIUM between
+  // piece input and clear output, not a consequence of how much a blast removes: leave the material
+  // and the bot simply clears more (+12.5%), settling at the same fill.
+  // What it does change is generosity — clears +12.5%, blasts +11.3%, multi-line rewards +36.0%,
+  // score +16.1%, run length 99.3 → 105.9 — and two of those are outside their band. It pushes run
+  // length further from the 50-90 target (board.md P-5) and makes the multi-line reward common,
+  // which was designed around being rare.
+  // Left off: it is more faithful to §2's wording and measurably worse against the project's own
+  // targets. Three balance points now exist; picking one is the owner's call.
+  sweepOnlyIsolated: false,
+};
+
+// Color is a property of the block itself: assigned in the tray, carried onto the board when
+// placed. Consumes no RNG — it varies colors per tray without shifting the piece stream.
+const BLOCK_COLORS = 4;
+function colorFor(refills, slot, pieceId) {
+  let h = Math.imul((refills * 3 + slot + 1) ^ Math.imul(pieceId + 1, 2654435761), 2246822519);
+  h = (h ^ (h >>> 13)) >>> 0;
+  return h % BLOCK_COLORS;
+}
+
+const cellFilled = (b, x, y) => ((b.rows[y] >> x) & 1) === 1;
+const inBounds = (x, y) => x >= 0 && y >= 0 && x < GRID_W && y < GRID_H;
+
+// --- progression curve (spec §4): powers get denser while the window to use them narrows
+function runTier(st) { return Math.floor(st.linesTotal / POWER_CFG.tierEvery); }
+function specialGap(st) {
+  return Math.max(POWER_CFG.minSpecialGap, POWER_CFG.specialEveryTrays - runTier(st));
+}
+function painterLife(st) {
+  return Math.max(POWER_CFG.minPainterLife, POWER_CFG.painterLife - runTier(st));
+}
+
+// opts.regionFree starts the EXPERIMENTAL free-3×3 mode. It is a separate mode on purpose: the
+// rule measured 2.5× longer runs and 3× the score, so folding it into the main game would mean
+// re-blessing the whole balance golden. `cfg.mode` carries the label for the HUD.
+function newRun(seed, opts = {}) {
+  const st = {
+    levelId: 0,
+    cfg: { goalType:'none', goalTotal:Infinity, moveLimit:null, noLose:false, par:0,
+           mode: opts.regionFree ? 'FREE' : 'RUN' },
+    board: newBoard({ regionFree: opts.regionFree }),
+    tray: [null, null, null],
+    trayPower: [null, null, null],        // POWERS.* or null per slot
+    trayColor: [0, 1, 2],                 // color no per slot — carried onto the board when placed
+    painter: null,                        // {cells:[[x,y]], remaining, painted:[[x,y]]}
+    comboMult: POWER_CFG.comboStart,
+    blasts: 0, paintedBlasted: 0, bestMult: POWER_CFG.comboStart, streak: 0, bestStreak: 0,
+    paintBonus: 0, multiRewards: 0,
+    refills: 0, linesTotal: 0, nextOwner: 1,
+    rng: makeRng(seed >>> 0),
+    score: 0, combo: 0, comboMiss: 0, bestCombo: 0, moves: 0, goalProgress: 0,
+    undoStack: [], undoLeft: 0,
+    phase: 'PLAYING', lossReason: null,
+  };
+  refillRun(st);
+  return st;
+}
+
+function refillRun(st) {
+  // pieces — at least one must fit (anti-frustration)
+  for (let attempt = 0; attempt < 20; attempt++) {
+    const probe = { state: st.rng.state };
+    const cand = [drawPiece(probe), drawPiece(probe), drawPiece(probe)];
+    st.rng.state = probe.state;
+    st.tray = cand;
+    if (cand.some(id => anyFit(st.board, PIECES[id]))) break;
+  }
+  // power assignment — RNG is always consumed so the piece stream stays aligned
+  const rSlot = rngNext(st.rng), rKind = rngNext(st.rng), rPair = rngNext(st.rng);
+  st.refills += 1;
+  st.trayPower = [null, null, null];
+  st.trayColor = [0,1,2].map(i => colorFor(st.refills, i, st.tray[i]));
+  const due = (st.refills === 1 && POWER_CFG.firstTraySpecial)
+           || (st.refills % specialGap(st) === 0);
+  if (due) {
+    const slot = Math.min(2, Math.floor(rSlot * 3));
+    if (rPair < POWER_CFG.pairChance) {
+      // paired powers: Painter + Magnet in the same tray — set up, gather, blast in one turn
+      st.trayPower[slot] = POWERS.PAINTER;
+      st.trayPower[(slot + 1) % 3] = POWERS.MAGNET;
+    } else if (POWER_CFG.synergyWindow && st.painter) {
+      // a Painter is out: make the incoming power a Magnet so the setup can be gathered
+      st.trayPower[slot] = POWERS.MAGNET;
+    } else {
+      st.trayPower[slot] = rKind < POWER_CFG.painterChance ? POWERS.PAINTER : POWERS.MAGNET;
+    }
+  }
+}
+
+// ---------------------------------------------------------------- Painter
+
+function paintCell(st, x, y) {
+  if (!inBounds(x, y)) return false;
+  const b = st.board;
+  if (!cellFilled(b, x, y)) return false;
+  if ((b.painted[y] >> x) & 1) return false;
+  if (st.painter.painted.length >= POWER_CFG.paintLimit + (st.paintBonus || 0)) return false;
+  b.painted[y] |= (1 << x);
+  st.painter.painted.push([x, y]);
+  return true;
+}
+
+// Shortest Chebyshev distance to the Painter (Infinity if outside the radius)
+function distToPainter(st, x, y) {
+  let best = Infinity;
+  for (const [cx, cy] of st.painter.cells) {
+    const d = Math.max(Math.abs(x - cx), Math.abs(y - cy));
+    if (d < best) best = d;
+  }
+  return best;
+}
+
+// Never leave WHICH cells get painted ambiguous when the cap is hit:
+// nearest to the Painter first, ties broken top-to-bottom then left-to-right.
+// Same rule as the Magnet's pull order — a random order would pollute playtesting.
+function paintInOrder(st, cand) {
+  const out = [];
+  for (const c of cand.sort((a, b) => (a.d - b.d) || (a.y - b.y) || (a.x - b.x)))
+    if (paintCell(st, c.x, c.y)) out.push([c.x, c.y]);
+  return out;
+}
+
+// The moment a Painter lands: paint the filled cells within its radius
+function paintAround(st) {
+  const r = POWER_CFG.paintRadius;
+  const seen = new Map();
+  for (const [cx, cy] of st.painter.cells)
+    for (let dy = -r; dy <= r; dy++)
+      for (let dx = -r; dx <= r; dx++) {
+        if (dx === 0 && dy === 0 && !POWER_CFG.paintSelf) continue;
+        const x = cx + dx, y = cy + dy;
+        if (!inBounds(x, y)) continue;
+        const d = Math.max(Math.abs(dx), Math.abs(dy)), key = y * GRID_W + x;
+        const prev = seen.get(key);
+        if (!prev || d < prev.d) seen.set(key, { x, y, d });
+      }
+  return paintInOrder(st, [...seen.values()]);
+}
+
+// Continuous painting: cells of NEW placements that enter an active Painter's radius
+function paintNewCells(st, cells) {
+  const r = POWER_CFG.paintRadius, cand = [];
+  for (const [px, py] of cells) {
+    const d = distToPainter(st, px, py);
+    if (d <= r) cand.push({ x: px, y: py, d });
+  }
+  return paintInOrder(st, cand);
+}
+
+// Timer ran out / blast happened → the paint fades and the Painter becomes a normal block
+function clearPaint(st) {
+  const b = st.board, gone = [];
+  for (const [x, y] of st.painter.painted)
+    if ((b.painted[y] >> x) & 1) { b.painted[y] &= ~(1 << x) & 0xFFFF; gone.push([x, y]); }
+  st.painter = null;
+  return gone;
+}
+
+// ---------------------------------------------------------------- Magnet
+
+function moveCell(b, x, y, nx, ny) {
+  const bit = 1 << x, nbit = 1 << nx;
+  b.rows[y] &= ~bit & 0xFFFF;  b.rows[ny] |= nbit;
+  if ((b.painted[y] >> x) & 1) { b.painted[y] &= ~bit & 0xFFFF; b.painted[ny] |= nbit; }
+  if ((b.broken[y]  >> x) & 1) { b.broken[y]  &= ~bit & 0xFFFF; b.broken[ny]  |= nbit; }
+  b.owner[ny * GRID_W + nx] = b.owner[y * GRID_W + x];
+  b.owner[y * GRID_W + x] = 0;
+  b.piece[ny * GRID_W + nx] = b.piece[y * GRID_W + x];
+  b.piece[y * GRID_W + x] = 0;
+}
+
+// The moment a Magnet lands: pulls cells within its radius one square toward itself.
+// Painted cells if any exist, otherwise normal filled cells (spec §3).
+// Order is deterministic: nearest to the Magnet outward — the same move must always repeat.
+function magnetPull(st, magnetCells) {
+  const b = st.board;
+  const own = new Set(magnetCells.map(([x, y]) => y * GRID_W + x));
+  const r = POWER_CFG.magnetRadius;
+  const seen = new Map();
+  for (const [mx, my] of magnetCells)
+    for (let dy = -r; dy <= r; dy++)
+      for (let dx = -r; dx <= r; dx++) {
+        const x = mx + dx, y = my + dy, key = y * GRID_W + x;
+        if (!inBounds(x, y) || own.has(key)) continue;
+        if (!cellFilled(b, x, y)) continue;
+        const d = Math.max(Math.abs(dx), Math.abs(dy));
+        const prev = seen.get(key);
+        if (!prev || d < prev.d) seen.set(key, { x, y, d, mx, my, painted: ((b.painted[y] >> x) & 1) === 1 });
+      }
+  let list = [...seen.values()];
+  if (list.some(c => c.painted)) list = list.filter(c => c.painted);
+  list.sort((a, c) => (a.d - c.d) || (a.y - c.y) || (a.x - c.x));
+
+  const moves = [];
+  for (const c of list) {
+    const nx = c.x + Math.sign(c.mx - c.x), ny = c.y + Math.sign(c.my - c.y);
+    if (nx === c.x && ny === c.y) continue;
+    if (!inBounds(nx, ny)) continue;
+    if (cellFilled(b, nx, ny) || ((b.blockers[ny] >> nx) & 1)) continue;  // target occupied → no pull
+    moveCell(b, c.x, c.y, nx, ny);
+    if (st.painter && c.painted)
+      for (const p of st.painter.painted)
+        if (p[0] === c.x && p[1] === c.y) { p[0] = nx; p[1] = ny; break; }
+    // The Painter's own body counts as painted, so the Magnet can drag the Painter itself.
+    // Only `painted` used to be updated, leaving `cells` pointing at the square the Painter
+    // no longer occupies — it then measured its radius, and painted, from a ghost position.
+    if (st.painter)
+      for (const p of st.painter.cells)
+        if (p[0] === c.x && p[1] === c.y) { p[0] = nx; p[1] = ny; break; }
+    moves.push({ from: [c.x, c.y], to: [nx, ny], painted: c.painted });
+  }
+  return moves;
+}
+
+// ---------------------------------------------------------------- Anchor
+//
+// Gathers the broken debris around a surviving Painter one cell inward. Order is the same
+// deterministic rule as the Magnet and the paint: nearest first, ties top-to-bottom then
+// left-to-right. A random order would pollute playtesting.
+//
+// A pull that would complete a row, column or region is REFUSED and undone, for two reasons that
+// point the same way. The mechanical one: there is no clearing step after the blast (spec §2 —
+// no cascade), so a completed line would sit on the board uncleared, which the invariant suite
+// forbids outright. The design one matters more: spec §2 puts the blast behind "the player
+// completes a line", and an Anchor that finished lines by itself would quietly take that
+// decision away — the exact failure IDEAS.md §3 rejected the fuse model for.
+
+function completesSomething(b, x, y) {
+  if (isRowClearable(b, y) || isColClearable(b, x)) return true;
+  if (!REGION) return false;
+  return isRegionClearable(b, Math.floor(x / REGION) * REGION, Math.floor(y / REGION) * REGION);
+}
+
+function anchorPull(st) {
+  const b = st.board, r = POWER_CFG.anchorRadius;
+  const own = new Set(st.painter.cells.map(([x, y]) => y * GRID_W + x));
+  const seen = new Map();
+  for (const [px, py] of st.painter.cells)
+    for (let dy = -r; dy <= r; dy++)
+      for (let dx = -r; dx <= r; dx++) {
+        const x = px + dx, y = py + dy, key = y * GRID_W + x;
+        if (!inBounds(x, y) || own.has(key)) continue;
+        if (!((b.broken[y] >> x) & 1)) continue;   // debris only — a clean-up, not a second Magnet
+        const d = Math.max(Math.abs(dx), Math.abs(dy));
+        const prev = seen.get(key);
+        if (!prev || d < prev.d) seen.set(key, { x, y, d, px, py });
+      }
+  const list = [...seen.values()].sort((a, c) => (a.d - c.d) || (a.y - c.y) || (a.x - c.x));
+
+  const moves = [];
+  for (const c of list) {
+    if (moves.length >= POWER_CFG.anchorMaxPulls) break;
+    const nx = c.x + Math.sign(c.px - c.x), ny = c.y + Math.sign(c.py - c.y);
+    if (nx === c.x && ny === c.y) continue;
+    if (!inBounds(nx, ny)) continue;
+    if (cellFilled(b, nx, ny) || ((b.blockers[ny] >> nx) & 1)) continue;  // target occupied → no pull
+    moveCell(b, c.x, c.y, nx, ny);
+    // moveCell is symmetric, so refusing a pull is just moving it back
+    if (completesSomething(b, nx, ny)) { moveCell(b, nx, ny, c.x, c.y); continue; }
+    // Debris can already be painted: a surviving Painter repaints its surroundings before the
+    // Anchor runs. The coordinate list has to follow the cell — this is the ghost-paint bug the
+    // fuzzer found twice, once for the Magnet and once for line clears.
+    for (const p of st.painter.painted)
+      if (p[0] === c.x && p[1] === c.y) { p[0] = nx; p[1] = ny; break; }
+    moves.push({ from: [c.x, c.y], to: [nx, ny], painted: ((b.painted[ny] >> nx) & 1) === 1 });
+  }
+  // whatever arrived in reach becomes fuel — capped by paintLimit like every other paint
+  return { moves, painted: moves.length ? paintAround(st) : [] };
+}
+
+// ---------------------------------------------------------------- blast
+
+function pieceCellsAt(piece, x, y) {
+  return piece.cells.map(([dx, dy]) => [x + dx, y + dy]);
+}
+
+function stampOwner(b, cells, id, colorNo) {
+  for (const [x, y] of cells) {
+    b.owner[y * GRID_W + x] = id;
+    b.piece[y * GRID_W + x] = colorNo + 1;   // 0 = no color assigned
+  }
+}
+
+// Wipe one cell across every layer. Board-level only: it does not touch painter.painted, because
+// the two callers below both discard that list straight afterwards (rebuilt for a survivor, or
+// dropped with the Painter). Syncing here would read as if something depended on it.
+function wipeCell(b, x, y) {
+  const key = y * GRID_W + x;
+  b.rows[y]    &= ~(1 << x) & 0xFFFF;
+  b.painted[y] &= ~(1 << x) & 0xFFFF;
+  b.broken[y]  &= ~(1 << x) & 0xFFFF;
+  b.owner[key] = 0;
+  b.piece[key] = 0;
+}
+
+// Cells of the blocks this blast hit that are STILL on the board — the partial-blast leftovers.
+// `spare` holds cells that must survive whatever happens (the Painter's own body).
+function leftoverCells(b, owners, spare) {
+  const out = [];
+  for (let y = 0; y < GRID_H; y++)
+    for (let x = 0; x < GRID_W; x++) {
+      const key = y * GRID_W + x, o = b.owner[key];
+      if (o && owners.has(o) && cellFilled(b, x, y) && !spare.has(key)) out.push([x, y]);
+    }
+  return out;
+}
+
+// Leftovers stay as orphan cells, drawn small with a dashed edge
+function markBroken(b, cells) {
+  const out = [];
+  for (const [x, y] of cells)
+    if (!((b.broken[y] >> x) & 1)) { b.broken[y] |= (1 << x); out.push([x, y]); }
+  return out;
+}
+
+// Is this cell touching anything orthogonally? A cell with a neighbour is part of a shape and can
+// still help finish a row, a column or a region. A cell with none is floating in a puzzle with no
+// gravity, which is what §2 called poison: it splits a line and blocks placements.
+function hasOrthNeighbour(b, x, y) {
+  const solid = (nx, ny) => inBounds(nx, ny) &&
+    (((b.rows[ny] | b.blockers[ny]) >> nx) & 1) === 1;
+  return solid(x - 1, y) || solid(x + 1, y) || solid(x, y - 1) || solid(x, y + 1);
+}
+
+// SWEEPER: the blast takes more than the painted cells. This is the switch ELESTIRI-VE-DENGE.md §2
+// and §7 both asked for — "(a) fragments stay, (b) a partial blast takes the whole block".
+//
+// sweepOnlyIsolated narrows it to what §2 actually described: *"dağınık TEK hücreler saf zehirdir"*.
+// The wide version removed clusters too, and clusters are material — they are exactly the cells a
+// line still needs.
+//
+// One pass, judged against the board as it stands before any sweeping. Wiping A can leave B
+// orphaned, and re-evaluating would cascade along a diagonal chain until a whole diagonal
+// disappeared — unpredictable for the player and dependent on scan order. One pass is
+// deterministic and matches what the player saw when the blast went off.
+function sweepLeftovers(b, cells) {
+  const doomed = POWER_CFG.sweepOnlyIsolated
+    ? cells.filter(([x, y]) => !hasOrthNeighbour(b, x, y))
+    : cells;
+  for (const [x, y] of doomed) wipeCell(b, x, y);
+  return doomed;
+}
+
+// Mass blast: painted cells vanish; the rest of those blocks are then either kept as broken
+// fragments or swept away, depending on POWER_CFG.sweepBroken.
+function blastPainted(st) {
+  const b = st.board;
+  // In chain mode the Painter protects its own body: the surroundings blast while it stays and
+  // repaints. If the body blasted too there would be nothing left to survive.
+  // If the body went with a line clear there is nothing to survive — never leave a ghost Painter
+  const body = st.painter.cells.filter(([x, y]) => cellFilled(b, x, y));
+  // The clock must not be what ends a chain — see survivesAtLastMove. A live Painter always has
+  // remaining >= 1 (tickPainter expires it at 0), so `> 0` means "only failing to blast kills it".
+  const needed = POWER_CFG.survivesAtLastMove ? 0 : 1;
+  const survives = POWER_CFG.painterSurvivesBlast && st.painter.remaining > needed && body.length > 0;
+  if (survives) st.painter.cells = body;
+  const own = new Set(st.painter.cells.map(([x, y]) => y * GRID_W + x));
+  const owners = new Set(), cells = [];
+  for (const [x, y] of st.painter.painted) {
+    if (!cellFilled(b, x, y)) continue;
+    if (survives && own.has(y * GRID_W + x)) continue;
+    const o = b.owner[y * GRID_W + x];
+    if (o) owners.add(o);
+    cells.push([x, y]);
+  }
+  for (const [x, y] of cells) wipeCell(b, x, y);
+
+  const leftovers = leftoverCells(b, owners, own);
+  const swept  = POWER_CFG.sweepBroken ? sweepLeftovers(b, leftovers) : [];
+  // Anything that survived the sweep is still a fragment and has to be marked as one. With the
+  // narrow rule that is the clusters, which is the entire point: keep the material, drop the litter.
+  const gone = new Set(swept.map(([x, y]) => y * GRID_W + x));
+  const broken = markBroken(b, leftovers.filter(([x, y]) => !gone.has(y * GRID_W + x)));
+  if (survives) {
+    // paint spent but the Painter is still out: it repaints → chaining becomes possible
+    if (POWER_CFG.refillLifeOnBlast) {
+      const full = painterLife(st);
+      st.painter.remaining = POWER_CFG.refillLifeAmount > 0
+        ? Math.min(full, st.painter.remaining + POWER_CFG.refillLifeAmount)
+        : full;                       // the reward extends the streak
+    }
+    st.painter.painted = [];
+    for (const [x, y] of st.painter.cells)          // its body counts as painted again
+      if (cellFilled(b, x, y)) {
+        // No `already painted?` guard here. A surviving body cell keeps the painted bit it was
+        // excluded from the blast with, so skipping it dropped the cell from the list while
+        // leaving it lit on the board: paint the player can see that scores nothing, counts
+        // toward no trigger, and is never cleaned up. Setting the bit again is a no-op.
+        b.painted[y] |= (1 << x); st.painter.painted.push([x, y]);
+      }
+    return { cells, broken, swept, repainted: paintAround(st) };
+  }
+  st.painter = null;
+  return { cells, broken, swept, repainted: [] };
+}
+
+// Multi-line reward: a Painter spawns on the FILLED cell nearest the intersection of the
+// cleared lines. Deterministic — the same board always gives the same result.
+function spawnPainterNear(st, res) {
+  const b = st.board;
+  const ty = res.rows.length ? res.rows[0] : (GRID_H >> 1);
+  const tx = res.cols.length ? res.cols[0] : (GRID_W >> 1);
+  let best = null, bestD = 1e9;
+  for (let yy = 0; yy < GRID_H; yy++)
+    for (let xx = 0; xx < GRID_W; xx++) {
+      if (!cellFilled(b, xx, yy)) continue;
+      const d = Math.abs(xx - tx) + Math.abs(yy - ty);
+      if (d < bestD) { bestD = d; best = [xx, yy]; }
+    }
+  if (!best) return null;
+  st.painter = { cells: [best], remaining: painterLife(st), painted: [] };
+  return { cell: best, painted: paintAround(st) };
+}
+
+// ---------------------------------------------------------------- move pipeline
+//
+// placeRun produces the ENTIRE outcome of a move and writes it into an event object (ev); the
+// presentation layer reads that object and turns it into effects. The order is deliberate:
+//
+//   1 place            2 apply the power     3 MEASURE the trigger state (before clearing)
+//   4 clear lines + score + reward           5 mass blast        6 tick timers
+//
+// Step 3 must come before step 4: if clearing wipes painted cells first, there is no way to
+// tell afterwards whether the blast was triggered.
+
+function applyPlacement(st, trayIdx, piece, x, y) {
+  const cells = pieceCellsAt(piece, x, y);
+  applyPiece(st.board, piece, x, y);
+  stampOwner(st.board, cells, st.nextOwner, st.trayColor[trayIdx]);
+  st.nextOwner = (st.nextOwner % 255) + 1;
+  st.tray[trayIdx] = null;
+  st.trayPower[trayIdx] = null;
+  st.moves += 1;
+  return cells;
+}
+
+function applyPower(st, power, cells, ev) {
+  if (power === POWERS.PAINTER) {
+    // MVP: only one active Painter at a time — a new one fades the previous one's paint (spec §7)
+    if (st.painter) ev.expired = clearPaint(st);
+    st.painter = { cells, remaining: painterLife(st), painted: [] };
+    ev.painterPlaced = { cells };
+    ev.paintedNow = paintAround(st);
+    return;
+  }
+  if (st.painter) ev.paintedNow = paintNewCells(st, cells);
+  // The Magnet is instant and carries no timer — it pulls AFTER painting so cells painted in
+  // the same move can also be gathered
+  if (power === POWERS.MAGNET) ev.pulled = magnetPull(st, cells);
+}
+
+// Measure BEFORE clearing: which lines are about to fill, and is a painted cell inside them?
+function measureTrigger(st) {
+  const b = st.board, fullRows = [], fullCols = [], fullRegions = [];
+  for (let yy = 0; yy < GRID_H; yy++) if (isRowClearable(b, yy)) fullRows.push(yy);
+  for (let xx = 0; xx < GRID_W; xx++) if (isColClearable(b, xx)) fullCols.push(xx);
+  for (const [bx, by] of regionOrigins(b)) if (isRegionClearable(b, bx, by)) fullRegions.push([bx, by]);
+  const inRegion = (px, py) => fullRegions.some(([bx, by]) =>
+    px >= bx && px < bx + REGION && py >= by && py < by + REGION);
+  // The Painter triggers on a row, a column OR a 3×3 region — making this easier is the main
+  // reason the region rule exists: measurements showed 42% of Painters faded unused.
+  const triggered = st.painter !== null && st.painter.painted.some(
+    ([px, py]) => fullRows.includes(py) || fullCols.includes(px) || inRegion(px, py));
+  // Blast score counts ALL painted cells: those that vanish with the cleared line count as
+  // blasted too, otherwise it feels like "I lined up the paint but got nothing for it".
+  return { triggered, paintedTotal: st.painter ? st.painter.painted.length : 0 };
+}
+
+function comboFactor(combo) {
+  return Math.min(POWER_CFG.comboLineMax,
+                  1 + Math.max(0, combo - 1) * POWER_CFG.comboLineBonus);
+}
+
+function scoreClear(st, res, ev) {
+  st.combo += 1; st.comboMiss = 0;
+  if (st.combo > st.bestCombo) st.bestCombo = st.combo;
+  // The chain has to PAY, otherwise it is decoration. Before this it did not touch the score.
+  const f = comboFactor(st.combo);
+  const pts = Math.round(res.n * POWER_CFG.lineScore * f);
+  st.score += pts; ev.gained += pts;
+  ev.cleared = res;
+  st.linesTotal += res.n;
+  ev.combo = st.combo; ev.comboFactor = f;
+}
+
+// Multi-line reward — the hardest thing in the game should pay more than score
+function grantMultiClearReward(st, res, ev) {
+  if (!POWER_CFG.multiClearReward || res.n < POWER_CFG.multiClearReward) return;
+  st.multiRewards += 1;
+  if (st.painter) {
+    // a Painter is already out: refresh its timer and permanently grow its paint capacity
+    st.painter.remaining = painterLife(st);
+    st.paintBonus += POWER_CFG.multiClearLimitBonus;
+    ev.multiReward = { kind:'BOOST', n:res.n, bonus:st.paintBonus,
+                       limit:POWER_CFG.paintLimit + st.paintBonus };
+  } else {
+    const sp = spawnPainterNear(st, res);
+    if (sp) ev.multiReward = { kind:'SPAWN', n:res.n, cell:sp.cell, painted:sp.painted };
+  }
+}
+
+function resolveBlast(st, paintedTotal, ev) {
+  const blast = blastPainted(st);          // the Painter either dies here or survives
+  if (paintedTotal <= 0) return;
+  const pts = Math.round(paintedTotal * POWER_CFG.paintedCellScore * st.comboMult);
+  st.score += pts; ev.gained += pts;
+  ev.blast = { ...blast, total: paintedTotal, points: pts, mult: st.comboMult };
+  st.blasts += 1; st.paintedBlasted += paintedTotal;
+  st.streak += 1; if (st.streak > st.bestStreak) st.bestStreak = st.streak;
+  ev.streak = st.streak;
+  st.comboMult = Math.min(POWER_CFG.comboMax,
+                          st.comboMult + POWER_CFG.comboStep);   // accrues, never resets (spec §4)
+  if (st.comboMult > st.bestMult) st.bestMult = st.comboMult;
+  ev.comboMult = st.comboMult;
+  // no cascade: gaps opened by a blast do not trigger further line clears (spec §2)
+
+  // ANCHOR: turn the debris this blast just made into fuel for the next one. Gated on the streak
+  // so it rewards a chain that is already running instead of handing out a free tidy-up on every
+  // blast — the streak is the thing that plateaus, so the streak is what it pays.
+  if (POWER_CFG.anchorMinStreak && st.painter && st.streak >= POWER_CFG.anchorMinStreak) {
+    const a = anchorPull(st);
+    if (a.moves.length) ev.anchored = a;
+  }
+}
+
+// Painter lifetime: it does not tick down on the move that placed it
+function tickPainter(st, power, ev) {
+  if (!st.painter || power === POWERS.PAINTER) return;
+  st.painter.remaining -= 1;
+  if (st.painter.remaining <= 0) ev.expired = clearPaint(st);
+}
+
+function placeRun(st, trayIdx, x, y) {
+  if (st.phase !== 'PLAYING') return null;
+  const id = st.tray[trayIdx];
+  if (id === null || id === undefined) return null;
+  const piece = PIECES[id];
+  if (!canPlace(st.board, piece, x, y)) return null;
+
+  const ev = { placed:{piece,x,y}, cleared:null, combo:0, gained:0, refilled:false, rescued:-1,
+               power: st.trayPower[trayIdx], painterPlaced:null, paintedNow:[], pulled:[],
+               blast:null, expired:null, anchored:null, comboMult: st.comboMult,
+               comboLeft:0, comboLost:0, comboFactor:1 };
+  const power = ev.power;
+
+  const cells = applyPlacement(st, trayIdx, piece, x, y);
+  applyPower(st, power, cells, ev);
+
+  const { triggered, paintedTotal } = measureTrigger(st);
+
+  const res = clearLines(st.board);
+  if (res.n > 0) {
+    scoreClear(st, res, ev);
+    grantMultiClearReward(st, res, ev);
+  } else if (st.combo > 0) {
+    // The chain does not die on the first quiet move — it burns through its grace first.
+    // This is also the only pressure the run has: the player can SEE it running out.
+    st.comboMiss += 1;
+    if (st.comboMiss > POWER_CFG.comboGrace) { ev.comboLost = st.combo; st.combo = 0; st.comboMiss = 0; }
+  }
+  ev.comboLeft = st.combo > 0 ? POWER_CFG.comboGrace - st.comboMiss + 1 : 0;
+
+  if (triggered && st.painter) resolveBlast(st, paintedTotal, ev);
+
+  // A line clear can take the Painter's own block with it. Its coordinates would otherwise stay
+  // behind and it would go on painting around a square that is no longer there. Pruned AFTER
+  // the blast so a trigger that was already earned still pays out.
+  if (st.painter) {
+    const alive = st.painter.cells.filter(([x, y]) => cellFilled(st.board, x, y));
+    if (alive.length === 0) ev.expired = clearPaint(st);
+    else st.painter.cells = alive;
+  }
+
+  tickPainter(st, power, ev);
+
+  // If the Painter left the board the streak ends — the streak lives only while it does.
+  // Unless it left ON the move it blasted: the streak counts consecutive BLASTS, and zeroing it
+  // there is the thing that reads as "I blasted and got punished for it". This is the narrow
+  // version of survivesAtLastMove — it keeps the reward without keeping the body, which is what
+  // made the wide version cost 10% of the run.
+  if (!st.painter && !(POWER_CFG.streakSurvivesBlastDeath && ev.blast)) st.streak = 0;
+
+  if (st.tray.every(t => t === null)) { refillRun(st); ev.refilled = true; }
+  if (isDead(st)) { st.phase = 'LOST'; st.lossReason = 'NO_SPACE'; }
+  return ev;
+}
+
+// ─── game3d/gl.js ─────────────────────────────────────────────
+// Minimal WebGL layer — matrices, shaders, an instanced mesh batch.
+//
+// No library. three.js would be 600 KB against a 200 KB game and would break the one rule this
+// project has kept since day one: no dependency, no outside request, works offline. Everything
+// here is the subset a board of cubes actually needs: one perspective camera, one directional
+// key light, and instanced draws so 81 blocks plus a few hundred pieces of debris cost one call.
+
+// ---------------------------------------------------------------- mat4 (column-major)
+const m4 = {
+  ident: () => new Float32Array([1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]),
+  perspective(fovy, aspect, near, far){
+    const f = 1/Math.tan(fovy/2), nf = 1/(near-far);
+    return new Float32Array([f/aspect,0,0,0, 0,f,0,0, 0,0,(far+near)*nf,-1, 0,0,2*far*near*nf,0]);
+  },
+  lookAt(eye, at, up){
+    const z0=eye[0]-at[0], z1=eye[1]-at[1], z2=eye[2]-at[2];
+    let l = Math.hypot(z0,z1,z2) || 1;
+    const zx=z0/l, zy=z1/l, zz=z2/l;
+    let xx=up[1]*zz-up[2]*zy, xy=up[2]*zx-up[0]*zz, xz=up[0]*zy-up[1]*zx;
+    l = Math.hypot(xx,xy,xz) || 1; xx/=l; xy/=l; xz/=l;
+    const yx=zy*xz-zz*xy, yy=zz*xx-zx*xz, yz=zx*xy-zy*xx;
+    return new Float32Array([
+      xx,yx,zx,0, xy,yy,zy,0, xz,yz,zz,0,
+      -(xx*eye[0]+xy*eye[1]+xz*eye[2]),
+      -(yx*eye[0]+yy*eye[1]+yz*eye[2]),
+      -(zx*eye[0]+zy*eye[1]+zz*eye[2]), 1]);
+  },
+  mul(a,b){
+    const o = new Float32Array(16);
+    for (let c=0;c<4;c++) for (let r=0;r<4;r++)
+      o[c*4+r] = a[r]*b[c*4] + a[4+r]*b[c*4+1] + a[8+r]*b[c*4+2] + a[12+r]*b[c*4+3];
+    return o;
+  },
+};
+
+// ---------------------------------------------------------------- context + programs
+let gl = null, glCanvas = null, instancing = null, isGL2 = false;
+
+function initGL(canvas){
+  glCanvas = canvas;
+  gl = canvas.getContext('webgl2', {antialias:true, alpha:false, powerPreference:'high-performance'});
+  isGL2 = !!gl;
+  if (!gl){
+    gl = canvas.getContext('webgl', {antialias:true, alpha:false});
+    if (!gl) return null;
+    // ANGLE_instanced_arrays ships on essentially every WebGL1 implementation still in use; the
+    // batch falls back to nothing without it, so this is the one hard requirement.
+    const ext = gl.getExtension('ANGLE_instanced_arrays');
+    if (!ext) return null;
+    instancing = {
+      divisor: (i,d) => ext.vertexAttribDivisorANGLE(i,d),
+      draw: (m,c,t,o,n) => ext.drawElementsInstancedANGLE(m,c,t,o,n),
+    };
+  } else {
+    instancing = {
+      divisor: (i,d) => gl.vertexAttribDivisor(i,d),
+      draw: (m,c,t,o,n) => gl.drawElementsInstanced(m,c,t,o,n),
+    };
+  }
+  gl.enable(gl.DEPTH_TEST);
+  gl.enable(gl.CULL_FACE);
+  gl.cullFace(gl.BACK);
+  return gl;
+}
+
+function compile(vsSrc, fsSrc){
+  const head = isGL2 ? '#version 300 es\n' : '';
+  const vs = gl.createShader(gl.VERTEX_SHADER);
+  gl.shaderSource(vs, head + (isGL2 ? vsSrc : vsSrc
+    .replace(/\bin /g,'attribute ').replace(/\bout /g,'varying ')));
+  gl.compileShader(vs);
+  if (!gl.getShaderParameter(vs, gl.COMPILE_STATUS)) throw new Error('vs: '+gl.getShaderInfoLog(vs));
+  const fs = gl.createShader(gl.FRAGMENT_SHADER);
+  gl.shaderSource(fs, head + (isGL2 ? fsSrc : fsSrc
+    .replace(/\bin /g,'varying ').replace(/out vec4 fragColor;\n/,'')
+    .replace(/\bfragColor\b/g,'gl_FragColor')));
+  gl.compileShader(fs);
+  if (!gl.getShaderParameter(fs, gl.COMPILE_STATUS)) throw new Error('fs: '+gl.getShaderInfoLog(fs));
+  const p = gl.createProgram();
+  gl.attachShader(p, vs); gl.attachShader(p, fs); gl.linkProgram(p);
+  if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error('link: '+gl.getProgramInfoLog(p));
+  const u = {};
+  const n = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS);
+  for (let i=0;i<n;i++){ const info = gl.getActiveUniform(p,i); u[info.name] = gl.getUniformLocation(p, info.name); }
+  return { p, u, a:(name)=>gl.getAttribLocation(p,name) };
+}
+
+// ---------------------------------------------------------------- the chamfered cube
+//
+// A raw cube reads as a texture-mapped box: every face is one flat tone and the silhouette has
+// nothing to catch a highlight. Cutting the corners gives 26 faces instead of 6, so the key light
+// draws a bright edge all the way around each block — which is what makes a jelly cube look like
+// a jelly cube without a single texture.
+function buildCube(bevel){
+  const pos = [], nor = [], idx = [];
+  const b = bevel, i = 1 - b;
+  const quad = (a1,a2,a3,a4, n) => {
+    const base = pos.length/3;
+    for (const v of [a1,a2,a3,a4]) { pos.push(v[0],v[1],v[2]); nor.push(n[0],n[1],n[2]); }
+    idx.push(base,base+1,base+2, base,base+2,base+3);
+  };
+  const tri = (a1,a2,a3, n) => {
+    const base = pos.length/3;
+    for (const v of [a1,a2,a3]) { pos.push(v[0],v[1],v[2]); nor.push(n[0],n[1],n[2]); }
+    idx.push(base,base+1,base+2);
+  };
+  const nrm = v => { const l = Math.hypot(v[0],v[1],v[2]); return [v[0]/l,v[1]/l,v[2]/l]; };
+
+  // six inset faces
+  for (const ax of [0,1,2]) for (const s of [1,-1]){
+    const n = [0,0,0]; n[ax] = s;
+    const u = [0,0,0], v = [0,0,0];
+    u[(ax+1)%3] = 1; v[(ax+2)%3] = 1;
+    const c = [n[0],n[1],n[2]];
+    const P = (su,sv) => [
+      c[0] + u[0]*su*i + v[0]*sv*i, c[1] + u[1]*su*i + v[1]*sv*i, c[2] + u[2]*su*i + v[2]*sv*i];
+    // winding flips with the sign so back-face culling keeps every face
+    if (s > 0) quad(P(-1,-1), P(1,-1), P(1,1), P(-1,1), n);
+    else       quad(P(-1,-1), P(-1,1), P(1,1), P(1,-1), n);
+  }
+  // twelve edge chamfers + eight corner chamfers, generated from the sign table
+  for (const ax of [0,1,2]){
+    const a1 = (ax+1)%3, a2 = (ax+2)%3;
+    for (const s1 of [1,-1]) for (const s2 of [1,-1]){
+      const n = [0,0,0]; n[a1] = s1; n[a2] = s2;
+      // the chamfer strip runs along `ax` between the two inset faces it joins
+      const pA = [0,0,0], pB = [0,0,0], pC = [0,0,0], pD = [0,0,0];
+      pA[ax] = -i; pA[a1] = s1*i; pA[a2] = s2*1;
+      pB[ax] =  i; pB[a1] = s1*i; pB[a2] = s2*1;
+      pC[ax] =  i; pC[a1] = s1*1; pC[a2] = s2*i;
+      pD[ax] = -i; pD[a1] = s1*1; pD[a2] = s2*i;
+      const nn = nrm(n);
+      if (s1*s2 > 0) quad(pA,pB,pC,pD, nn); else quad(pD,pC,pB,pA, nn);
+    }
+  }
+  for (const sx of [1,-1]) for (const sy of [1,-1]) for (const sz of [1,-1]){
+    const p1 = [sx*i, sy*1, sz*i], p2 = [sx*1, sy*i, sz*i], p3 = [sx*i, sy*i, sz*1];
+    const n = nrm([sx,sy,sz]);
+    // (p1,p2,p3) winds INWARD when the corner's signs multiply positive — checked with the
+    // cross product rather than guessed, because the failure is eight little black notches per
+    // block and it reads as a lighting bug, not a winding one.
+    if (sx*sy*sz > 0) tri(p3,p2,p1,n); else tri(p1,p2,p3,n);
+  }
+  return { pos:new Float32Array(pos), nor:new Float32Array(nor), idx:new Uint16Array(idx) };
+}
+
+// A genuinely ROUND cube — a marshmallow, not a die with its corners filed off.
+//
+// The chamfered cube above is still a polyhedron: every face is flat, every edge is a hard
+// crease, and flat shading makes the creases the loudest thing on the block. "Soft" is a
+// property of the NORMALS, not the silhouette. So this takes a subdivided cube and projects
+// every vertex onto the rounded-box surface: clamp the point to the inner box, then push it
+// out by the corner radius along the direction it left the box in. That direction IS the
+// normal, and it varies smoothly across the whole corner — the highlight becomes one soft blob
+// that slides around the block instead of snapping between facets.
+function buildRoundedCube(radius, segs){
+  const pos = [], nor = [], idx = [];
+  const r = Math.min(0.98, radius), core = 1 - r;
+  const clampC = v => Math.max(-core, Math.min(core, v));
+  for (const ax of [0,1,2]) for (const s of [1,-1]){
+    const a1 = (ax+1)%3, a2 = (ax+2)%3;
+    const base = pos.length/3;
+    for (let i = 0; i <= segs; i++) for (let j = 0; j <= segs; j++){
+      const p = [0,0,0];
+      p[ax] = s;
+      p[a1] = -1 + 2*i/segs;
+      p[a2] = -1 + 2*j/segs;
+      const c = [clampC(p[0]), clampC(p[1]), clampC(p[2])];
+      let n = [p[0]-c[0], p[1]-c[1], p[2]-c[2]];
+      const l = Math.hypot(n[0],n[1],n[2]) || 1;
+      n = [n[0]/l, n[1]/l, n[2]/l];
+      pos.push(c[0]+n[0]*r, c[1]+n[1]*r, c[2]+n[2]*r);
+      nor.push(n[0], n[1], n[2]);
+    }
+    for (let i = 0; i < segs; i++) for (let j = 0; j < segs; j++){
+      const a = base + i*(segs+1) + j, b = a + segs + 1;
+      // winding follows the face's sign so back-face culling keeps every face
+      if (s > 0) idx.push(a, b, a+1,  a+1, b, b+1);
+      else       idx.push(a, a+1, b,  a+1, b+1, b);
+    }
+  }
+  return { pos:new Float32Array(pos), nor:new Float32Array(nor), idx:new Uint16Array(idx) };
+}
+
+// A flat quad on the XZ plane — contact shadows and shockwave rings.
+function buildQuad(){
+  return {
+    pos: new Float32Array([-1,0,-1,  1,0,-1,  1,0,1,  -1,0,1]),
+    nor: new Float32Array([0,1,0, 0,1,0, 0,1,0, 0,1,0]),
+    idx: new Uint16Array([0,1,2, 0,2,3]),
+  };
+}
+
+// ---------------------------------------------------------------- instanced batch
+// Per instance: position(3) scale(3) rotation(3) color(3) glow(1) alpha(1) = 14 floats.
+const INST_FLOATS = 14;
+
+function makeBatch(mesh, prog, max){
+  const vbo = gl.createBuffer(), nbo = gl.createBuffer(), ibo = gl.createBuffer(), inst = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, vbo); gl.bufferData(gl.ARRAY_BUFFER, mesh.pos, gl.STATIC_DRAW);
+  gl.bindBuffer(gl.ARRAY_BUFFER, nbo); gl.bufferData(gl.ARRAY_BUFFER, mesh.nor, gl.STATIC_DRAW);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, mesh.idx, gl.STATIC_DRAW);
+  const data = new Float32Array(max * INST_FLOATS);
+  gl.bindBuffer(gl.ARRAY_BUFFER, inst); gl.bufferData(gl.ARRAY_BUFFER, data.byteLength, gl.DYNAMIC_DRAW);
+  return { mesh, prog, vbo, nbo, ibo, inst, data, n:0, max };
+}
+
+function batchReset(b){ b.n = 0; }
+
+// One instance. Everything the look needs is here: where, how big, how turned, what colour,
+// how much it glows and how solid it is.
+function push(b, x,y,z, sx,sy,sz, rx,ry,rz, r,g,bl, glow, alpha){
+  if (b.n >= b.max) return;
+  const o = b.n * INST_FLOATS, d = b.data;
+  d[o]=x; d[o+1]=y; d[o+2]=z;
+  d[o+3]=sx; d[o+4]=sy; d[o+5]=sz;
+  d[o+6]=rx; d[o+7]=ry; d[o+8]=rz;
+  d[o+9]=r; d[o+10]=g; d[o+11]=bl;
+  d[o+12]=glow; d[o+13]=alpha;
+  b.n++;
+}
+
+function batchDraw(b, uniforms){
+  if (!b.n) return;
+  const P = b.prog;
+  gl.useProgram(P.p);
+  for (const k in uniforms){
+    const loc = P.u[k]; if (!loc) continue;
+    const v = uniforms[k];
+    if (v.length === 16) gl.uniformMatrix4fv(loc, false, v);
+    else if (v.length === 3) gl.uniform3fv(loc, v);
+    else if (v.length === 2) gl.uniform2fv(loc, v);
+    else gl.uniform1f(loc, v);
+  }
+  const bind = (buf, name, size, stride, off, div) => {
+    const loc = P.a(name); if (loc < 0) return;
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.enableVertexAttribArray(loc);
+    gl.vertexAttribPointer(loc, size, gl.FLOAT, false, stride, off);
+    instancing.divisor(loc, div);
+  };
+  bind(b.vbo, 'aPos', 3, 0, 0, 0);
+  bind(b.nbo, 'aNorm', 3, 0, 0, 0);
+  const S = INST_FLOATS*4;
+  gl.bindBuffer(gl.ARRAY_BUFFER, b.inst);
+  gl.bufferSubData(gl.ARRAY_BUFFER, 0, b.data.subarray(0, b.n*INST_FLOATS));
+  bind(b.inst, 'iPos',   3, S, 0,  1);
+  bind(b.inst, 'iScale', 3, S, 12, 1);
+  bind(b.inst, 'iRot',   3, S, 24, 1);
+  bind(b.inst, 'iColor', 3, S, 36, 1);
+  bind(b.inst, 'iGlow',  1, S, 48, 1);
+  bind(b.inst, 'iAlpha', 1, S, 52, 1);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, b.ibo);
+  instancing.draw(gl.TRIANGLES, b.mesh.idx.length, gl.UNSIGNED_SHORT, 0, b.n);
+}
+
+// ─── game3d/scene3d.js ────────────────────────────────────────
+// The look: camera, lights, materials, and the board furniture.
+//
+// ART DIRECTION — "JELLY LAB". One dark obsidian slab lit from above-left, floating in a cold
+// room, with warm jelly blocks on it. Two decisions carry the whole style:
+//
+//   1. The blocks are chamfered, not cubes, so the key light draws a bright edge around every
+//      silhouette. That single highlight is what separates "candy" from "textured box".
+//   2. Nothing on the board is flat-lit. The slab is almost black, the sockets are darker still,
+//      and the only saturated colour in the frame is the blocks — so the eye goes to the state
+//      that matters (what is filled) before it goes to anything else.
+//
+// Paint is the exception that proves it: a painted cell is the only thing allowed to EMIT light.
+// When a blast is coming the board is the brightest it ever gets, and that reads before any HUD.
+
+const VS_SOLID = `
+precision highp float;
+in vec3 aPos; in vec3 aNorm;
+in vec3 iPos; in vec3 iScale; in vec3 iRot; in vec3 iColor; in float iGlow; in float iAlpha;
+uniform mat4 uVP;
+out vec3 vN; out vec3 vW; out vec3 vC; out float vGlow; out float vA;
+void main(){
+  float cx = cos(iRot.x), sx = sin(iRot.x);
+  float cy = cos(iRot.y), sy = sin(iRot.y);
+  float cz = cos(iRot.z), sz = sin(iRot.z);
+  mat3 Rx = mat3(1.0,0.0,0.0, 0.0,cx,sx, 0.0,-sx,cx);
+  mat3 Ry = mat3(cy,0.0,-sy, 0.0,1.0,0.0, sy,0.0,cy);
+  mat3 Rz = mat3(cz,sz,0.0, -sz,cz,0.0, 0.0,0.0,1.0);
+  mat3 R = Ry * Rx * Rz;
+  vec3 p = R * (aPos * iScale) + iPos;
+  vN = normalize(R * (aNorm / max(iScale, vec3(0.001))));
+  vW = p; vC = iColor; vGlow = iGlow; vA = iAlpha;
+  gl_Position = uVP * vec4(p, 1.0);
+}`;
+
+const FS_SOLID = `
+precision highp float;
+in vec3 vN; in vec3 vW; in vec3 vC; in float vGlow; in float vA;
+uniform vec3 uEye; uniform vec3 uLight; uniform vec3 uAmb; uniform float uBoost;
+out vec4 fragColor;
+void main(){
+  vec3 N = normalize(vN);
+  vec3 V = normalize(uEye - vW);
+  vec3 L = normalize(uLight);
+  float ndl = max(dot(N, L), 0.0);
+  // half-lambert fill: candy never goes fully black on its shadow side
+  float wrap = dot(N, L) * 0.5 + 0.5;
+  vec3 H = normalize(L + V);
+  float spec = pow(max(dot(N, H), 0.0), 8.0);
+  float fres = pow(1.0 - max(dot(N, V), 0.0), 3.0);
+  vec3 col = vC * (uAmb + ndl * 0.50 + wrap * wrap * 0.60);
+  col += vec3(1.0, 0.99, 0.96) * spec * 0.16;
+  col += vC * fres * 0.40;                      // a soft edge, not a chrome rim
+  col += vec3(0.30, 0.20, 0.34) * (1.0 - wrap) * 0.35;   // warm bounce from the room on the shadow side
+  col = mix(col, vC, 0.18);                     // pull everything back toward the pure candy tone
+  col += vC * vGlow * (0.55 + uBoost * 0.5);
+  col = min(col, vC * 1.35 + 0.12);             // glow may brighten, never bleach to white
+  fragColor = vec4(col, vA);
+}`;
+
+// Contact shadow / shockwave ring: the same flat quad, told apart by uMode.
+const VS_FLAT = `
+precision highp float;
+in vec3 aPos; in vec3 aNorm;
+in vec3 iPos; in vec3 iScale; in vec3 iRot; in vec3 iColor; in float iGlow; in float iAlpha;
+uniform mat4 uVP;
+out vec2 vUV; out vec3 vC; out float vA; out float vGlow;
+void main(){
+  vUV = aPos.xz;
+  vec3 p = aPos * iScale + iPos;
+  vC = iColor; vA = iAlpha; vGlow = iGlow;
+  gl_Position = uVP * vec4(p, 1.0);
+  vec3 unusedN = aNorm; vec3 unusedR = iRot;
+}`;
+
+const FS_SHADOW = `
+precision highp float;
+in vec2 vUV; in vec3 vC; in float vA; in float vGlow;
+out vec4 fragColor;
+void main(){
+  float d = length(vUV);
+  // vGlow 0 = soft blob (a contact shadow), 1 = ring (a shockwave)
+  float blob = 1.0 - smoothstep(0.25, 1.0, d);
+  float ring = smoothstep(0.55, 0.85, d) * (1.0 - smoothstep(0.9, 1.0, d));
+  float a = mix(blob, ring, vGlow) * vA;
+  if (a < 0.004) discard;
+  fragColor = vec4(vC, a);
+}`;
+
+// Background: one oversized triangle, a vertical gradient and a vignette. Cheaper than a mesh
+// and it means the room is part of the render rather than a CSS colour behind it.
+const VS_BG = `
+precision highp float;
+in vec3 aPos;
+out vec2 vP;
+void main(){ vP = aPos.xy; gl_Position = vec4(aPos.xy, 0.999, 1.0); }`;
+const FS_BG = `
+precision highp float;
+in vec2 vP;
+uniform vec3 uTop; uniform vec3 uBot; uniform float uPulse;
+out vec4 fragColor;
+void main(){
+  float t = vP.y * 0.5 + 0.5;
+  vec3 col = mix(uBot, uTop, t);
+  float v = 1.0 - length(vP * vec2(0.72, 0.62));
+  col *= 0.55 + 0.55 * clamp(v, 0.0, 1.0);
+  float pool = 1.0 - clamp(length((vP - vec2(0.0, 0.16)) * vec2(1.05, 1.5)), 0.0, 1.0);
+  col += uTop * pool * pool * 0.55;
+  col += uTop * uPulse * 0.6 * clamp(v, 0.0, 1.0);
+  fragColor = vec4(col, 1.0);
+}`;
+
+// ---------------------------------------------------------------- palette
+const hex3 = h => [parseInt(h.slice(1,3),16)/255, parseInt(h.slice(3,5),16)/255, parseInt(h.slice(5,7),16)/255];
+const JELLY_RGB = ['#FFD98A','#8CE8D5','#C2B8FF','#FFB0C8'].map(hex3);
+const PAINT_RGB   = hex3('#FF7FB6');
+const MAGNET_RGB  = hex3('#7BD8FF');
+const SLAB_RGB    = hex3('#2E3350');
+const SOCKET_RGB  = hex3('#232744');
+const RIM_RGB     = hex3('#4A4E78');
+const BG_TOP      = hex3('#4A4173');
+const BG_BOT      = hex3('#171432');
+const TRAY_RGB    = hex3('#282C4A');
+
+// ---------------------------------------------------------------- world constants
+const CELL = 1.0;                       // one board cell is one world unit
+const BLOCK_XZ = 0.44, BLOCK_Y = 0.40;  // a block does not fill its cell — the gap is the grid
+const SLAB_TOP = 0.0;                   // blocks rest on y = 0
+const TRAY_Z = 7.3, TRAY_Y = -0.15;     // the tray sits in front of the slab, on the same table
+const HOVER_Y = 1.7;                    // how high a dragged piece floats
+
+const cellX = cx => (cx - (GRID_W - 1) / 2) * CELL;
+const cellZ = cy => (cy - (GRID_H - 1) / 2) * CELL;
+
+// ---------------------------------------------------------------- camera
+// `lens` is a vertical lens shift, not a rotation. Fitting the board by distance alone centres
+// the WORLD box, not the picture of it: a pitched camera projects the far edge tighter than the
+// near one, so the content sat high and left a dead third under the tray. Shifting the frustum
+// instead of moving the camera keeps the perspective identical and just re-centres the frame.
+const cam = { yaw: 0, pitch: 0.90, dist: 16, target: [0, 0, 1.2], shake: 0, kick: 0, roll: 0, lens: 0 };
+
+function camEye(){
+  const cp = Math.cos(cam.pitch), sp = Math.sin(cam.pitch);
+  const d = cam.dist * (1 - cam.kick * 0.06);
+  return [
+    cam.target[0] + Math.sin(cam.yaw) * cp * d,
+    cam.target[1] + sp * d,
+    cam.target[2] + Math.cos(cam.yaw) * cp * d,
+  ];
+}
+
+// The board plus the tray have to fit whatever shape the screen is, and "roughly" is not good
+// enough: on the first build a phone showed the slab floating in the middle third of the screen
+// with dead space above and below it. So the fit is MEASURED, not estimated — project the corners
+// of the world box the game occupies and pull the camera back until every one of them is inside
+// the frame. Twelve iterations, once per resize.
+// Two boxes, not one. Fitting a single box that contains both the board and the tray hands the
+// horizontal constraint to the TRAY, because the tray is nearer the camera and projects wider —
+// so the board came out at three quarters of the width it could have had. The board is what the
+// player reads, so the board gets the tight fit and the tray is only required to stay on screen
+// vertically; its outer corners may be cropped.
+const BOARD_BOX = { x: 5.05, z0: -5.4, z1: 5.4, y: 1.3 };
+const TRAY_BOX  = { x: 4.6,  z0: 6.0,  z1: 8.8, y: 0.7 };
+
+function projMatrix(aspect, fov){
+  const P = m4.perspective(fov, aspect, 0.1, 200);
+  P[9] = -cam.lens;                     // vertical lens shift, applied in clip space
+  return P;
+}
+
+function fitCamera(w, h){
+  const aspect = w / h;
+  const tall = h / w;
+  // A tall screen looks at the board more steeply: at a shallow angle a 9×9 board on a phone is
+  // mostly the far edge of the slab and the near rows fall off the bottom.
+  cam.pitch = 0.70 + Math.min(0.36, Math.max(0, tall - 0.9) * 0.30);
+  cam.target[2] = 1.2;
+  cam.lens = 0;
+  const fov = aspect < 0.8 ? 0.80 : 0.92;
+  const cornersOf = (b) => {
+    const out = [];
+    for (const x of [-b.x, b.x]) for (const z of [b.z0, b.z1]) for (const y of [0, b.y]) out.push([x, y, z]);
+    return out;
+  };
+  const board = cornersOf(BOARD_BOX), tray = cornersOf(TRAY_BOX);
+
+  const measure = (pts) => {
+    const vp = m4.mul(projMatrix(aspect, fov), m4.lookAt(camEye(), cam.target, [0, 1, 0]));
+    let x0 = 9, x1 = -9, y0 = 9, y1 = -9;
+    for (const c of pts){
+      const cw = vp[3]*c[0] + vp[7]*c[1] + vp[11]*c[2] + vp[15];
+      if (cw <= 0.001) return null;
+      const nx = (vp[0]*c[0] + vp[4]*c[1] + vp[8]*c[2] + vp[12]) / cw;
+      const ny = (vp[1]*c[0] + vp[5]*c[1] + vp[9]*c[2] + vp[13]) / cw;
+      x0 = Math.min(x0, nx); x1 = Math.max(x1, nx);
+      y0 = Math.min(y0, ny); y1 = Math.max(y1, ny);
+    }
+    return { x0, x1, y0, y1 };
+  };
+  // The HUD owns a strip at the top and one at the bottom. These numbers are the whole layout
+  // contract between the 3D scene and the flat readout over it.
+  const MX = 0.99, MY = 0.90;
+  const fits = (d) => {
+    cam.dist = d;
+    const b = measure(board), t = measure(tray);
+    if (!b || !t) return false;
+    return b.x0 > -MX && b.x1 < MX && b.y0 > -MY && b.y1 < MY && t.y0 > -MY && t.y1 < MY;
+  };
+
+  // distance, then centre, then distance again — recentring frees room, so the second pass
+  // usually comes back closer than the first
+  for (let pass = 0; pass < 2; pass++){
+    let d = 8;
+    for (let i = 0; i < 60 && !fits(d); i++) d *= 1.04;
+    cam.dist = d;
+    const b = measure(board), t = measure(tray);
+    if (b && t) cam.lens -= (Math.min(b.y0, t.y0) + Math.max(b.y1, t.y1)) / 2;
+  }
+  return fov;
+}
+
+function viewProj(w, h, fov){
+  const eye = camEye();
+  const sh = cam.shake;
+  const target = [cam.target[0] + (Math.random()-0.5)*sh*0.5,
+                  cam.target[1] + (Math.random()-0.5)*sh*0.5,
+                  cam.target[2] + (Math.random()-0.5)*sh*0.5];
+  const P = projMatrix(w / h, fov * (1 + cam.kick * 0.05));
+  const V = m4.lookAt(eye, target, [Math.sin(cam.roll), Math.cos(cam.roll), 0]);
+  return { vp: m4.mul(P, V), eye };
+}
+
+// ---------------------------------------------------------------- screen → board
+function invert4(m){
+  const inv = new Float32Array(16);
+  const a = m;
+  inv[0]=a[5]*a[10]*a[15]-a[5]*a[11]*a[14]-a[9]*a[6]*a[15]+a[9]*a[7]*a[14]+a[13]*a[6]*a[11]-a[13]*a[7]*a[10];
+  inv[4]=-a[4]*a[10]*a[15]+a[4]*a[11]*a[14]+a[8]*a[6]*a[15]-a[8]*a[7]*a[14]-a[12]*a[6]*a[11]+a[12]*a[7]*a[10];
+  inv[8]=a[4]*a[9]*a[15]-a[4]*a[11]*a[13]-a[8]*a[5]*a[15]+a[8]*a[7]*a[13]+a[12]*a[5]*a[11]-a[12]*a[7]*a[9];
+  inv[12]=-a[4]*a[9]*a[14]+a[4]*a[10]*a[13]+a[8]*a[5]*a[14]-a[8]*a[6]*a[13]-a[12]*a[5]*a[10]+a[12]*a[6]*a[9];
+  inv[1]=-a[1]*a[10]*a[15]+a[1]*a[11]*a[14]+a[9]*a[2]*a[15]-a[9]*a[3]*a[14]-a[13]*a[2]*a[11]+a[13]*a[3]*a[10];
+  inv[5]=a[0]*a[10]*a[15]-a[0]*a[11]*a[14]-a[8]*a[2]*a[15]+a[8]*a[3]*a[14]+a[12]*a[2]*a[11]-a[12]*a[3]*a[10];
+  inv[9]=-a[0]*a[9]*a[15]+a[0]*a[11]*a[13]+a[8]*a[1]*a[15]-a[8]*a[3]*a[13]-a[12]*a[1]*a[11]+a[12]*a[3]*a[9];
+  inv[13]=a[0]*a[9]*a[14]-a[0]*a[10]*a[13]-a[8]*a[1]*a[14]+a[8]*a[2]*a[13]+a[12]*a[1]*a[10]-a[12]*a[2]*a[9];
+  inv[2]=a[1]*a[6]*a[15]-a[1]*a[7]*a[14]-a[5]*a[2]*a[15]+a[5]*a[3]*a[14]+a[13]*a[2]*a[7]-a[13]*a[3]*a[6];
+  inv[6]=-a[0]*a[6]*a[15]+a[0]*a[7]*a[14]+a[4]*a[2]*a[15]-a[4]*a[3]*a[14]-a[12]*a[2]*a[7]+a[12]*a[3]*a[6];
+  inv[10]=a[0]*a[5]*a[15]-a[0]*a[7]*a[13]-a[4]*a[1]*a[15]+a[4]*a[3]*a[13]+a[12]*a[1]*a[7]-a[12]*a[3]*a[5];
+  inv[14]=-a[0]*a[5]*a[14]+a[0]*a[6]*a[13]+a[4]*a[1]*a[14]-a[4]*a[2]*a[13]-a[12]*a[1]*a[6]+a[12]*a[2]*a[5];
+  inv[3]=-a[1]*a[6]*a[11]+a[1]*a[7]*a[10]+a[5]*a[2]*a[11]-a[5]*a[3]*a[10]-a[9]*a[2]*a[7]+a[9]*a[3]*a[6];
+  inv[7]=a[0]*a[6]*a[11]-a[0]*a[7]*a[10]-a[4]*a[2]*a[11]+a[4]*a[3]*a[10]+a[8]*a[2]*a[7]-a[8]*a[3]*a[6];
+  inv[11]=-a[0]*a[5]*a[11]+a[0]*a[7]*a[9]+a[4]*a[1]*a[11]-a[4]*a[3]*a[9]-a[8]*a[1]*a[7]+a[8]*a[3]*a[5];
+  inv[15]=a[0]*a[5]*a[10]-a[0]*a[6]*a[9]-a[4]*a[1]*a[10]+a[4]*a[2]*a[9]+a[8]*a[1]*a[6]-a[8]*a[2]*a[5];
+  let det = a[0]*inv[0] + a[1]*inv[4] + a[2]*inv[8] + a[3]*inv[12];
+  if (!det) return null;
+  det = 1.0 / det;
+  for (let i = 0; i < 16; i++) inv[i] *= det;
+  return inv;
+}
+
+// Where does the pointer hit the plane y = planeY? This is the whole input model: the board is
+// a physical surface and the finger touches it, rather than a grid of rectangles on a screen.
+function pickPlane(invVP, ndcX, ndcY, planeY){
+  const un = (z) => {
+    const x = invVP[0]*ndcX + invVP[4]*ndcY + invVP[8]*z + invVP[12];
+    const y = invVP[1]*ndcX + invVP[5]*ndcY + invVP[9]*z + invVP[13];
+    const w = invVP[2]*ndcX + invVP[6]*ndcY + invVP[10]*z + invVP[14];
+    const q = invVP[3]*ndcX + invVP[7]*ndcY + invVP[11]*z + invVP[15];
+    return [x/q, y/q, w/q];
+  };
+  const a = un(-1), b = un(1);
+  const dy = b[1] - a[1];
+  if (Math.abs(dy) < 1e-6) return null;
+  const t = (planeY - a[1]) / dy;
+  return [a[0] + (b[0]-a[0])*t, planeY, a[2] + (b[2]-a[2])*t];
+}
+
+// ─── game3d/i18n3.js ──────────────────────────────────────────
+// Strings for the 3D concept. Its own table on purpose: the concept is a separate artifact and
+// should not be able to break the shipping game's dictionary. Same rule though — nothing
+// user-visible is written inline anywhere else.
+const STRINGS3 = {
+  en: {
+    title:'POWER JAM', sub:'3D CONCEPT — JELLY LAB',
+    play:'PLAY  ▶', tap:'drag a block onto the slab',
+    score:'SCORE', best:'BEST', lines:'LINES', moves:'{n} moves',
+    streak:'STREAK ×{n}', chain:'CHAIN {n}', mult:'×{n}',
+    paint:'{n}/{cap} paint · {left} left', powerIn:'power in {n}',
+    painter:'PAINTER', magnet:'MAGNET',
+    blast:'MASS BLAST', cells:'{n} cells  ×{m}', combo:'COMBO ×{n}',
+    lost:'CHAIN LOST · {n}', linesAtOnce:'{n} LINES AT ONCE',
+    spawned:'PAINTER SPAWNED', empowered:'PAINTER EMPOWERED',
+    targetNext:'NEXT {n}', targetBest:'BEST {n}', targetLeft:'{n} to go',
+    targetCleared:'TARGET {n}  ✓', bestBeaten:'RECORD BROKEN',
+    over:'No room left', pts:'{n} pts', newBest:'NEW BEST',
+    soClose:'SO CLOSE  ·  {n} short of your best', bestScore:'best: {n}',
+    retry:'Retry ↻', menu:'Menu',
+    noWebGL:'This concept needs WebGL. The 2D game runs anywhere.',
+    hintPainter:'PAINTER — it paints the filled cells around it',
+    hintMagnet:'MAGNET — it pulls painted cells toward it',
+    hintBlast:'Fill a line a painted cell sits on and they all blast',
+  },
+  tr: {
+    title:'POWER JAM', sub:'3D KONSEPT — JÖLE LABORATUVARI',
+    play:'OYNA  ▶', tap:'bir bloğu tahtaya sürükle',
+    score:'SKOR', best:'EN İYİ', lines:'SIRA', moves:'{n} hamle',
+    streak:'SERİ ×{n}', chain:'ZİNCİR {n}', mult:'×{n}',
+    paint:'{n}/{cap} boya · {left} kaldı', powerIn:'güç: {n} tur',
+    painter:'BOYACI', magnet:'MIKNATIS',
+    blast:'TOPLU PATLAMA', cells:'{n} hücre  ×{m}', combo:'KOMBO ×{n}',
+    lost:'ZİNCİR KOPTU · {n}', linesAtOnce:'{n} SIRA BİRDEN',
+    spawned:'BOYACI DOĞDU', empowered:'BOYACI GÜÇLENDİ',
+    targetNext:'SONRAKİ {n}', targetBest:'REKOR {n}', targetLeft:'{n} kaldı',
+    targetCleared:'HEDEF {n}  ✓', bestBeaten:'REKOR KIRILDI',
+    over:'Yer kalmadı', pts:'{n} puan', newBest:'YENİ REKOR',
+    soClose:'AZ KALDI  ·  rekoruna {n} puan', bestScore:'en iyi: {n}',
+    retry:'Tekrar ↻', menu:'Menü',
+    noWebGL:'Bu konsept WebGL istiyor. 2D oyun her yerde çalışır.',
+    hintPainter:'BOYACI — çevresindeki dolu hücreleri boyar',
+    hintMagnet:'MIKNATIS — boyalı hücreleri kendine çeker',
+    hintBlast:'Boyalı bir hücrenin sırasını doldur, hepsi birden patlar',
+  },
+};
+let LANG3 = 'en';
+function S3(key, vars){
+  let s = (STRINGS3[LANG3] && STRINGS3[LANG3][key]) || STRINGS3.en[key] || key;
+  if (vars) for (const k in vars) s = s.split('{'+k+'}').join(String(vars[k]));
+  return s;
+}
+
+// ─── game3d/sfx3.js ───────────────────────────────────────────
+// Synthetic sound, same approach as the 2D game: oscillators, no audio files, so the concept
+// stays one file. The blast is pitched by the streak — the ear is told "again, and bigger".
+let AC3 = null, muted3 = false;
+function ac3(){ if(!AC3){ try{ AC3 = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } return AC3; }
+function tone3(freq, dur, type, vol, slide){
+  const a = ac3(); if (!a || muted3) return;
+  const o = a.createOscillator(), g = a.createGain();
+  o.type = type || 'sine';
+  o.frequency.setValueAtTime(freq, a.currentTime);
+  if (slide) o.frequency.exponentialRampToValueAtTime(slide, a.currentTime + dur);
+  g.gain.setValueAtTime(0.0001, a.currentTime);
+  g.gain.exponentialRampToValueAtTime(vol || 0.12, a.currentTime + 0.008);
+  g.gain.exponentialRampToValueAtTime(0.0001, a.currentTime + dur);
+  o.connect(g); g.connect(a.destination); o.start(); o.stop(a.currentTime + dur + 0.02);
+}
+function sfx3(kind, n){
+  if (kind === 'pick')  tone3(300 + Math.random()*30, 0.07, 'sine', 0.07, 460);
+  else if (kind === 'place') tone3(190 + Math.random()*40, 0.10, 'triangle', 0.11, 105);
+  else if (kind === 'clear'){ const semi = Math.min(n||1, 8) - 1, base = 520 * Math.pow(2, semi/12);
+    tone3(base, 0.16, 'sine', 0.14); setTimeout(()=>tone3(base*1.5, 0.14, 'sine', 0.09), 55); }
+  else if (kind === 'paint'){ tone3(440, 0.22, 'sine', 0.10, 900); setTimeout(()=>tone3(680, 0.16, 'triangle', 0.07), 90); }
+  else if (kind === 'magnet'){ tone3(920, 0.20, 'sine', 0.09, 300); setTimeout(()=>tone3(300, 0.14, 'triangle', 0.07), 110); }
+  else if (kind === 'charge'){ tone3(210, 0.28, 'sawtooth', 0.05, 780);
+    [0,90,180].forEach((d,i)=>setTimeout(()=>tone3(520*Math.pow(2,i/12), 0.10, 'sine', 0.05), d)); }
+  else if (kind === 'blast'){ const s = Math.min(n||1, 8), up = Math.pow(2, (s-1)*2/12);
+    tone3(150*up, 0.42, 'square', 0.16, 50*up);
+    tone3(88*up, 0.36, 'sawtooth', 0.12, 40*up);
+    [740,980,1240,1560].forEach((f,i)=>setTimeout(()=>tone3(f*up, 0.20, 'sine', 0.12), 50+i*65)); }
+  else if (kind === 'reward'){ [392,523,659,784,1046].forEach((f,i)=>setTimeout(()=>tone3(f, 0.22, 'triangle', 0.12), i*70)); }
+  else if (kind === 'record'){ [523,659,784,1046,1319].forEach((f,i)=>setTimeout(()=>tone3(f, 0.24, 'sine', 0.13), i*90)); }
+  else if (kind === 'fizzle') tone3(420, 0.30, 'triangle', 0.07, 120);
+  else if (kind === 'over')   tone3(260, 0.55, 'triangle', 0.10, 70);
+}
+
+// ─── game3d/fx3d.js ───────────────────────────────────────────
+// Effects. The 2D game's juice rule holds here and gets easier to honour in 3D: a blast is
+// ANTICIPATION → HIT-STOP → RELEASE. What changes is that the release is physical — the cubes
+// that were on the board a frame ago are the cubes flying through the air, same colour, same
+// size, thrown from where they stood. Nothing dissolves into a particle sprite.
+
+let debris = [];        // launched cubes, real gravity, real spin
+let waves = [];         // shockwave rings on the slab
+let pops = [];          // world-anchored score numbers, drawn by the HUD
+let banners = [];       // screen-anchored headlines
+let freeze3 = 0;        // hit-stop, ms — nothing advances while this runs
+let flashAmt = 0;       // full-screen bloom on the background
+
+const GRAV = 26;
+
+function launch(x, y, z, col, opts = {}){
+  const spread = opts.spread ?? 1;
+  const up = opts.up ?? 8;
+  debris.push({
+    x, y, z,
+    vx: (Math.random()-0.5) * spread * 7 + (opts.dx||0),
+    vy: up * (0.65 + Math.random()*0.7),
+    vz: (Math.random()-0.5) * spread * 7 + (opts.dz||0),
+    rx: 0, ry: 0, rz: 0,
+    vrx: (Math.random()-0.5)*12, vry: (Math.random()-0.5)*12, vrz: (Math.random()-0.5)*12,
+    s: opts.s ?? BLOCK_XZ, col, glow: opts.glow ?? 0,
+    t: 0, dur: opts.dur ?? 1100,
+  });
+}
+
+function shockwave(x, z, col, r = 7, dur = 620){
+  waves.push({ x, z, col, r, t: 0, dur });
+}
+
+function popNumber(x, y, z, text, sub, col){
+  pops.push({ x, y, z, text, sub, col, t: 0, dur: 1000 });
+}
+
+// One column, one row each, newest at the bottom — the same rule the 2D game arrived at after
+// three banners landed in the same pixels. The row is the first FREE one, never the count.
+const BANNER_MAX = 3;
+function banner(text, col, dur = 800){
+  while (banners.length >= BANNER_MAX) banners.shift();
+  const taken = new Set(banners.map(b => b.slot));
+  let slot = 0; while (taken.has(slot)) slot++;
+  banners.push({ text, col, t: 0, dur, slot });
+}
+
+function updateFx3(dt){
+  if (freeze3 > 0){ freeze3 -= dt; return; }
+  const s = dt / 1000;
+  for (let i = debris.length - 1; i >= 0; i--){
+    const d = debris[i];
+    d.t += dt;
+    d.vy -= GRAV * s;
+    d.x += d.vx * s; d.y += d.vy * s; d.z += d.vz * s;
+    d.rx += d.vrx * s; d.ry += d.vry * s; d.rz += d.vrz * s;
+    if (d.y < d.s * 0.6 && d.vy < 0){       // one bounce off the slab, then it is spent
+      d.y = d.s * 0.6; d.vy = -d.vy * 0.34;
+      d.vx *= 0.7; d.vz *= 0.7;
+    }
+    if (d.t >= d.dur) debris.splice(i, 1);
+  }
+  for (let i = waves.length - 1; i >= 0; i--){ waves[i].t += dt; if (waves[i].t >= waves[i].dur) waves.splice(i,1); }
+  for (let i = pops.length - 1; i >= 0; i--){ pops[i].t += dt; if (pops[i].t >= pops[i].dur) pops.splice(i,1); }
+  for (let i = banners.length - 1; i >= 0; i--){ banners[i].t += dt; if (banners[i].t >= banners[i].dur) banners.splice(i,1); }
+  if (flashAmt > 0) flashAmt = Math.max(0, flashAmt - dt / 420);
+  if (cam.shake > 0) cam.shake = Math.max(0, cam.shake - dt * 0.0055);
+  if (cam.kick > 0)  cam.kick  = Math.max(0, cam.kick - dt / 300);
+}
+
+function clearFx3(){ debris = []; waves = []; pops = []; banners = []; freeze3 = 0; flashAmt = 0; cam.shake = 0; cam.kick = 0; }
+
+// ─── game3d/hud3d.js ──────────────────────────────────────────
+// The HUD is a 2D canvas laid over the WebGL one. Text belongs on a 2D context: drawing it in
+// the 3D scene would mean a font atlas, and a billboarded score that scales with distance is
+// harder to read, not more impressive. So the world is 3D and the readout is flat — the split
+// every shipped 3D casual game uses.
+
+let hctx = null, hcanvas = null, HW = 0, HH = 0, DPR = 1;
+let hudButtons = [];
+
+function hudInit(canvas){
+  hcanvas = canvas;
+  hctx = canvas.getContext('2d');
+}
+function hudResize(w, h, dpr){
+  HW = w; HH = h; DPR = dpr;
+  hcanvas.width = Math.round(w * dpr); hcanvas.height = Math.round(h * dpr);
+  hcanvas.style.width = w + 'px'; hcanvas.style.height = h + 'px';
+  hctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+const HC = {
+  text:'#F6F1FF', dim:'#B4AEDA', accent:'#FFD98A',
+  paint:'#FF7FB6', magnet:'#7BD8FF', err:'#FF8FA8',
+  panel:'rgba(30,26,58,0.93)', line:'rgba(255,255,255,0.14)',
+};
+
+function ht(s, x, y, size, color, align = 'left', weight = '700'){
+  hctx.font = `${weight} ${size}px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif`;
+  hctx.fillStyle = color; hctx.textAlign = align; hctx.textBaseline = 'middle';
+  hctx.fillText(s, x, y);
+}
+function htw(s, size, weight = '700'){
+  hctx.font = `${weight} ${size}px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif`;
+  return hctx.measureText(String(s)).width;
+}
+// Shrink until it fits. Same lesson as the 2D game: measure, never assume — a banner that runs
+// off its own panel is the bug that only a screenshot ever finds.
+function htFit(s, x, y, size, color, maxW, align = 'left', weight = '700'){
+  let sz = size;
+  for (let i = 0; i < 14; i++){
+    if (htw(s, sz, weight) <= maxW || sz <= 8) break;
+    sz -= 1;
+  }
+  ht(s, x, y, sz, color, align, weight);
+}
+function hrr(x, y, w, h, r){
+  hctx.beginPath();
+  hctx.moveTo(x+r, y); hctx.arcTo(x+w, y, x+w, y+h, r); hctx.arcTo(x+w, y+h, x, y+h, r);
+  hctx.arcTo(x, y+h, x, y, r); hctx.arcTo(x, y, x+w, y, r); hctx.closePath();
+}
+function hbutton(id, x, y, w, h, label, primary){
+  hudButtons.push({ id, x, y, w, h });
+  hctx.save();
+  hctx.fillStyle = primary ? HC.accent : 'rgba(255,255,255,0.08)';
+  hrr(x, y, w, h, h*0.28); hctx.fill();
+  hctx.strokeStyle = primary ? 'rgba(255,255,255,0.4)' : HC.line; hctx.lineWidth = 1.5;
+  hrr(x, y, w, h, h*0.28); hctx.stroke();
+  hctx.restore();
+  ht(label, x + w/2, y + h/2 + 1, Math.min(h*0.42, 19), primary ? '#20160A' : HC.text, 'center', '800');
+}
+
+// world → screen, for the score numbers that belong to a place on the board
+function project(vp, x, y, z){
+  const cx = vp[0]*x + vp[4]*y + vp[8]*z + vp[12];
+  const cy = vp[1]*x + vp[5]*y + vp[9]*z + vp[13];
+  const cw = vp[3]*x + vp[7]*y + vp[11]*z + vp[15];
+  if (cw <= 0.0001) return null;
+  return [(cx/cw * 0.5 + 0.5) * HW, (1 - (cy/cw * 0.5 + 0.5)) * HH];
+}
+
+function drawHud3(vp){
+  hctx.clearRect(0, 0, HW, HH);
+  hudButtons = [];
+  const pad = Math.round(Math.min(HW, HH) * 0.045);
+  const narrow = HW < 420;
+
+  // --- top left: lines, and the run's live status line
+  ht(S3('lines'), pad, pad + 6, 11, HC.dim, 'left', '700');
+  ht(String(st3.linesTotal), pad, pad + 28, 22, HC.text, 'left', '800');
+
+  // --- top right: the multiplier, the streak, the chain. Right to left, dropped rather than
+  //     overlapped, exactly as the 2D HUD learned to do it.
+  let bx = HW - pad;
+  const chip = (label, fill, fg) => {
+    const w = Math.max(46, htw(label, 12.5, '800') + 20);
+    bx -= w;
+    hctx.save(); hctx.fillStyle = fill; hrr(bx, pad + 2, w, 26, 13); hctx.fill(); hctx.restore();
+    ht(label, bx + w/2, pad + 15, 12.5, fg, 'center', '800');
+    bx -= 8;
+  };
+  chip(S3('mult', {n: st3.comboMult.toFixed(1)}), st3.comboMult > 1 ? HC.paint : 'rgba(255,255,255,0.10)',
+       st3.comboMult > 1 ? '#20160A' : HC.dim);
+  if (st3.streak > 0) chip(S3('streak', {n: st3.streak}), HC.accent, '#20160A');
+  if (st3.combo >= 2 && !narrow) chip(S3('chain', {n: st3.combo}), 'rgba(255,95,162,0.30)', HC.text);
+
+  // --- the power status: how much paint is live, or how far the next power is
+  let status, scol;
+  if (st3.painter){
+    const cap = POWER_CFG.paintLimit + st3.paintBonus;
+    status = S3('paint', {n: st3.painter.painted.length, cap, left: st3.painter.remaining});
+    scol = st3.painter.painted.length >= cap ? HC.err : HC.paint;
+  } else {
+    const gap = specialGap(st3);
+    status = S3('powerIn', {n: gap - (st3.refills % gap)});
+    scol = HC.dim;
+  }
+  if (bx - pad > htw(status, 11.5, '700') + 10) ht(status, bx - 2, pad + 15, 11.5, scol, 'right', '700');
+
+  // --- bottom: the target bar. Carried over from the 2D game, where it is the only thing that
+  //     tells a run how it is doing while it is still running.
+  const by = HH - pad - 30;
+  drawTarget3(pad, by, HW - pad*2);
+  ht(S3('moves', {n: st3.moves}), HW/2, HH - pad + 4, 13, HC.dim, 'center', '600');
+  ht(String(st3.score), HW - pad, HH - pad - 2, 26, HC.accent, 'right', '800');
+  ht(S3('score'), HW - pad, HH - pad + 18, 10, HC.dim, 'right', '700');
+
+  drawPops3(vp);
+  drawBanners3();
+  drawHint3();
+}
+
+function drawTarget3(x, y, w){
+  const t = runTarget3();
+  if (!t) return;
+  let prev = 0;
+  for (const v of targetMarks3()) if (v <= st3.score) prev = v;
+  const k = Math.max(0, Math.min(1, (st3.score - prev) / (t.value - prev)));
+  const col = t.best ? HC.accent : HC.paint;
+  hctx.save();
+  hctx.fillStyle = 'rgba(255,255,255,0.10)'; hrr(x, y, w, 5, 2.5); hctx.fill();
+  hctx.fillStyle = col; hctx.globalAlpha = 0.6 + 0.4 * (0.5 + 0.5*Math.sin(now3/420));
+  hrr(x, y, Math.max(5, w*k), 5, 2.5); hctx.fill();
+  hctx.restore();
+  const gap = S3('targetLeft', {n: Math.max(0, t.value - st3.score)});
+  const name = t.best ? S3('targetBest', {n: t.value}) : S3('targetNext', {n: t.value});
+  const full = `${name} · ${gap}`;
+  const room = HW/2 - htw(S3('moves', {n: st3.moves}), 13, '600')/2 - x - 12;
+  ht(htw(full, 10.5, '700') <= room ? full : gap, x, y + 16, 10.5, col, 'left', '700');
+}
+
+function drawPops3(vp){
+  for (const p of pops){
+    const k = p.t / p.dur;
+    const sp = project(vp, p.x, p.y + k * 2.2, p.z);
+    if (!sp) continue;
+    hctx.save();
+    hctx.globalAlpha = k < 0.7 ? 1 : 1 - (k - 0.7) / 0.3;
+    const sc = k < 0.16 ? 0.5 + 0.9 * (k / 0.16) : 1.4 - 0.15 * Math.min(1, (k - 0.16) / 0.5);
+    hctx.translate(sp[0], sp[1]); hctx.scale(sc, sc);
+    hctx.shadowColor = 'rgba(0,0,0,0.85)'; hctx.shadowBlur = 12;
+    hctx.font = '800 30px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif';
+    hctx.textAlign = 'center'; hctx.textBaseline = 'middle';
+    hctx.lineWidth = 6; hctx.strokeStyle = 'rgba(4,8,14,0.9)';
+    hctx.strokeText(p.text, 0, 0);
+    hctx.shadowColor = p.col; hctx.shadowBlur = 20;
+    ht(p.text, 0, 0, 30, '#FFFFFF', 'center', '800');
+    hctx.shadowBlur = 0;
+    if (p.sub) ht(p.sub, 0, 22, 13, p.col, 'center', '800');
+    hctx.restore();
+  }
+}
+
+function drawBanners3(){
+  const baseY = HH * 0.245;   // below the onboarding line, above the world-anchored score pops
+  for (const b of banners){
+    const k = b.t / b.dur;
+    const sc = k < 0.25 ? (k/0.25) * 1.15 : 1.15 - (k-0.25)/0.75 * 0.15;
+    hctx.save();
+    hctx.globalAlpha = 1 - Math.max(0, (k - 0.6) / 0.4);
+    hctx.translate(HW/2, baseY + b.slot * 34 - k * 26);
+    hctx.scale(sc, sc);
+    hctx.shadowColor = b.col; hctx.shadowBlur = 18;
+    htFit(b.text, 0, 0, 24, b.col, HW * 0.86, 'center', '800');
+    hctx.restore();
+  }
+}
+
+// The onboarding line. Three showings each, then it never appears again — the concept has to
+// explain itself without a tutorial screen.
+let hint3 = null;
+function showHint3(key){
+  if (hintsSeen3[key] >= 3 || (hint3 && hint3.key === key)) return;
+  hintsSeen3[key] = (hintsSeen3[key] || 0) + 1;
+  hint3 = { key, t: 0, dur: 3800 };
+}
+function drawHint3(){
+  if (!hint3) return;
+  const k = hint3.t / hint3.dur;
+  const a = k < 0.08 ? k/0.08 : (k > 0.86 ? (1-k)/0.14 : 1);
+  const col = hint3.key === 'magnet' ? HC.magnet : HC.paint;
+  const w = Math.min(HW - 32, 460), x = (HW - w)/2, y = HH * 0.135;
+  hctx.save();
+  hctx.globalAlpha = Math.max(0, Math.min(1, a));
+  hctx.fillStyle = HC.panel; hrr(x, y, w, 40, 12); hctx.fill();
+  hctx.strokeStyle = col; hctx.lineWidth = 2; hrr(x, y, w, 40, 12); hctx.stroke();
+  hctx.fillStyle = col; hrr(x, y, 4, 40, 2); hctx.fill();
+  htFit(S3('hint' + hint3.key[0].toUpperCase() + hint3.key.slice(1)), x + 16, y + 20, 13, col, w - 32, 'left', '800');
+  hctx.restore();
+}
+
+// The first build drew the title straight over the tumbling blocks and neither could be read.
+// The scene is the background here, so the text needs a ground of its own: a scrim top and
+// bottom, title up top, the button down in the thumb zone where a phone wants it.
+function drawMenu3(){
+  hctx.clearRect(0, 0, HW, HH);
+  hudButtons = [];
+
+  const scrim = (y, h, from, to) => {
+    const g = hctx.createLinearGradient(0, y, 0, y + h);
+    g.addColorStop(0, from); g.addColorStop(1, to);
+    hctx.fillStyle = g; hctx.fillRect(0, y, HW, h);
+  };
+  scrim(0, HH * 0.30, 'rgba(18,15,40,0.92)', 'rgba(18,15,40,0)');
+  scrim(HH * 0.62, HH * 0.38, 'rgba(18,15,40,0)', 'rgba(18,15,40,0.94)');
+
+  const ty = HH * 0.13;
+  hctx.save();
+  hctx.shadowColor = HC.accent; hctx.shadowBlur = 34;
+  htFit(S3('title'), HW/2, ty, Math.min(56, HW*0.145), HC.accent, HW*0.86, 'center', '800');
+  hctx.restore();
+  htFit(S3('sub'), HW/2, ty + 34, 12.5, HC.dim, HW*0.86, 'center', '700');
+
+  const bw = Math.min(280, HW*0.74), bh = 58;
+  hbutton('play3', (HW-bw)/2, HH*0.80 - bh/2, bw, bh, S3('play'), true);
+  ht(S3('tap'), HW/2, HH*0.80 + bh/2 + 22, 12.5, HC.dim, 'center', '600');
+  if (best3 > 0) ht(S3('bestScore', {n: best3}), HW/2, HH*0.80 - bh/2 - 22, 12.5, HC.accent, 'center', '700');
+}
+
+function drawOver3(){
+  const k = Math.min(1, (now3 - overAt3) / 260);
+  hctx.save();
+  hctx.globalAlpha = k * 0.72; hctx.fillStyle = '#171432'; hctx.fillRect(0, 0, HW, HH);
+  hctx.restore();
+  hudButtons = [];
+  const bw = Math.min(HW*0.86, 360), bh = 250, bx = (HW-bw)/2, by = (HH-bh)/2;
+  hctx.save(); hctx.globalAlpha = k;
+  hctx.fillStyle = HC.panel; hrr(bx, by, bw, bh, 18); hctx.fill();
+  hctx.strokeStyle = HC.line; hctx.lineWidth = 2; hrr(bx, by, bw, bh, 18); hctx.stroke();
+
+  const isBest = st3.score > 0 && st3.score > bestAtStart3;
+  const short = bestAtStart3 - st3.score;
+  const close = !isBest && bestAtStart3 > 0 && short <= bestAtStart3 * 0.2;
+  ht(S3('over'), bx + bw/2, by + 40, 20, HC.text, 'center', '700');
+  ht(S3('pts', {n: st3.score}), bx + bw/2, by + 76, 26, HC.accent, 'center', '800');
+  htFit(isBest ? S3('newBest') : close ? S3('soClose', {n: short}) : S3('bestScore', {n: bestAtStart3}),
+        bx + bw/2, by + 100, 11.5, isBest || close ? HC.accent : HC.dim, bw - 40, 'center', '700');
+
+  const rows = [
+    [S3('blast'), String(st3.blasts)],
+    [S3('streak', {n: ''}).trim(), `×${st3.bestStreak||0}`],
+    [S3('lines'), String(st3.linesTotal)],
+    [S3('moves', {n: st3.moves}), ''],
+  ];
+  rows.forEach(([l, v], i) => {
+    const yy = by + 130 + i*20;
+    ht(l, bx + 26, yy, 12, HC.dim, 'left', '600');
+    if (v) ht(v, bx + bw - 26, yy, 12.5, HC.text, 'right', '800');
+  });
+  hbutton('menu3', bx + 20, by + bh - 58, (bw-56)/2, 42, S3('menu'), false);
+  hbutton('retry3', bx + bw/2 + 8, by + bh - 58, (bw-56)/2, 42, S3('retry'), true);
+  hctx.restore();
+}
+
+// ─── game3d/main3d.js ─────────────────────────────────────────
+// POWER JAM 3D — the concept's game loop.
+//
+// The RULES are not reimplemented here. src/core/ is the same code the 2D game runs: newRun,
+// placeRun, the Painter, the Magnet, the chain, the streak, the multi-line reward. This file is
+// only a second presentation of them. That is the whole point of the concept — if the 3D version
+// felt better because it played differently, it would prove nothing about 3D.
+
+let st3 = null, scene3 = 'MENU', now3 = 0, last3 = 0, overAt3 = 0;
+let best3 = 0, bestAtStart3 = 0, targetHit3 = 0;
+let hintsSeen3 = {};
+let lockUntil3 = 0;
+let W3 = 0, H3 = 0, FOV = 0.86;
+let glcv = null, batchCube = null, batchFlat = null, progSolid = null, progFlat = null, progBg = null, bgBuf = null;
+const cellBorn = new Float32Array(GRID_W * GRID_H);   // when each cell's block landed
+
+const SAVE3_KEY = 'powerjam3d_v1';
+function readSave3(){ try { return JSON.parse(localStorage.getItem(SAVE3_KEY)) || {}; } catch(e){ return {}; } }
+function writeSave3(d){ try { localStorage.setItem(SAVE3_KEY, JSON.stringify(d)); } catch(e){} }
+
+// ---------------------------------------------------------------- the target ladder
+// Carried over from the 2D game unchanged, including the reason it exists: an endless run with
+// no second number beside the score ends at a stop, not at a result.
+const LADDER3 = [1000, 2500, 5000, 10000];
+function targetMarks3(){
+  const marks = LADDER3.slice();
+  const reach = Math.max(st3 ? st3.score : 0, bestAtStart3) * 2;
+  let v = marks[marks.length - 1];
+  while (v < 4000000 && v <= reach){ v *= 2; marks.push(v); }
+  if (bestAtStart3 > 0 && !marks.includes(bestAtStart3)) marks.push(bestAtStart3);
+  return marks.sort((a, b) => a - b);
+}
+function runTarget3(){
+  const score = st3 ? st3.score : 0;
+  for (const v of targetMarks3()) if (v > score) return { value: v, best: bestAtStart3 > 0 && v === bestAtStart3 };
+  return null;
+}
+
+// ---------------------------------------------------------------- board reads
+const idx3 = (x, y) => y * GRID_W + x;
+const filled3  = (x, y) => (st3.board.rows[y] >> x) & 1;
+const painted3 = (x, y) => (st3.board.painted[y] >> x) & 1;
+const broken3  = (x, y) => (st3.board.broken[y] >> x) & 1;
+function colorOf3(x, y){
+  const c = st3.board.piece[idx3(x, y)];
+  return JELLY_RGB[(c > 0 ? c - 1 : 0) % JELLY_RGB.length];
+}
+function isPainterCell(x, y){
+  return !!(st3.painter && st3.painter.cells.some(([px, py]) => px === x && py === y));
+}
+
+// ---------------------------------------------------------------- block animation
+// A block does not appear. It falls, lands, squashes and settles — the single cheapest thing
+// that makes a placement feel like it happened TO the board rather than being switched on.
+const DROP_MS = 260, SETTLE_MS = 260;
+function blockAnim(age){
+  if (age >= DROP_MS + SETTLE_MS || age < 0) return [BLOCK_Y, 1, 1];
+  if (age < DROP_MS){
+    const t = age / DROP_MS, e = t * t;                        // gravity, not a linear slide
+    return [BLOCK_Y + 8.0 * (1 - e), 1 - 0.10 * (1 - e), 1 + 0.22 * (1 - e)];
+  }
+  const k = (age - DROP_MS) / SETTLE_MS;
+  const d = Math.sin(k * Math.PI * 2) * Math.exp(-k * 3.2) * 0.42;   // damped rebound
+  return [BLOCK_Y + Math.max(0, d) * 0.30, 1 + d * 0.45, 1 - d * 0.62];
+}
+
+// ---------------------------------------------------------------- run lifecycle
+function startRun3(){
+  const save = readSave3();
+  best3 = save.best || 0;
+  bestAtStart3 = best3;
+  targetHit3 = 0;
+  st3 = newRun((Date.now() ^ ((save.runs || 0) * 2654435761)) >>> 0);
+  save.runs = (save.runs || 0) + 1; save.best = best3; writeSave3(save);
+  cellBorn.fill(-99999);
+  clearFx3();
+  drag3 = null; hover3 = null;
+  scene3 = 'PLAY'; lockUntil3 = 0;
+}
+
+// ---------------------------------------------------------------- a move, and its consequences
+function doPlace3(ti, gx, gy){
+  const piece = PIECES[st3.tray[ti]];
+  const ev = placeRun(st3, ti, gx, gy);
+  if (!ev) return;
+
+  const cells = piece.cells.map(([dx, dy]) => [gx + dx, gy + dy]);
+  for (const [x, y] of cells) cellBorn[idx3(x, y)] = now3;
+  let lock = 220;
+  sfx3('place');
+  cam.shake = Math.max(cam.shake, 0.10);
+
+  if (ev.painterPlaced){ sfx3('paint'); showHint3('painter'); flashAmt = Math.max(flashAmt, 0.25); }
+  else if (ev.power === POWERS.MAGNET){ sfx3('magnet'); showHint3('magnet'); }
+
+  // the Magnet's pull: every cell it dragged throws a spark trail toward it
+  if (ev.pulled && ev.pulled.moves && ev.pulled.moves.length){
+    for (const m of ev.pulled.moves){
+      cellBorn[idx3(m.to[0], m.to[1])] = now3 - DROP_MS;   // it slides in, it does not fall in
+      shockwave(cellX(m.to[0]), cellZ(m.to[1]), MAGNET_RGB, 1.6, 420);
+    }
+    lock = Math.max(lock, 300);
+  }
+
+  // an ordinary clear: the cubes are launched, they are not deleted
+  if (ev.cleared){
+    const deep = Math.min(1, (ev.combo - 1) / 6);
+    for (const [x, y] of ev.cleared.cells)
+      launch(cellX(x), BLOCK_Y, cellZ(y), colorOf3(x, y) || JELLY_RGB[0],
+             { up: 7 + deep * 4, spread: 0.7, s: BLOCK_XZ, dur: 1000 });
+    cam.shake = Math.max(cam.shake, 0.22 + (ev.cleared.n - 1) * 0.16 + deep * 0.25);
+    sfx3('clear', Math.min(ev.combo, 8));
+    lock = Math.max(lock, 300);
+    if (ev.combo > 1) banner(S3('combo', {n: ev.combo}), '#FFC66D', 620);
+  } else if (ev.comboLost >= 2){
+    banner(S3('lost', {n: ev.comboLost}), '#FB7185', 700);
+    sfx3('fizzle');
+  }
+
+  if (ev.multiReward){
+    const mr = ev.multiReward;
+    banner(S3('linesAtOnce', {n: mr.n}), '#FFC66D', 900);
+    popNumber(0, 2.4, 0, mr.kind === 'SPAWN' ? S3('spawned') : S3('empowered'), '', PAINT_RGB);
+    shockwave(0, 0, PAINT_RGB, 9, 800);
+    flashAmt = 1; cam.kick = 1; cam.shake = Math.max(cam.shake, 0.7);
+    freeze3 = 90; lock = Math.max(lock, 620);
+    sfx3('reward');
+    if (mr.kind === 'SPAWN') cellBorn[idx3(mr.cell[0], mr.cell[1])] = now3;
+  }
+
+  // THE BLAST. Anticipation is bought with hit-stop, the release is 10-20 cubes leaving the
+  // board at speed with a shockwave under them. This is the moment the concept exists for.
+  if (ev.blast){
+    const streak = ev.streak || 1;
+    freeze3 = 110 + Math.min(120, streak * 20);
+    cam.kick = 1; cam.shake = Math.max(cam.shake, 0.85);
+    flashAmt = 1;
+    shockwave(0, 0, PAINT_RGB, 11, 700);
+    for (const [x, y] of (ev.blast.cells || [])){
+      const wx = cellX(x), wz = cellZ(y);
+      const d = Math.hypot(wx, wz) || 1;
+      launch(wx, BLOCK_Y, wz, PAINT_RGB,
+             { up: 11, spread: 1.4, s: BLOCK_XZ, glow: 0.9, dur: 1250, dx: wx/d*4, dz: wz/d*4 });
+    }
+    popNumber(0, 2.2, 0, '+' + ev.blast.points,
+              S3('cells', {n: ev.blast.total, m: ev.blast.mult.toFixed(1)}), PAINT_RGB);
+    banner(S3('blast'), '#FF5FA2', 900);
+    sfx3('charge');
+    setTimeout(() => sfx3('blast', streak), 90);
+    showHint3('blast');
+    lock = Math.max(lock, 700);
+  } else if (ev.expired && ev.expired.length){
+    sfx3('fizzle');
+  }
+
+  fxTarget3();
+  lockUntil3 = now3 + lock;
+
+  if (st3.score > best3){ best3 = st3.score; const s = readSave3(); s.best = best3; writeSave3(s); }
+  if (st3.phase !== 'PLAYING'){
+    sfx3('over');
+    setTimeout(() => { if (st3 && st3.phase !== 'PLAYING'){ scene3 = 'OVER'; overAt3 = now3; } }, lock + 320);
+  }
+}
+
+// A target on the ladder was passed. The record gets the louder one — it is the only mark the
+// player set themselves.
+function fxTarget3(){
+  let top = 0;
+  for (const v of targetMarks3()) if (st3.score >= v) top = v;
+  if (top <= targetHit3) return;
+  const beatBest = bestAtStart3 > 0 && top >= bestAtStart3 && targetHit3 < bestAtStart3;
+  targetHit3 = top;
+  banner(beatBest ? S3('bestBeaten') : S3('targetCleared', {n: top}), beatBest ? '#FFC66D' : '#FF5FA2', 900);
+  cam.kick = Math.max(cam.kick, beatBest ? 0.9 : 0.4);
+  flashAmt = Math.max(flashAmt, beatBest ? 0.9 : 0.4);
+  sfx3(beatBest ? 'record' : 'reward');
+}
+
+// ---------------------------------------------------------------- input
+let drag3 = null;      // { ti, cells } — the piece currently in the air
+let hover3 = null;     // { x, y, ok } — where it would land
+// Centred, not (0,0): a pointer parked at the origin means the idle camera opens the board
+// already yawed 15 degrees off, which reads as a broken render rather than as drift.
+let pointer3 = { x: -1, y: -1, down: false };
+let invVP = null;
+
+function traySlotCenter(i){ return [(i - 1) * 3.05, TRAY_Y, TRAY_Z]; }
+
+// Tray pieces are laid out around their own centre so a 1×5 bar and a 3×3 cube both sit in the
+// middle of their slot instead of hanging off one corner.
+function trayCells(i){
+  const id = st3.tray[i];
+  if (id === null || id === undefined) return null;
+  const p = PIECES[id];
+  const c = traySlotCenter(i);
+  const s = p.w > 3 || p.h > 3 ? 0.46 : 0.58;      // long pieces shrink so every slot reads the same
+  return p.cells.map(([dx, dy]) => [
+    c[0] + (dx - (p.w - 1) / 2) * s, c[1] + 0.34, c[2] + (dy - (p.h - 1) / 2) * s, s * 0.44,
+  ]);
+}
+
+function pickTray(wx, wz){
+  for (let i = 0; i < 3; i++){
+    if (st3.tray[i] === null || st3.tray[i] === undefined) continue;
+    const c = traySlotCenter(i);
+    if (Math.abs(wx - c[0]) < 1.5 && Math.abs(wz - c[2]) < 1.4) return i;
+  }
+  return -1;
+}
+
+function onDown(px, py){
+  pointer3.down = true; pointer3.x = px; pointer3.y = py;
+  if (scene3 === 'MENU' || scene3 === 'OVER'){
+    for (const b of hudButtons)
+      if (px >= b.x && px <= b.x + b.w && py >= b.y && py <= b.y + b.h){
+        if (b.id === 'play3' || b.id === 'retry3') startRun3();
+        else if (b.id === 'menu3') scene3 = 'MENU';
+        return;
+      }
+    return;
+  }
+  if (now3 < lockUntil3) return;
+  const g = groundPick(px, py, TRAY_Y);
+  if (!g) return;
+  const ti = pickTray(g[0], g[2]);
+  if (ti >= 0){ drag3 = { ti }; sfx3('pick'); updateHover(px, py); }
+}
+
+function onMove(px, py){
+  pointer3.x = px; pointer3.y = py;
+  if (drag3) updateHover(px, py);
+}
+
+function onUp(){
+  pointer3.down = false;
+  if (drag3 && hover3 && hover3.ok) doPlace3(drag3.ti, hover3.x, hover3.y);
+  drag3 = null; hover3 = null;
+}
+
+// The finger holds the piece ABOVE the board, and the shadow says where it will land. Lifting it
+// is not a nicety on a phone: without it the hand covers the exact cells the choice depends on.
+function updateHover(px, py){
+  const g = groundPick(px, py - Math.min(70, H3 * 0.09), BLOCK_Y);
+  if (!g){ hover3 = null; return; }
+  const p = PIECES[st3.tray[drag3.ti]];
+  const gx = Math.round(g[0] / CELL + (GRID_W - 1) / 2 - (p.w - 1) / 2);
+  const gy = Math.round(g[2] / CELL + (GRID_H - 1) / 2 - (p.h - 1) / 2);
+  const x = Math.max(0, Math.min(GRID_W - p.w, gx));
+  const y = Math.max(0, Math.min(GRID_H - p.h, gy));
+  hover3 = { x, y, ok: canPlace(st3.board, p, x, y),
+             preview: canPlace(st3.board, p, x, y) ? previewClear(st3.board, p, x, y) : null };
+}
+
+function groundPick(px, py, planeY){
+  if (!invVP) return null;
+  return pickPlane(invVP, (px / W3) * 2 - 1, 1 - (py / H3) * 2, planeY);
+}
+
+// ---------------------------------------------------------------- render
+function drawScene(){
+  const vpe = viewProj(W3, H3, FOV);
+  invVP = invert4(vpe.vp);
+  const U = { uVP: vpe.vp, uEye: new Float32Array(vpe.eye),
+              uLight: new Float32Array([0.40, 0.88, 0.34]),
+              uAmb: new Float32Array([0.42, 0.40, 0.50]),
+              uBoost: Math.min(1.2, (st3 ? st3.streak : 0) * 0.18) };
+
+  gl.viewport(0, 0, glcv.width, glcv.height);
+  gl.clearColor(0.09, 0.08, 0.20, 1);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+  // background room
+  gl.useProgram(progBg.p);
+  gl.uniform3fv(progBg.u.uTop, new Float32Array(BG_TOP));
+  gl.uniform3fv(progBg.u.uBot, new Float32Array(BG_BOT));
+  gl.uniform1f(progBg.u.uPulse, flashAmt);
+  gl.bindBuffer(gl.ARRAY_BUFFER, bgBuf);
+  const aBg = progBg.a('aPos');
+  gl.enableVertexAttribArray(aBg);
+  gl.vertexAttribPointer(aBg, 3, gl.FLOAT, false, 0, 0);
+  instancing.divisor(aBg, 0);
+  gl.disable(gl.DEPTH_TEST);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+  gl.enable(gl.DEPTH_TEST);
+
+  batchReset(batchCube);
+  batchReset(batchFlat);
+
+  const half = (GRID_W * CELL) / 2;
+  // the slab, and the tray table in front of it
+  push(batchCube, 0, -0.42, 0, half + 0.35, 0.42, half + 0.35, 0,0,0, SLAB_RGB[0], SLAB_RGB[1], SLAB_RGB[2], 0, 1);
+  push(batchCube, 0, -0.34, TRAY_Z, 4.55, 0.26, 1.35, 0,0,0, TRAY_RGB[0], TRAY_RGB[1], TRAY_RGB[2], 0, 1);
+
+  if (scene3 !== 'MENU' && st3) drawBoard();
+  else drawIdleBoard();
+
+  batchDraw(batchCube, U);
+
+  // shadows and rings last, blended, never writing depth — otherwise a contact shadow punches a
+  // hole in the block standing on it
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+  gl.depthMask(false);
+  batchDraw(batchFlat, { uVP: vpe.vp });
+  gl.depthMask(true);
+  gl.disable(gl.BLEND);
+  return vpe.vp;
+}
+
+function shadowFor(x, z, y, size, strength){
+  const lift = Math.max(0, y - BLOCK_Y);
+  const s = size * (1.55 + lift * 0.22);
+  push(batchFlat, x + lift * 0.16, 0.015, z + lift * 0.10, s, 1, s, 0,0,0, 0, 0, 0,
+       0, Math.max(0, strength * (1 - lift * 0.055)));
+}
+
+function drawBoard(){
+  const pulse = 0.5 + 0.5 * Math.sin(now3 / 300);
+
+  // sockets: the empty grid, and the 3×3 regions marked by a slightly lighter floor. The region
+  // rule is only playable if the regions are visible.
+  for (let y = 0; y < GRID_H; y++) for (let x = 0; x < GRID_W; x++){
+    if (filled3(x, y)) continue;
+    const reg = ((Math.floor(x / REGION) + Math.floor(y / REGION)) % 2) === 0;
+    let c = reg ? SOCKET_RGB : RIM_RGB.map(v => v * 0.35);
+    let glow = 0;
+    if (hover3 && hover3.preview && drag3){
+      const pv = hover3.preview;
+      const inReg = (pv.regions || []).some(([bx, by]) => x >= bx && x < bx + REGION && y >= by && y < by + REGION);
+      if (pv.rows.includes(y) || pv.cols.includes(x) || inReg){ c = PAINT_RGB; glow = 0.5 + pulse * 0.5; }
+    }
+    push(batchCube, cellX(x), 0.03, cellZ(y), BLOCK_XZ, 0.035, BLOCK_XZ, 0,0,0, c[0], c[1], c[2], glow, 1);
+  }
+
+  // the blocks
+  for (let y = 0; y < GRID_H; y++) for (let x = 0; x < GRID_W; x++){
+    if (!filled3(x, y)) continue;
+    const [by, sxz0, sy0] = blockAnim(now3 - cellBorn[idx3(x, y)]);
+    const jig = Math.sin(now3 / 640 + x * 1.7 + y * 2.3) * 0.022;
+    const sxz = sxz0 * (1 + jig), sy = sy0 * (1 - jig);
+    const isP = painted3(x, y), isB = broken3(x, y), isCore = isPainterCell(x, y);
+    const col = isP ? PAINT_RGB : colorOf3(x, y);
+    const shrink = isB ? 0.72 : 1;
+    const glow = isP ? 0.35 + pulse * 0.45 : (isCore ? 0.30 : 0);
+    push(batchCube, cellX(x), by, cellZ(y),
+         BLOCK_XZ * sxz * shrink, BLOCK_Y * sy * shrink, BLOCK_XZ * sxz * shrink,
+         0, 0, 0, col[0], col[1], col[2], glow, 1);
+    shadowFor(cellX(x), cellZ(y), by, BLOCK_XZ, 0.42);
+  }
+
+  // the tray: three recessed pads, so an empty slot still reads as a slot
+  for (let i = 0; i < 3; i++){
+    const c = traySlotCenter(i);
+    const busy = st3.tray[i] !== null && st3.tray[i] !== undefined;
+    push(batchCube, c[0], -0.03, c[2], 1.32, 0.05, 1.08, 0,0,0,
+         SOCKET_RGB[0], SOCKET_RGB[1], SOCKET_RGB[2], busy ? 0.05 : 0, 1);
+  }
+  for (let i = 0; i < 3; i++){
+    if (drag3 && drag3.ti === i) continue;
+    const cells = trayCells(i);
+    if (!cells) continue;
+    const pw = st3.trayPower[i];
+    const col = pw === POWERS.PAINTER ? PAINT_RGB : pw === POWERS.MAGNET ? MAGNET_RGB
+              : JELLY_RGB[st3.trayColor[i] % JELLY_RGB.length];
+    const bob = Math.sin(now3 / 620 + i) * 0.06;
+    const glow = pw ? 0.30 + pulse * 0.35 : 0;
+    for (const [cx, cy, cz, s] of cells){
+      push(batchCube, cx, cy + bob, cz, s, s * 0.9, s, 0, Math.sin(now3/2600 + i) * 0.06, 0,
+           col[0], col[1], col[2], glow, 1);
+      shadowFor(cx, cz, cy + bob + 0.3, s, 0.30);
+    }
+  }
+
+  // the piece in the air, and the footprint it will fill
+  if (drag3 && hover3){
+    const p = PIECES[st3.tray[drag3.ti]];
+    const pw = st3.trayPower[drag3.ti];
+    const col = pw === POWERS.PAINTER ? PAINT_RGB : pw === POWERS.MAGNET ? MAGNET_RGB
+              : JELLY_RGB[st3.trayColor[drag3.ti] % JELLY_RGB.length];
+    const y = HOVER_Y + Math.sin(now3 / 300) * 0.05;
+    for (const [dx, dy] of p.cells){
+      const wx = cellX(hover3.x + dx), wz = cellZ(hover3.y + dy);
+      push(batchCube, wx, y, wz, BLOCK_XZ, BLOCK_Y, BLOCK_XZ, 0,0,0,
+           col[0], col[1], col[2], hover3.ok ? 0.45 : 0, 1);
+      if (hover3.ok){
+        // the landing footprint: a bright plate exactly where the block will sit
+        push(batchCube, wx, 0.05, wz, BLOCK_XZ * 0.95, 0.04, BLOCK_XZ * 0.95, 0,0,0,
+             col[0], col[1], col[2], 0.7, 1);
+        shadowFor(wx, wz, y, BLOCK_XZ, 0.55);
+      } else {
+        push(batchCube, wx, 0.05, wz, BLOCK_XZ * 0.95, 0.04, BLOCK_XZ * 0.95, 0,0,0, 0.6, 0.1, 0.2, 0.5, 1);
+      }
+    }
+  }
+
+  drawDebris();
+}
+
+// The menu is not a still image: the board plays a slow idle so the first thing anyone sees is
+// the material, lit and moving.
+function drawIdleBoard(){
+  for (let y = 0; y < GRID_H; y++) for (let x = 0; x < GRID_W; x++){
+    const reg = ((Math.floor(x / REGION) + Math.floor(y / REGION)) % 2) === 0;
+    const c = reg ? SOCKET_RGB : RIM_RGB.map(v => v * 0.35);
+    push(batchCube, cellX(x), 0.03, cellZ(y), BLOCK_XZ, 0.035, BLOCK_XZ, 0,0,0, c[0], c[1], c[2], 0, 1);
+  }
+  const t = now3 / 1000;
+  for (let i = 0; i < 14; i++){
+    const a = i * 2.399 + t * 0.25;
+    const r = 1.2 + (i % 5) * 0.75;
+    const x = Math.cos(a) * r, z = Math.sin(a) * r;
+    const yy = BLOCK_Y + 0.28 + Math.sin(t * 1.6 + i) * 0.22;
+    const c = JELLY_RGB[i % JELLY_RGB.length];
+    push(batchCube, x, yy, z, BLOCK_XZ, BLOCK_Y, BLOCK_XZ, t * 0.3 + i, t * 0.4, 0, c[0], c[1], c[2], 0.10, 1);
+    shadowFor(x, z, yy, BLOCK_XZ, 0.35);
+  }
+  drawDebris();
+}
+
+function drawDebris(){
+  for (const d of debris){
+    const k = d.t / d.dur;
+    const fade = k < 0.7 ? 1 : 1 - (k - 0.7) / 0.3;
+    push(batchCube, d.x, d.y, d.z, d.s * fade, d.s * fade, d.s * fade,
+         d.rx, d.ry, d.rz, d.col[0], d.col[1], d.col[2], d.glow * fade, 1);
+    shadowFor(d.x, d.z, d.y, d.s, 0.30 * fade);
+  }
+  for (const w of waves){
+    const k = w.t / w.dur;
+    const r = 0.6 + k * w.r;
+    push(batchFlat, w.x, 0.03, w.z, r, 1, r, 0,0,0, w.col[0], w.col[1], w.col[2], 1, (1 - k) * 0.75);
+  }
+}
+
+// ---------------------------------------------------------------- loop
+function frame3(t){
+  const dt = Math.min(50, t - last3 || 16);
+  last3 = t;
+  now3 = t;
+  updateFx3(dt);
+  if (hint3){ hint3.t += dt; if (hint3.t >= hint3.dur) hint3 = null; }
+
+  // The camera drifts with the pointer. It is a small thing and it is most of why a 3D board
+  // reads as an object on a table rather than a picture of one.
+  const px = pointer3.x < 0 ? W3 / 2 : pointer3.x;
+  const targetYaw = ((px / Math.max(1, W3)) - 0.5) * 0.20;
+  cam.yaw += (targetYaw - cam.yaw) * Math.min(1, dt / 260);
+  if (scene3 === 'MENU') cam.yaw = Math.sin(t / 5200) * 0.28;
+
+  const vp = drawScene();
+  if (scene3 === 'MENU') drawMenu3();
+  else { drawHud3(vp); if (scene3 === 'OVER') drawOver3(); }
+
+  requestAnimationFrame(frame3);
+}
+
+function resize3(){
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  W3 = glcv.clientWidth; H3 = glcv.clientHeight;
+  glcv.width = Math.round(W3 * dpr); glcv.height = Math.round(H3 * dpr);
+  hudResize(W3, H3, dpr);
+  FOV = fitCamera(W3, H3);
+}
+
+function boot3(){
+  glcv = document.getElementById('gl');
+  hudInit(document.getElementById('hud'));
+  if (!initGL(glcv)){
+    const c = document.getElementById('hud').getContext('2d');
+    c.fillStyle = '#0A1018'; c.fillRect(0, 0, 2000, 2000);
+    c.fillStyle = '#EAF2F7'; c.font = '600 16px system-ui'; c.textAlign = 'center';
+    c.fillText(S3('noWebGL'), 200, 100);
+    return;
+  }
+  LANG3 = (navigator.language || 'en').toLowerCase().startsWith('tr') ? 'tr' : 'en';
+  progSolid = compile(VS_SOLID, FS_SOLID);
+  progFlat  = compile(VS_FLAT, FS_SHADOW);
+  progBg    = compile(VS_BG, FS_BG);
+  batchCube = makeBatch(buildRoundedCube(0.55, 7), progSolid, 900);   // round, with smooth normals — see buildRoundedCube
+  batchFlat = makeBatch(buildQuad(), progFlat, 900);
+  bgBuf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, bgBuf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,0, 3,-1,0, -1,3,0]), gl.STATIC_DRAW);
+
+  best3 = readSave3().best || 0;
+  resize3();
+  window.addEventListener('resize', resize3);
+
+  const pos = e => { const r = glcv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+  glcv.addEventListener('pointerdown', e => { glcv.setPointerCapture(e.pointerId); onDown(...pos(e)); });
+  glcv.addEventListener('pointermove', e => onMove(...pos(e)));
+  glcv.addEventListener('pointerup',   e => onUp());
+  glcv.addEventListener('pointercancel', e => onUp());
+  document.addEventListener('pointerdown', () => { const a = ac3(); if (a && a.state === 'suspended') a.resume(); }, {once:true});
+
+  requestAnimationFrame(frame3);
+
+  // test hook — the concept is driven by tools/shots3d.mjs the same way the 2D game is
+  window.__t3 = {
+    core: { PIECES, GRID_W, GRID_H, canPlace },
+    get state(){ return st3; }, get scene(){ return scene3; },
+    startRun: startRun3, drop: doPlace3, setLang: l => { LANG3 = l; },
+    mute: v => { muted3 = v; },
+    get debris(){ return debris.length; },
+    get gl2(){ return isGL2; },
+  };
+}
+
+boot3();
+</script>
+</body>
+</html>

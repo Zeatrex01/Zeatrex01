@@ -11,7 +11,6 @@ Notes for the site in this repo (`index.html`, `styles.css`, `config.js`, `app.j
 
 | Prototype | Tech | Frame | Status |
 |---|---|---|---|
-| **Power Jam** — paint, pull, blast in a single move | Canvas 2D | portrait | Playable |
 | **Royal Guard** — build a barricade, protect your king | Three.js, cannon-es, WebGL | portrait | Playable |
 | **Corn Bucket** — aim, cut it loose, fill the bucket | Canvas 2D | portrait | Playable |
 | **Traffic Detective** — patrol the neighbourhood, catch the rule breaker | Canvas 2D | portrait | Playable |
@@ -25,6 +24,17 @@ of variants, and every variant is playable through the same player as a prototyp
 | Campaign | Variants | Store |
 |---|---|---|
 | **Popcorn Pop Sort** | Conveyor, Rush | App Store |
+
+## Variants
+
+One build shown in more than one form, grouped under a shared header. Config
+lives in `CONFIG.series`; the group carries the copy for the loop the builds
+share, and each variant is playable through the same player as a prototype.
+
+| Group | Variants | What changes |
+|---|---|---|
+| **Power Jam** | Power Jam 2D, Power Jam 3D | The camera: a flat Canvas 2D board, or a tilted slab drawn with hand-written WebGL2 shaders |
+| **Sevkiyat Hattı** | Külah Köşesi, Çiftlik Postası | The theme only — the rules, the level generator and the difficulty curve are identical |
 
 ---
 

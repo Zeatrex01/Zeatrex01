@@ -29,18 +29,6 @@ const CONFIG = {
     // ========================================
     prototypes: [
         {
-            id: "power_block_jam",
-            path: "games/PowerBlockJam/",
-            year: "2026",
-            status: "playable",
-            engine: "Canvas 2D",
-            tech: ["JavaScript", "Canvas 2D", "WebAudio", "Puzzle mechanics"],
-            frame: "portrait",
-            accent: "#ff4d8d",
-            art: "power-block-jam",
-            image: ""
-        },
-        {
             id: "royal_guard",
             path: "games/royal-guard/",       // must contain an index.html
             year: "2026",
@@ -124,6 +112,34 @@ const CONFIG = {
     // ========================================
     series: [
         {
+            id: "power_jam",
+            accent: "#ff4d8d",
+            art: "power-block-jam",
+            year: "2026",
+            engine: "Canvas 2D · WebGL2",
+            tech: ["JavaScript", "Canvas 2D", "WebGL2", "GLSL", "Puzzle mechanics"],
+            variants: [
+                {
+                    id: "power_block_jam",
+                    path: "games/PowerBlockJam/",
+                    status: "playable",
+                    frame: "portrait",
+                    accent: "#ff4d8d",
+                    engine: "Canvas 2D",
+                    art: "power-block-jam"
+                },
+                {
+                    id: "power_jam_3d",
+                    path: "games/power-jam-3d/",
+                    status: "playable",
+                    frame: "portrait",
+                    accent: "#8b6cf0",
+                    engine: "WebGL2",
+                    art: "power-jam-3d"
+                }
+            ]
+        },
+        {
             id: "dispatch_line",
             accent: "#3fa08f",
             art: "dispatch-icon",
@@ -167,7 +183,7 @@ const CONFIG = {
             nav: {
                 library: "Kütüphane",
                 ads: "Reklamlar",
-                series: "Temalar",
+                series: "Varyantlar",
                 contact: "İletişim",
                 langLabel: "EN"
             },
@@ -183,7 +199,7 @@ const CONFIG = {
             sections: {
                 all: "Tüm prototipler",
                 ads: "Oynanabilir reklamlar",
-                series: "Tema varyantları"
+                series: "Varyantlar"
             },
             ads: {
                 live: "Mağazalarda yayında",
@@ -191,7 +207,17 @@ const CONFIG = {
             },
             series: {
                 sharedLoop: "Ortak döngü",
-                themeLabel: "Tema",
+                themeLabel: "Bu sürüm",
+                power_jam: {
+                    title: "Power Jam",
+                    badge: "Aynı döngü · 2D ve 3B",
+                    blurb: "Aynı blok yerleştirme döngüsünün iki sunumu. Kurallar bire bir aynı: 9×9 tahtaya parça yerleştir, sıra, sütun ya da 3×3 bölgeleri temizleyerek yer aç, Boyacı ve Mıknatıs güç bloklarıyla zincirleme patlamalar kur. Değişen şey kamera ve malzeme — biri düz bir tahta, diğeri ışığı içine alan jöle küplerden kurulu eğimli bir tezgâh. Aynı mekaniğin üç boyuta taşınınca ne kazanıp ne kaybettiğini görmek için ikisi yan yana duruyor.",
+                    controls: [
+                        "Parçaları tepsiden 9×9 tahtaya sürükle",
+                        "Sıra, sütun veya 3×3 bölgeleri doldurarak temizle",
+                        "Boyacı ile boya, Mıknatıs ile topla, kombolarla çarpanı yükselt"
+                    ]
+                },
                 dispatch_line: {
                     title: "Sevkiyat Hattı",
                     badge: "Tek çekirdek · iki tema",
@@ -248,8 +274,18 @@ const CONFIG = {
                         "Sıradaki siparişler şeridine bakarak kasaları önden ayır"
                     ]
                 },
+                power_jam_3d: {
+                    title: "Power Jam 3D",
+                    tagline: "Aynı tahta, jöle bloklarla ve gerçek ışıkla.",
+                    description: "Power Jam'in 3B konsepti. Tahta artık eğimli bir tezgâh, bloklar ışığı içine alan jöle küpler; sahne hiçbir kütüphane kullanmadan, elle yazılmış WebGL2 shader'larıyla çiziliyor. Oynanış bire bir aynı, ama okuma değişiyor: hangi bölgenin dolmak üzere olduğunu düz bir ızgaradan değil, hacimden ve gölgeden anlıyorsun. Skor hedefi, hamle sayacı ve combo çarpanı ekranda açık duruyor.",
+                    controls: [
+                        "Parçayı tepsiden alıp tezgâha sürükle",
+                        "Çarpanı düşürmemek için temizlikleri arka arkaya bağla",
+                        "Üstteki \"power in N\" sayacı sıradaki güç bloğunu haber verir"
+                    ]
+                },
                 power_block_jam: {
-                    title: "Power Jam",
+                    title: "Power Jam 2D",
                     tagline: "Boya, topla, tek hamlede patlat.",
                     description: "9×9 ızgarada geçen, klasik blok yerleştirme mekaniğini dinamik güç bloklarıyla birleştiren bulmaca prototipi. Parçaları tahtaya yerleştirerek sıraları, sütunları ya da 3×3 bölgeleri temizle; çevresini renklendiren Boyacı ve boyaları kendine çeken Mıknatıs bloklarıyla zincirleme patlamalar oluştur.",
                     controls: [
@@ -319,7 +355,7 @@ const CONFIG = {
             nav: {
                 library: "Library",
                 ads: "Ads",
-                series: "Themes",
+                series: "Variants",
                 contact: "Contact",
                 langLabel: "TR"
             },
@@ -335,7 +371,7 @@ const CONFIG = {
             sections: {
                 all: "All prototypes",
                 ads: "Playable ads",
-                series: "Theme variants"
+                series: "Variants"
             },
             ads: {
                 live: "Live on the stores",
@@ -343,7 +379,17 @@ const CONFIG = {
             },
             series: {
                 sharedLoop: "Shared loop",
-                themeLabel: "Theme",
+                themeLabel: "This build",
+                power_jam: {
+                    title: "Power Jam",
+                    badge: "One loop · 2D and 3D",
+                    blurb: "One block-placement loop, presented two ways. The rules are identical: drop pieces onto a 9×9 board, clear rows, columns or 3×3 zones to win space back, and chain blasts with the Painter and Magnet power blocks. What moves is the camera and the material — a flat board in one, a tilted slab of jelly cubes that catch the light in the other. The two sit side by side to show what the same mechanic gains and loses on the way into three dimensions.",
+                    controls: [
+                        "Drag pieces from the tray onto the 9×9 board",
+                        "Fill rows, columns or 3×3 regions to clear them",
+                        "Dye with Painter, gather with Magnet, chain clears to raise the multiplier"
+                    ]
+                },
                 dispatch_line: {
                     title: "Dispatch Line",
                     badge: "One core · two themes",
@@ -400,8 +446,18 @@ const CONFIG = {
                         "Watch the upcoming-orders strip and reserve crates ahead of time"
                     ]
                 },
+                power_jam_3d: {
+                    title: "Power Jam 3D",
+                    tagline: "The same board, in jelly and real light.",
+                    description: "The 3D concept for Power Jam. The board is now a tilted slab and the pieces are jelly cubes that catch the light; the scene is drawn with hand-written WebGL2 shaders and no library at all. The play is identical, but the reading changes: you judge which region is about to fill from volume and shadow rather than from a flat grid. The score target, the move counter and the combo multiplier stay on screen.",
+                    controls: [
+                        "Drag a piece off the tray and onto the slab",
+                        "Chain clears back to back to keep the multiplier up",
+                        "The \"power in N\" counter up top calls the next power block"
+                    ]
+                },
                 power_block_jam: {
-                    title: "Power Jam",
+                    title: "Power Jam 2D",
                     tagline: "Paint, pull, blast in a single move.",
                     description: "A 9×9 grid block puzzle prototype fusing classic polyomino placement with active power blocks. Drag shapes to clear lines, columns, or 3×3 zones. Unleash Painter blocks that color neighboring cells and Magnet blocks that pull paint together to trigger massive chain blasts.",
                     controls: [

@@ -292,6 +292,68 @@
                 "</svg>";
         },
 
+        // The 3D build's own look: a tilted slab of cells with jelly cubes
+        // sitting upright on it, so the perspective reads without squashing
+        // the pieces.
+        "power-jam-3d": function (uid) {
+            var cube = function (x, y, s, top, side, gloss) {
+                var r = s * .3;
+                return '<g transform="translate(' + x + ' ' + y + ')">' +
+                    '<rect x="' + (-s / 2) + '" y="' + (-s / 2 + s * .2) + '" width="' + s +
+                    '" height="' + s + '" rx="' + r + '" fill="' + side + '"/>' +
+                    '<rect x="' + (-s / 2) + '" y="' + (-s / 2) + '" width="' + s +
+                    '" height="' + s + '" rx="' + r + '" fill="' + top + '"/>' +
+                    '<rect x="' + (-s * .28) + '" y="' + (-s * .32) + '" width="' + (s * .33) +
+                    '" height="' + (s * .19) + '" rx="' + (s * .095) + '" fill="' + gloss +
+                    '" opacity=".7"/></g>';
+            };
+
+            // 9x9 of cells, flattened and tilted as one group.
+            var cells = "", r2, c2;
+            for (r2 = 0; r2 < 9; r2++) {
+                for (c2 = 0; c2 < 9; c2++) {
+                    var zone = (Math.floor(r2 / 3) + Math.floor(c2 / 3)) % 2;
+                    cells += '<rect x="' + (c2 * 46 - 207) + '" y="' + (r2 * 46 - 207) +
+                        '" width="40" height="40" rx="11" fill="' +
+                        (zone ? "#2a2a44" : "#3b3b5e") + '"/>';
+                }
+            }
+
+            var JELLY = [
+                ["#f7a8c8", "#c96f96", "#ffe4ef"],
+                ["#9fe6df", "#5faead", "#e6fffb"],
+                ["#fbe08f", "#c9a94f", "#fff6d8"],
+                ["#c9b7f5", "#8d78c9", "#f0eaff"]
+            ];
+            var spots = [[268, 214, 1], [330, 236, 0], [392, 214, 3],
+                         [300, 268, 2], [452, 246, 1], [514, 224, 0],
+                         [360, 300, 3], [424, 278, 2], [486, 300, 1],
+                         [548, 268, 3]];
+            var pieces = spots.map(function (sp) {
+                var j = JELLY[sp[2]];
+                return cube(sp[0], sp[1], 52, j[0], j[1], j[2]);
+            }).join("");
+
+
+            return '' +
+                '<svg viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" role="img">' +
+                '<defs>' +
+                '<radialGradient id="glow-' + uid + '" cx=".5" cy=".18" r=".8">' +
+                '<stop offset="0" stop-color="#4a3a78"/><stop offset="1" stop-color="#161028"/>' +
+                "</radialGradient>" +
+                '<linearGradient id="fade-' + uid + '" x1="0" y1="0" x2="0" y2="1">' +
+                '<stop offset=".6" stop-color="#06060a" stop-opacity="0"/>' +
+                '<stop offset="1" stop-color="#06060a" stop-opacity=".9"/></linearGradient>' +
+                "</defs>" +
+                '<rect width="800" height="500" fill="url(#glow-' + uid + ')"/>' +
+                '<g transform="translate(400 258) rotate(-6) scale(1 .56)">' +
+                '<rect x="-232" y="-232" width="464" height="464" rx="46" fill="#4a4a72"/>' +
+                cells + "</g>" +
+                pieces +
+                '<rect width="800" height="500" fill="url(#fade-' + uid + ')"/>' +
+                "</svg>";
+        },
+
         // Popcorn Pop Sort shares one scene; the two ad variants change the
         // opening beat rather than the theme.
         "popcorn-conveyor": function (uid) { return popcornArt(uid, "conveyor"); },
