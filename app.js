@@ -309,6 +309,172 @@
                 '</svg>';
         },
 
+        // The dispatch series shares one loop; the key art keeps the same
+        // staging (supply above, bins in the middle, lane below) per theme.
+        "kulah-kosesi": function (uid) {
+            var scoop = function (x, y, r, c, hi) {
+                return '<circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="' + c + '"/>' +
+                    '<circle cx="' + (x - r * .36) + '" cy="' + (y - r * .38) + '" r="' + (r * .3) +
+                    '" fill="' + hi + '" opacity=".6"/>';
+            };
+            var tub = function (x, y, w, c, filled) {
+                var h = w * .82, inner = "";
+                for (var i = 0; i < filled; i++) {
+                    inner += '<circle cx="' + (x + (i % 2 ? w * .22 : -w * .22)) + '" cy="' +
+                        (y + (i > 1 ? h * .2 : h * .48)) + '" r="' + (w * .19) + '" fill="' + c + '"/>';
+                }
+                return '<g><rect x="' + (x - w / 2) + '" y="' + y + '" width="' + w + '" height="' + h +
+                    '" rx="' + (w * .16) + '" fill="#f6f1e0"/>' +
+                    '<rect x="' + (x - w / 2 - 5) + '" y="' + (y - 9) + '" width="' + (w + 10) +
+                    '" height="15" rx="7" fill="#fffdf3"/>' + inner + '</g>';
+            };
+            var guest = function (x, y, s2, c) {
+                return '<g transform="translate(' + x + ' ' + y + ') scale(' + s2 + ')">' +
+                    '<ellipse cx="0" cy="34" rx="26" ry="7" fill="#2c6a5e" opacity=".22"/>' +
+                    '<rect x="-21" y="-6" width="42" height="42" rx="16" fill="' + c + '"/>' +
+                    '<circle cx="0" cy="-19" r="17" fill="#f2cfa8"/>' +
+                    '<path d="M-17-24a17 15 0 0 1 34 0z" fill="#4c3a30"/></g>';
+            };
+            return '' +
+                '<svg viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" role="img">' +
+                '<defs>' +
+                '<linearGradient id="sky-' + uid + '" x1="0" y1="0" x2="0" y2="1">' +
+                '<stop offset="0" stop-color="#d9f2ea"/><stop offset="1" stop-color="#a7ded0"/></linearGradient>' +
+                '<linearGradient id="fade-' + uid + '" x1="0" y1="0" x2="0" y2="1">' +
+                '<stop offset=".58" stop-color="#06060a" stop-opacity="0"/>' +
+                '<stop offset="1" stop-color="#06060a" stop-opacity=".9"/></linearGradient>' +
+                '</defs>' +
+
+                '<rect width="800" height="500" fill="url(#sky-' + uid + ')"/>' +
+                '<circle cx="668" cy="86" r="46" fill="#fff4d2" opacity=".8"/>' +
+                '<ellipse cx="150" cy="96" rx="74" ry="26" fill="#ffffff" opacity=".55"/>' +
+                '<ellipse cx="206" cy="82" rx="48" ry="21" fill="#ffffff" opacity=".45"/>' +
+                '<path d="M0 296 Q400 258 800 296 V500 H0 Z" fill="#7fc9b5"/>' +
+                '<path d="M0 296 Q400 258 800 296 V320 Q400 282 0 320 Z" fill="#93d6c2"/>' +
+
+                /* the cart */
+                '<g>' +
+                '<rect x="96" y="170" width="250" height="118" rx="18" fill="#fbf6e6"/>' +
+                '<rect x="96" y="170" width="250" height="28" rx="13" fill="#3fa08f"/>' +
+                '<path d="M84 144h274l-16 30H100z" fill="#ffffff"/>' +
+                '<path d="M126 144h34l-16 30h-34z" fill="#3fa08f"/>' +
+                '<path d="M198 144h34l-16 30h-34z" fill="#3fa08f"/>' +
+                '<path d="M270 144h34l-16 30h-34z" fill="#3fa08f"/>' +
+                '<rect x="126" y="210" width="120" height="52" rx="12" fill="#dcefe7"/>' +
+                '<circle cx="150" cy="290" r="22" fill="#3c4a4d"/><circle cx="150" cy="290" r="9" fill="#c9d8d4"/>' +
+                '<circle cx="300" cy="290" r="22" fill="#3c4a4d"/><circle cx="300" cy="290" r="9" fill="#c9d8d4"/>' +
+                '</g>' +
+
+                /* three tubs waiting to be stocked */
+                tub(124, 316, 74, "#f19ab4", 3) + tub(214, 316, 74, "#f6e3b4", 2) + tub(304, 316, 74, "#9b6444", 4) +
+
+                /* the cone being served */
+                '<g transform="translate(600 206)">' +
+                '<path d="M-40 26 L40 26 L0 146 Z" fill="#e0a155"/>' +
+                '<path d="M-24 62 L24 62 L14 92 L-14 92 Z" fill="#c98b45" opacity=".55"/>' +
+                scoop(0, 16, 44, "#f19ab4", "#fff") +
+                scoop(-16, -34, 38, "#f6e3b4", "#fff") +
+                scoop(18, -66, 33, "#9b6444", "#e0b295") +
+                '<circle cx="30" cy="-92" r="9" fill="#e0553f"/>' +
+                '</g>' +
+
+                /* customers in the lane */
+                guest(468, 350, .92, "#e58b6d") + guest(710, 362, 1.02, "#5f8fd6") +
+
+                '<rect width="800" height="500" fill="url(#fade-' + uid + ')"/>' +
+                '</svg>';
+        },
+
+        "ciftlik-postasi": function (uid) {
+            var crate = function (x, y, w, inner) {
+                var h = w * .78;
+                return '<g><rect x="' + (x - w / 2) + '" y="' + y + '" width="' + w + '" height="' + h +
+                    '" rx="' + (w * .12) + '" fill="#c98b45"/>' +
+                    '<rect x="' + (x - w / 2) + '" y="' + (y + h * .38) + '" width="' + w + '" height="' + (h * .17) +
+                    '" fill="#a86f34"/>' +
+                    '<rect x="' + (x - w / 2 - 5) + '" y="' + (y - 9) + '" width="' + (w + 10) +
+                    '" height="15" rx="7" fill="#e0a155"/>' + inner + '</g>';
+            };
+            var egg = function (x, y) { return '<ellipse cx="' + x + '" cy="' + y + '" rx="12" ry="15" fill="#fdf6e6"/>'; };
+            var milk = function (x, y) {
+                return '<path d="M' + (x - 10) + ' ' + (y - 10) + 'h20v24a5 5 0 0 1-5 5h-10a5 5 0 0 1-5-5z" fill="#f4fbff"/>' +
+                    '<rect x="' + (x - 5) + '" y="' + (y - 18) + '" width="10" height="9" rx="3" fill="#5f8fd6"/>';
+            };
+            var wool = function (x, y) {
+                return '<circle cx="' + x + '" cy="' + y + '" r="13" fill="#f0ece0"/>' +
+                    '<circle cx="' + (x - 8) + '" cy="' + (y + 4) + '" r="9" fill="#e2dccc"/>' +
+                    '<circle cx="' + (x + 8) + '" cy="' + (y + 3) + '" r="9" fill="#f6f2e8"/>';
+            };
+            return '' +
+                '<svg viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" role="img">' +
+                '<defs>' +
+                '<linearGradient id="sky-' + uid + '" x1="0" y1="0" x2="0" y2="1">' +
+                '<stop offset="0" stop-color="#eaf5d2"/><stop offset="1" stop-color="#c3e29a"/></linearGradient>' +
+                '<linearGradient id="fade-' + uid + '" x1="0" y1="0" x2="0" y2="1">' +
+                '<stop offset=".58" stop-color="#06060a" stop-opacity="0"/>' +
+                '<stop offset="1" stop-color="#06060a" stop-opacity=".9"/></linearGradient>' +
+                '</defs>' +
+
+                '<rect width="800" height="500" fill="url(#sky-' + uid + ')"/>' +
+                '<circle cx="132" cy="82" r="42" fill="#fff4c8" opacity=".85"/>' +
+                '<ellipse cx="596" cy="88" rx="70" ry="24" fill="#ffffff" opacity=".5"/>' +
+                '<path d="M0 300 Q400 262 800 300 V500 H0 Z" fill="#8fbf5a"/>' +
+                '<path d="M0 300 Q400 262 800 300 V326 Q400 288 0 326 Z" fill="#a3cf6b"/>' +
+
+                /* barn and silo on the horizon */
+                '<g>' +
+                '<rect x="452" y="196" width="176" height="104" rx="8" fill="#b8503f"/>' +
+                '<path d="M440 196l100-56 100 56z" fill="#8f3a2d"/>' +
+                '<rect x="516" y="234" width="48" height="66" rx="6" fill="#f4ead2"/>' +
+                '<path d="M516 254h48M540 234v66" stroke="#b8503f" stroke-width="7"/>' +
+                '<rect x="648" y="180" width="60" height="120" rx="12" fill="#d8d2bc"/>' +
+                '<path d="M642 182a36 30 0 0 1 72 0z" fill="#9aa08c"/>' +
+                '</g>' +
+
+                /* fence line */
+                '<g fill="#e2d7ba">' +
+                '<rect x="60" y="238" width="11" height="62" rx="4"/><rect x="150" y="238" width="11" height="62" rx="4"/>' +
+                '<rect x="240" y="238" width="11" height="62" rx="4"/><rect x="330" y="238" width="11" height="62" rx="4"/>' +
+                '<rect x="54" y="252" width="294" height="10" rx="5"/><rect x="54" y="276" width="294" height="10" rx="5"/>' +
+                '</g>' +
+
+                /* three crates on the loading row */
+                crate(124, 312, 78, egg(111, 334) + egg(137, 330)) +
+                crate(228, 312, 78, milk(217, 336) + milk(241, 336)) +
+                crate(332, 312, 78, wool(319, 336) + wool(345, 334)) +
+
+                /* the pickup coming down the lane */
+                '<g transform="translate(600 318)">' +
+                '<ellipse cx="0" cy="66" rx="128" ry="14" fill="#4d7a2c" opacity=".25"/>' +
+                '<rect x="-124" y="-24" width="140" height="76" rx="14" fill="#e0a155"/>' +
+                '<rect x="-112" y="-12" width="116" height="52" rx="8" fill="#c98b45"/>' +
+                '<path d="M16-46h56l44 46v52H16z" fill="#5f8fd6"/>' +
+                '<path d="M32-34h34l30 32H32z" fill="#d7ecff"/>' +
+                '<circle cx="-72" cy="54" r="27" fill="#3d4436"/><circle cx="-72" cy="54" r="11" fill="#cdd6c2"/>' +
+                '<circle cx="76" cy="54" r="27" fill="#3d4436"/><circle cx="76" cy="54" r="11" fill="#cdd6c2"/>' +
+                egg(-84, 6) + milk(-40, 8) + wool(-4, 6) +
+                '</g>' +
+
+                '<rect width="800" height="500" fill="url(#fade-' + uid + ')"/>' +
+                '</svg>';
+        },
+
+        // Group icon for the series: one bin, two themes split down the middle.
+        "dispatch-icon": function () {
+            return '' +
+                '<svg viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice" role="img">' +
+                '<rect width="100" height="200" fill="#1d3b38"/>' +
+                '<rect x="100" width="100" height="200" fill="#2f3a1d"/>' +
+                '<circle cx="56" cy="52" r="19" fill="#f19ab4"/>' +
+                '<circle cx="144" cy="52" r="17" fill="#fdf6e6"/>' +
+                '<rect x="40" y="92" width="120" height="76" rx="16" fill="#f6f1e0"/>' +
+                '<rect x="34" y="82" width="132" height="20" rx="10" fill="#fffdf3"/>' +
+                '<circle cx="72" cy="124" r="16" fill="#3fa08f"/><circle cx="72" cy="152" r="16" fill="#3fa08f"/>' +
+                '<circle cx="128" cy="124" r="16" fill="#8fb03f"/><circle cx="128" cy="152" r="16" fill="#8fb03f"/>' +
+                '<rect x="98" y="0" width="4" height="200" fill="#06060a" opacity=".35"/>' +
+                '</svg>';
+        },
+
         "default": function (uid, accent) {
             return '' +
                 '<svg viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" role="img">' +
@@ -393,10 +559,12 @@
         });
     };
 
-    // Everything the player can open: library prototypes plus every ad variant.
+    // Everything the player can open: library prototypes plus the variants of
+    // every grouped entry (ad campaigns and theme series alike).
+    var GROUPS = (CONFIG.campaigns || []).concat(CONFIG.series || []);
     var PLAYABLE = CONFIG.prototypes.concat.apply(
         CONFIG.prototypes,
-        (CONFIG.campaigns || []).map(function (c) { return c.variants; })
+        GROUPS.map(function (c) { return c.variants; })
     );
 
     function findGame(id) {
@@ -435,8 +603,8 @@
         });
 
         var playable = PLAYABLE.filter(function (g) { return g.status === "playable"; });
-        var engines = CONFIG.prototypes.map(function (g) { return g.engine; })
-            .filter(function (v, i, a) { return a.indexOf(v) === i; });
+        var engines = PLAYABLE.map(function (g) { return g.engine; })
+            .filter(function (v, i, a) { return v && a.indexOf(v) === i; });
 
         $("#stats").innerHTML = [
             ["" + (playable.length < 10 ? "0" : "") + playable.length, T.stats.playable],
@@ -549,6 +717,72 @@
             '<p class="camp__blurb">' + esc(copy.blurb) + '</p>' +
             '<div class="camp__grid">' + variants + '</div>' +
             '</section>';
+    }
+
+    // The series block reuses the campaign shell: one shared header, the loop
+    // described once, then a card per theme.
+    function seriesHTML(c) {
+        var copy = (T.series && T.series[c.id]) || {};
+        var icon = (ART[c.art] || ART["default"])(c.id.replace(/[^a-z0-9]/gi, ""), c.accent);
+
+        var controls = (copy.controls || []).map(function (line) {
+            return "<li><i>—</i><span>" + esc(line) + "</span></li>";
+        }).join("");
+        var tags = (c.tech || []).map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("");
+
+        var themes = c.variants.map(function (v, i) {
+            var vc = T.games[v.id] || {};
+            return '' +
+                '<article class="card card--ad reveal" style="--accent:' + esc(v.accent) +
+                ';animation-delay:' + (Math.min(i, 4) * 70) + 'ms">' +
+                '<div class="card__art">' + coverHTML(v) +
+                '<span class="card__badge">' + esc(T.status.playable) + '</span>' +
+                '<div class="card__head"><h3>' + esc(vc.title) + '</h3><p>' + esc(vc.tagline) + '</p></div>' +
+                '</div>' +
+                '<div class="card__body">' +
+                '<p class="card__desc">' + esc(vc.description) + '</p>' +
+                ((vc.controls || []).length
+                    ? '<div><p class="block__label">' + esc(T.series.themeLabel) + '</p><ul class="controls">' +
+                    vc.controls.map(function (line) {
+                        return "<li><i>—</i><span>" + esc(line) + "</span></li>";
+                    }).join("") + '</ul></div>'
+                    : "") +
+                '<div class="card__actions">' +
+                '<button class="btn btn--play" type="button" data-play="' + esc(v.id) + '">' +
+                ICON.play + '<span>' + esc(T.labels.play) + '</span></button>' +
+                '<a class="btn btn--icon" href="' + esc(v.path) + '" target="_blank" rel="noopener noreferrer" title="' +
+                esc(T.labels.newTab) + '" aria-label="' + esc(T.labels.newTab) + '">' + ICON.external + '</a>' +
+                '</div></div></article>';
+        }).join("");
+
+        return '' +
+            '<section class="camp camp--series" style="--accent:' + esc(c.accent) + '">' +
+            '<header class="camp__head">' +
+            '<div class="camp__icon">' + icon + '</div>' +
+            '<div class="camp__meta"><h3>' + esc(copy.title) + '</h3>' +
+            '<span class="camp__live camp__live--soft">' + esc(copy.badge) + '</span></div>' +
+            '<div class="meta camp__facts">' +
+            "<div><span>" + esc(T.labels.engine) + "</span><b>" + esc(c.engine) + "</b></div>" +
+            "<div><span>" + esc(T.labels.year) + "</span><b>" + esc(c.year) + "</b></div>" +
+            '</div>' +
+            '</header>' +
+            '<p class="camp__blurb">' + esc(copy.blurb) + '</p>' +
+            (controls || tags
+                ? '<div class="camp__shared">' +
+                (controls ? '<div><p class="block__label">' + esc(T.series.sharedLoop) +
+                    '</p><ul class="controls">' + controls + '</ul></div>' : "") +
+                (tags ? '<div><p class="block__label">' + esc(T.labels.tech) +
+                    '</p><ul class="tags">' + tags + '</ul></div>' : "") +
+                '</div>'
+                : "") +
+            '<div class="camp__grid">' + themes + '</div>' +
+            '</section>';
+    }
+
+    function renderSeries() {
+        var host = $("#series");
+        if (!host) return;
+        host.innerHTML = (CONFIG.series || []).map(seriesHTML).join("");
     }
 
     function renderCampaigns() {
@@ -676,6 +910,7 @@
         renderStatic();
         renderLibrary();
         renderCampaigns();
+        renderSeries();
         syncFsButton();
         if (open) {
             var c = T.games[open.id] || {};
@@ -689,6 +924,7 @@
     renderStatic();
     renderLibrary();
     renderCampaigns();
+    renderSeries();
     syncFsButton();
 
     syncFromHash();   // deep link: /#play-<id> opens straight into the game

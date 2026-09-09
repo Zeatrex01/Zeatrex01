@@ -6,6 +6,10 @@
 //   1) drop its build in  games/<slug>/index.html
 //   2) add one entry to CONFIG.prototypes below
 //   3) add its texts to translations.tr.games / translations.en.games
+//
+// Grouped entries: CONFIG.campaigns (ads for one shipped app) and
+// CONFIG.series (one core loop shipped under several themes) hold their
+// own `variants`, each of which is playable exactly like a prototype.
 // =========================================================
 
 const CONFIG = {
@@ -116,6 +120,40 @@ const CONFIG = {
     ],
 
     // ========================================
+    // SERIES — one core loop, dressed as two games
+    // ========================================
+    series: [
+        {
+            id: "dispatch_line",
+            accent: "#3fa08f",
+            art: "dispatch-icon",
+            year: "2026",
+            engine: "DOM + CSS",
+            tech: ["JavaScript", "DOM", "CSS animation", "Sprite atlas"],
+            variants: [
+                {
+                    id: "kulah_kosesi",
+                    path: "games/kulah-kosesi/",
+                    status: "playable",
+                    frame: "portrait",
+                    accent: "#3fa08f",
+                    engine: "DOM + CSS",
+                    art: "kulah-kosesi"
+                },
+                {
+                    id: "ciftlik_postasi",
+                    path: "games/ciftlik-postasi/",
+                    status: "playable",
+                    frame: "portrait",
+                    accent: "#8fb03f",
+                    engine: "DOM + CSS",
+                    art: "ciftlik-postasi"
+                }
+            ]
+        }
+    ],
+
+    // ========================================
     // TRANSLATIONS
     // ========================================
     translations: {
@@ -129,6 +167,7 @@ const CONFIG = {
             nav: {
                 library: "Kütüphane",
                 ads: "Reklamlar",
+                series: "Temalar",
                 contact: "İletişim",
                 langLabel: "EN"
             },
@@ -143,12 +182,29 @@ const CONFIG = {
             },
             sections: {
                 all: "Tüm prototipler",
-                ads: "Oynanabilir reklamlar"
+                ads: "Oynanabilir reklamlar",
+                series: "Tema varyantları"
             },
             ads: {
                 live: "Mağazalarda yayında",
                 variantLabel: "Varyant"
             },
+            series: {
+                sharedLoop: "Ortak döngü",
+                themeLabel: "Tema",
+                dispatch_line: {
+                    title: "Sevkiyat Hattı",
+                    badge: "Tek çekirdek · iki tema",
+                    blurb: "Tek bir yerleştirme döngüsünün iki ayrı temayla kurulmuş hâli. Kural takımı, seviye üretimi ve zorluk eğrisi ikisinde de bire bir aynı; değişen sadece kimin sipariş verdiği. Aynı mekaniğin tema değişince ne kadar farklı hissettirdiğini ölçmek için ikisi yan yana tutuluyor.",
+                    controls: [
+                        "Sıradaki ürünü bir depoya yerleştir — dokun ya da 1–5 tuşları",
+                        "Her depo dört birim alır ve boşalana kadar tek çeşit kabul eder",
+                        "Sipariş hizaya gelince yükleme kendiliğinden olur, iki hamlede bir hat ilerler",
+                        "Süre sınırı yok; Geri al ve Tekrar her an açık"
+                    ]
+                }
+            },
+
             campaigns: {
                 popcorn_pop_sort: {
                     title: "Popcorn Pop Sort",
@@ -172,6 +228,26 @@ const CONFIG = {
                 wip: "Geliştiriliyor"
             },
             games: {
+                kulah_kosesi: {
+                    title: "Külah Köşesi",
+                    tagline: "Topları önden hazırla, külah hizaya gelince servis olsun.",
+                    description: "Sevkiyat döngüsünün dondurma arabası teması. Çilek, vanilya ve çikolata toplarını haznelere önden yerleştiriyorsun; müşteri hizaya geldiğinde iki top külahına kendiliğinden gidiyor. Sipariş kartında tat adı ve kalan top sayısı açık yazdığı için plan müşteriye bakarak değil, hattaki sıraya bakarak kuruluyor.",
+                    controls: [
+                        "Sıradaki topu bir hazneye koy, hazne boşalana kadar tek tat alır",
+                        "Müşteri hizaya gelince iki top külaha otomatik aktarılır",
+                        "Müşteri çıkışa varmadan siparişi tamamla"
+                    ]
+                },
+                ciftlik_postasi: {
+                    title: "Çiftlik Postası",
+                    tagline: "Kasaları doldur, araç geçerken yükünü alsın.",
+                    description: "Aynı döngünün çiftlik teması. Yumurta, süt ve yün kasalara giriyor, hattan geçen araç hizaya geldiğinde yükünü alıp yoluna devam ediyor. Dondurma sürümünden tek farkı sunum: sipariş kartı yerine araç üstünde yük göstergesi var ve sıradaki siparişler şeridi açık duruyor, yani planı bir adım ileriden kurabiliyorsun.",
+                    controls: [
+                        "Sıradaki ürünü bir kasaya koy, kasa boşalana kadar tek çeşit alır",
+                        "Araç hizaya gelince iki ürün yüke otomatik aktarılır",
+                        "Sıradaki siparişler şeridine bakarak kasaları önden ayır"
+                    ]
+                },
                 power_block_jam: {
                     title: "Power Jam",
                     tagline: "Boya, topla, tek hamlede patlat.",
@@ -243,6 +319,7 @@ const CONFIG = {
             nav: {
                 library: "Library",
                 ads: "Ads",
+                series: "Themes",
                 contact: "Contact",
                 langLabel: "TR"
             },
@@ -257,12 +334,29 @@ const CONFIG = {
             },
             sections: {
                 all: "All prototypes",
-                ads: "Playable ads"
+                ads: "Playable ads",
+                series: "Theme variants"
             },
             ads: {
                 live: "Live on the stores",
                 variantLabel: "Variant"
             },
+            series: {
+                sharedLoop: "Shared loop",
+                themeLabel: "Theme",
+                dispatch_line: {
+                    title: "Dispatch Line",
+                    badge: "One core · two themes",
+                    blurb: "A single placement loop built out as two separate games. The rules, the level generator and the difficulty curve are identical in both; the only thing that changes is who is placing the order. The two are kept side by side to measure how differently the same mechanic reads once the theme moves.",
+                    controls: [
+                        "Place the next item into a bin — tap, or press 1–5",
+                        "Each bin holds four units and takes a single kind until it empties",
+                        "Orders load themselves once they line up; the lane advances every two moves",
+                        "No timer; undo and retry stay available throughout"
+                    ]
+                }
+            },
+
             campaigns: {
                 popcorn_pop_sort: {
                     title: "Popcorn Pop Sort",
@@ -286,6 +380,26 @@ const CONFIG = {
                 wip: "Work in progress"
             },
             games: {
+                kulah_kosesi: {
+                    title: "Cone Corner",
+                    tagline: "Stock the scoops early, serve the cone as it lines up.",
+                    description: "The ice cream cart theme of the dispatch loop. You stock strawberry, vanilla and chocolate into the tubs ahead of time; once a customer lines up, two scoops move onto their cone on their own. The order card spells out the flavour and how many scoops are left, so the planning is done off the queue rather than off the customer in front of you.",
+                    controls: [
+                        "Drop the next scoop into a tub; a tub takes one flavour until it empties",
+                        "Two scoops transfer to the cone automatically once a customer lines up",
+                        "Finish the order before the customer reaches the exit"
+                    ]
+                },
+                ciftlik_postasi: {
+                    title: "Farm Run",
+                    tagline: "Fill the crates, let the truck take its load on the way past.",
+                    description: "The farmyard theme of the same loop. Eggs, milk and wool go into the crates, and a truck passing down the lane picks up its load once it lines up. The only difference from the ice cream build is presentation: the load reads off the truck instead of an order card, and the upcoming-orders strip stays visible, so you can plan one step further ahead.",
+                    controls: [
+                        "Drop the next item into a crate; a crate takes one kind until it empties",
+                        "Two items transfer to the load automatically once a truck lines up",
+                        "Watch the upcoming-orders strip and reserve crates ahead of time"
+                    ]
+                },
                 power_block_jam: {
                     title: "Power Jam",
                     tagline: "Paint, pull, blast in a single move.",

@@ -647,6 +647,37 @@ html.is-ready {
     }
 }
 
+/* ---------------- SERIES (one loop, several themes) ---------------- */
+/* Reuses the campaign shell; the header trades store buttons for the shared
+   engine/year facts, and the loop is described once above the theme cards. */
+.camp__live--soft {
+    color: var(--accent);
+    background: transparent;
+    border: 1px solid var(--accent);
+}
+
+.camp__facts {
+    flex: none;
+    gap: clamp(18px, 3vw, 34px);
+    grid-template-columns: repeat(2, auto);
+    text-align: right;
+}
+
+.camp__shared {
+    display: grid;
+    gap: clamp(14px, 2vw, 18px);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+    padding: clamp(14px, 2.2vw, 20px) clamp(16px, 2.4vw, 22px) 0;
+}
+
+@media (max-width: 620px) {
+    .camp__facts {
+        width: 100%;
+        text-align: left;
+        justify-content: flex-start;
+    }
+}
+
 /* ---------------- FOOTER ---------------- */
 .footer {
     border-top: 1px solid var(--line);
