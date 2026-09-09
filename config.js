@@ -195,12 +195,12 @@ const CONFIG = {
                 dispatch_line: {
                     title: "Sevkiyat Hattı",
                     badge: "Tek çekirdek · iki tema",
-                    blurb: "Tek bir yerleştirme döngüsünün iki ayrı temayla kurulmuş hâli. Kural takımı, seviye üretimi ve zorluk eğrisi ikisinde de bire bir aynı; değişen sadece kimin sipariş verdiği. Aynı mekaniğin tema değişince ne kadar farklı hissettirdiğini ölçmek için ikisi yan yana tutuluyor.",
+                    blurb: "Tek bir yerleştirme döngüsünün iki ayrı temayla kurulmuş hâli. Kural takımı, seviye üretimi ve zorluk eğrisi ikisinde de bire bir aynı; değişen sadece kimin sipariş verdiği. Aynı mekaniğin tema değişince ne kadar farklı hissettirdiğini ölçmek için ikisi yan yana tutuluyor. İkisi de kendi başına açılan ayrı bir mod.",
                     controls: [
-                        "Sıradaki ürünü bir depoya yerleştir — dokun ya da 1–5 tuşları",
+                        "Sıradaki ürünü bir depoya yerleştir — dokun ya da 1–4 tuşları",
                         "Her depo dört birim alır ve boşalana kadar tek çeşit kabul eder",
-                        "Sipariş hizaya gelince yükleme kendiliğinden olur, iki hamlede bir hat ilerler",
-                        "Süre sınırı yok; Geri al ve Tekrar her an açık"
+                        "Altında yer olan sipariş, ne olduğuna bakılmadan yüklenir — yanlış teslimat bölümü bitirir",
+                        "Süre ilk hamlede başlar; iki hamlede bir hat sola ilerler"
                     ]
                 }
             },
@@ -231,17 +231,17 @@ const CONFIG = {
                 kulah_kosesi: {
                     title: "Külah Köşesi",
                     tagline: "Topları önden hazırla, külah hizaya gelince servis olsun.",
-                    description: "Sevkiyat döngüsünün dondurma arabası teması. Çilek, vanilya ve çikolata toplarını haznelere önden yerleştiriyorsun; müşteri hizaya geldiğinde iki top külahına kendiliğinden gidiyor. Sipariş kartında tat adı ve kalan top sayısı açık yazdığı için plan müşteriye bakarak değil, hattaki sıraya bakarak kuruluyor.",
+                    description: "Sevkiyat döngüsünün dondurma arabası teması. Çilek, vanilya ve çikolata toplarını dört hazneye önden yerleştiriyorsun; müşteri hizaya geldiğinde iki top külahına kendiliğinden gidiyor. Aktarım tada bakmadan yapıldığı için yanlış haznenin altına yanlış müşteri gelmesi bölümü bitirir — asıl iş, sırayı okuyup hangi tadı nereye saklayacağına karar vermek. Sipariş kartında tat adı ve kalan top sayısı açık yazar.",
                     controls: [
                         "Sıradaki topu bir hazneye koy, hazne boşalana kadar tek tat alır",
                         "Müşteri hizaya gelince iki top külaha otomatik aktarılır",
-                        "Müşteri çıkışa varmadan siparişi tamamla"
+                        "Yanlış tat teslim etme; müşteri çıkışa varmadan siparişi tamamla"
                     ]
                 },
                 ciftlik_postasi: {
                     title: "Çiftlik Postası",
                     tagline: "Kasaları doldur, araç geçerken yükünü alsın.",
-                    description: "Aynı döngünün çiftlik teması. Yumurta, süt ve yün kasalara giriyor, hattan geçen araç hizaya geldiğinde yükünü alıp yoluna devam ediyor. Dondurma sürümünden tek farkı sunum: sipariş kartı yerine araç üstünde yük göstergesi var ve sıradaki siparişler şeridi açık duruyor, yani planı bir adım ileriden kurabiliyorsun.",
+                    description: "Aynı döngünün çiftlik teması ve kendi başına ayrı bir mod. Yumurta, süt ve yün kasalara giriyor, hattan geçen araç hizaya geldiğinde yükünü alıp yoluna devam ediyor. Kurallar dondurma sürümüyle birebir aynı; değişen sunum: sipariş kartı yerine aracın üstünde yük göstergesi var ve sıradaki siparişler şeridi açık duruyor, yani planı bir adım ileriden kurabiliyorsun.",
                     controls: [
                         "Sıradaki ürünü bir kasaya koy, kasa boşalana kadar tek çeşit alır",
                         "Araç hizaya gelince iki ürün yüke otomatik aktarılır",
@@ -347,12 +347,12 @@ const CONFIG = {
                 dispatch_line: {
                     title: "Dispatch Line",
                     badge: "One core · two themes",
-                    blurb: "A single placement loop built out as two separate games. The rules, the level generator and the difficulty curve are identical in both; the only thing that changes is who is placing the order. The two are kept side by side to measure how differently the same mechanic reads once the theme moves.",
+                    blurb: "A single placement loop built out as two separate games. The rules, the level generator and the difficulty curve are identical in both; the only thing that changes is who is placing the order. The two are kept side by side to measure how differently the same mechanic reads once the theme moves. Each one opens as its own standalone mode.",
                     controls: [
-                        "Place the next item into a bin — tap, or press 1–5",
+                        "Place the next item into a bin — tap, or press 1–4",
                         "Each bin holds four units and takes a single kind until it empties",
-                        "Orders load themselves once they line up; the lane advances every two moves",
-                        "No timer; undo and retry stay available throughout"
+                        "Whatever sits above an order loads into it sight unseen — a wrong delivery ends the level",
+                        "The clock starts on your first move; the lane advances every two moves"
                     ]
                 }
             },
@@ -383,17 +383,17 @@ const CONFIG = {
                 kulah_kosesi: {
                     title: "Cone Corner",
                     tagline: "Stock the scoops early, serve the cone as it lines up.",
-                    description: "The ice cream cart theme of the dispatch loop. You stock strawberry, vanilla and chocolate into the tubs ahead of time; once a customer lines up, two scoops move onto their cone on their own. The order card spells out the flavour and how many scoops are left, so the planning is done off the queue rather than off the customer in front of you.",
+                    description: "The ice cream cart theme of the dispatch loop. You stock strawberry, vanilla and chocolate into four tubs ahead of time; once a customer lines up, two scoops move onto their cone on their own. The transfer never checks the flavour, so the wrong customer arriving under the wrong tub ends the level — the real work is reading the queue and deciding what to park where. The order card spells out the flavour and the scoops still owed.",
                     controls: [
                         "Drop the next scoop into a tub; a tub takes one flavour until it empties",
                         "Two scoops transfer to the cone automatically once a customer lines up",
-                        "Finish the order before the customer reaches the exit"
+                        "Never serve the wrong flavour, and finish before the customer reaches the exit"
                     ]
                 },
                 ciftlik_postasi: {
                     title: "Farm Run",
                     tagline: "Fill the crates, let the truck take its load on the way past.",
-                    description: "The farmyard theme of the same loop. Eggs, milk and wool go into the crates, and a truck passing down the lane picks up its load once it lines up. The only difference from the ice cream build is presentation: the load reads off the truck instead of an order card, and the upcoming-orders strip stays visible, so you can plan one step further ahead.",
+                    description: "The farmyard theme of the same loop, opening as its own standalone mode. Eggs, milk and wool go into the crates, and a truck passing down the lane picks up its load once it lines up. The rules match the ice cream build exactly; presentation is what moves: the load reads off the truck instead of an order card, and the upcoming-orders strip stays visible, so you can plan one step further ahead.",
                     controls: [
                         "Drop the next item into a crate; a crate takes one kind until it empties",
                         "Two items transfer to the load automatically once a truck lines up",
