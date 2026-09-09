@@ -1,85 +1,110 @@
-# malik3d.page mini portfolio — developer notes
+# Prototype Library — developer notes
 
-Notes for the site in this repo (`index.html`, `styles.css`, `config.js`, `app.js`).
-The repo README is the GitHub profile page — these notes do not belong there.
+Notes for the site in this repo (`index.html`, `styles.css`, `config.js`, `app.js`,
+`games/`). The repo README is the GitHub profile page — these notes do not belong there.
 
 **Live:** https://zeatrex01.github.io/Zeatrex01/
 
 ---
 
-## What this is
+## Prototypes
 
-One phone, rendered at two sizes. The whole site is a small phone OS: a status
-bar, a home screen of app icons, and app screens that slide in over it.
+| Prototype | Tech | Frame | Status |
+|---|---|---|---|
+| **Power Jam** — paint, pull, blast in a single move | Canvas 2D | portrait | Playable |
+| **Royal Guard** — build a barricade, protect your king | Three.js, cannon-es, WebGL | portrait | Playable |
+| **Corn Bucket** — aim, cut it loose, fill the bucket | Canvas 2D | portrait | Playable |
+| **Traffic Detective** — patrol the neighbourhood, catch the rule breaker | Canvas 2D | portrait | Playable |
 
-- **Wide screens** draw the device — bezel, side buttons, shadow — centred on a
-  backdrop, so it reads as an object sitting on a desk.
-- **At 760px and under** the bezel drops away and the screen becomes the
-  viewport, so on a real phone the site simply *is* the phone UI.
+## Playable ads
 
-Everything is hand written: no framework, no build step, no runtime transpiler.
+Ad creatives built for a shipped app, kept in their own section with a store link.
+Config lives in `CONFIG.campaigns`; each campaign has a store link and any number
+of variants, and every variant is playable through the same player as a prototype.
 
-## Apps
-
-`CONFIG.apps` drives both the home grid and the dock. One entry per icon:
-
-| field | meaning |
-|---|---|
-| `id` | matches `translations.<lang>.appCopy.<id>` and the glyph in `GLYPH` |
-| `kind` | `"app"` renders a screen in-page · `"external"` opens `url` in a new tab |
-| `place` | `"home"` for the icon grid · `"dock"` for the labelled bar at the bottom |
-| `accent` | the tile colour |
-| `url` | external entries only |
-
-| App | Kind | Where it goes |
+| Campaign | Variants | Store |
 |---|---|---|
-| **About** | app | Name, role, core focus, stack — copy lives in `translations.<lang>.about` |
-| **Asset Packs** | app | The two storefronts in `CONFIG.assetPacks` |
-| **Contact** | app | `CONFIG.email`, `CONFIG.links.site`, then `CONFIG.social` |
-| **Games** | external | games.malik3d.page |
-| **malik3d.page** | external | dock |
+| **Popcorn Pop Sort** | Conveyor, Rush | App Store |
 
-Adding an app means: one entry in `CONFIG.apps`, its copy in both
-`translations.tr.appCopy` and `translations.en.appCopy`, a glyph in `GLYPH`, and
-— for `kind: "app"` — a body builder registered in the `BODY` map in `app.js`.
-
-## The games
-
-The builds still live in `games/<slug>/index.html`, one self-contained file each,
-but **this site no longer renders them** — the Games icon links out to
-games.malik3d.page. `CONFIG.prototypes`, `CONFIG.campaigns` and `CONFIG.series`,
-along with their TR/EN copy, are kept intact for the games site to pick up.
-
-Each build embeds its own code and artwork, so a build can be opened straight
-from the filesystem with no server.
-
-> One trap worth remembering: the dispatch builds originally handed their
-> artwork to CSS through custom properties on the root element, and Blink
-> silently drops a custom-property value at 2 MiB. The two scene backgrounds sit
-> above that line, so they vanished with no error while the smaller sprite
-> sheets came through. They go in as plain stylesheet rules now, which have no
-> such ceiling.
+---
 
 ## Structure
 
 ```
-index.html          The phone shell: status bar, home screen, home indicator
+index.html          Markup shell
 styles.css          All styling, hand written, no framework
-config.js           All data: apps, asset packs, social links, TR/EN copy
-app.js              Home screen + app screens, navigation, clock, language
-games/<slug>/       One folder per build, each a self-contained index.html
+config.js           All data: social links, prototype list, TR/EN translations
+app.js              Rendering + the in-page fullscreen player
+games/<slug>/       One folder per build, each with a self-contained index.html
 LICENSE             All rights reserved
 ```
 
-## Behaviour worth knowing
+No framework, no CDN bundles, no runtime transpiler: the whole page is **~50 KB over
+5 requests**, `DOMContentLoaded` in ~25 ms locally. The player mounts its `<iframe>`
+only after **PLAY** is pressed, so no game build is downloaded until a visitor
+actually asks for it, and closing the player unmounts it so the game stops.
 
-- **Language** — TR/EN, remembered in `localStorage`, guessed from
-  `navigator.language` on a first visit. The toggle re-renders everything and
-  reopens whatever app was on screen.
-- **Deep links** — `#app-<id>` opens that app directly; the home indicator, the
-  back button, Escape and the browser's back button all return home.
-- **Focus** — an open app hides the home screen with `visibility`, not just
-  `opacity`, so its icons leave the tab order rather than being invisible but
-  still focusable.
-- **Boot** — a short splash inside the screen; it is skipped outright under
-  `prefers-reduced-motion`, and a click dismisses it.
+Also handled: `Esc` and the Android/browser back button close the player, the
+Fullscreen API is used where the browser supports it (hidden on iPhone Safari,
+which has no element fullscreen), phones get the game at full screen with no
+letterboxing, `prefers-reduced-motion` is respected, and `#play-<id>` deep links
+open straight into a prototype.
+
+---
+
+## Adding a prototype
+
+1. Drop the build at `games/<slug>/index.html` (single self-contained file, no external requests).
+2. Add one entry to `CONFIG.prototypes` in [`config.js`](config.js):
+
+```js
+{
+    id: "my_game",
+    path: "games/my-game/",
+    year: "2026",
+    status: "playable",        // "playable" | "wip"
+    engine: "Three.js",
+    tech: ["Three.js", "WebGL"],
+    frame: "portrait",         // "portrait" | "landscape"
+    accent: "#54c39a",
+    art: "",                   // key art key in app.js ART map
+    image: ""                  // or a screenshot: "assets/covers/my-game.jpg"
+}
+```
+
+3. Add `my_game` texts (title, tagline, description, controls) to
+   `translations.tr.games` **and** `translations.en.games`.
+4. Optional: give it key art. Either set `image` to a screenshot path, or add an
+   entry to the `ART` map in `app.js`. With neither, it falls back to a generated
+   accent-tinted cover.
+
+No build step — push to `main` and the GitHub Pages workflow deploys the repo as-is.
+
+### Portrait lock
+
+Royal Guard and Traffic Detective need more height than a phone gives in landscape,
+so each build carries an appended portrait gate (`#rg-portrait-gate`): it tries
+`screen.orientation.lock`, and always falls back to a CSS overlay under
+`@media (orientation:landscape) and (max-height:<n>px)`. **These patches sit in the
+built file and are wiped whenever the build is re-exported** — re-apply after every
+upload. Corn Bucket and the Popcorn Sort ads adapt on their own and carry no gate.
+
+---
+
+## Local preview
+
+```bash
+npx http-server . -p 4321 -c-1
+```
+
+Then open http://localhost:4321.
+
+---
+
+## License
+
+Copyright (c) 2026 Enes Aksu. All rights reserved. See [LICENSE](LICENSE).
+
+The site and the prototypes are published to be played and read, not copied,
+re-hosted or republished. Third-party libraries bundled inside the game builds
+(Three.js, cannon-es) keep their own MIT licenses.
