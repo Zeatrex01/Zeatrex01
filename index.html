@@ -5,16 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#08080a">
-    <meta name="description" content="A library of game prototypes playable straight in the browser. No installs, no store pages.">
+    <meta name="description" content="Enes Aksu — Technical Animator &amp; 3D Generalist. Asset packs, games and contact, laid out as a small phone.">
     <meta name="author" content="Enes Aksu">
     <meta name="robots" content="index, follow">
     <meta name="copyright" content="Copyright (c) 2026 Enes Aksu. All rights reserved.">
 
-    <meta property="og:title" content="Prototype Library">
-    <meta property="og:description" content="Game prototypes playable straight in the browser. Three.js, Unity and WebGL experiments.">
+    <meta property="og:title" content="Malik3D — Enes Aksu">
+    <meta property="og:description" content="Technical Animator &amp; 3D Generalist. Asset packs, games and contact.">
     <meta property="og:type" content="website">
 
-    <title>Prototype Library</title>
+    <title>Malik3D — Enes Aksu</title>
 
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23ff3a5e'/%3E%3Cpath d='M10 9h12L14 16h8l-12 8 4-8h-6z' fill='%23fff'/%3E%3C/svg%3E">
 
@@ -26,94 +26,61 @@
 </head>
 
 <body>
-    <a class="skip-link" href="#library" data-i18n="a11y.skip">Skip to the library</a>
+    <a class="skip-link" href="#home" data-i18n="a11y.skip">Skip to the home screen</a>
 
-    <!-- ============ NAV ============ -->
-    <header class="nav" id="nav">
-        <div class="shell nav__inner">
-            <a class="brand" href="#top" aria-label="Home">
-                <span class="brand__mark" aria-hidden="true">
-                    <svg viewBox="0 0 32 32"><path d="M10 9h12L14 16h8l-12 8 4-8h-6z" /></svg>
-                </span>
-            </a>
+    <!-- The whole site is one phone. On a real phone it fills the viewport;
+         on a wide screen it sits in the middle of the backdrop. -->
+    <div class="stage">
+        <div class="device">
+            <div class="device__screen">
 
-            <nav class="nav__links" aria-label="Primary">
-                <a href="#library" data-i18n="nav.library">Library</a>
-                <a href="#ads" data-i18n="nav.ads">Ads</a>
-                <a href="#themes" data-i18n="nav.series">Themes</a>
-                <a href="#contact" data-i18n="nav.contact">Contact</a>
-            </nav>
+                <!-- ============ BOOT ============ -->
+                <div class="boot" id="boot">
+                    <span class="boot__mark" aria-hidden="true">
+                        <svg viewBox="0 0 32 32"><path d="M10 9h12L14 16h8l-12 8 4-8h-6z" /></svg>
+                    </span>
+                    <span class="boot__label" data-i18n="os.boot">Starting up</span>
+                    <span class="boot__bar" aria-hidden="true"><i></i></span>
+                </div>
 
-            <button class="lang" id="langToggle" type="button" aria-label="Change language">
-                <span data-i18n="nav.langLabel">TR</span>
-            </button>
-        </div>
-    </header>
+                <!-- ============ STATUS BAR ============ -->
+                <header class="status">
+                    <time class="status__time" id="clock"></time>
+                    <span class="status__carrier" data-i18n="os.carrier">MALIK3D</span>
+                    <span class="status__right">
+                        <button class="status__lang" id="langToggle" type="button" aria-label="Change language">
+                            <span data-i18n="os.langLabel">TR</span>
+                        </button>
+                        <svg class="status__glyph" viewBox="0 0 18 12" aria-hidden="true">
+                            <rect x="0" y="8" width="3" height="4" rx="1" />
+                            <rect x="5" y="5" width="3" height="7" rx="1" />
+                            <rect x="10" y="2" width="3" height="10" rx="1" />
+                            <rect x="15" y="0" width="3" height="12" rx="1" opacity=".35" />
+                        </svg>
+                        <svg class="status__glyph" viewBox="0 0 26 12" aria-hidden="true">
+                            <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" fill="none" stroke="currentColor" opacity=".45" />
+                            <rect x="2.5" y="2.5" width="14" height="7" rx="2" />
+                            <path d="M23.5 4v4a2.6 2.6 0 0 0 0-4z" opacity=".45" />
+                        </svg>
+                    </span>
+                </header>
 
-    <main id="top">
-        <!-- ============ HERO ============ -->
-        <section class="hero">
-            <div class="hero__glow" aria-hidden="true"></div>
-            <div class="shell">
-                <h1 class="hero__title" data-i18n="hero.title">Prototype Library</h1>
-                <p class="hero__sub" data-i18n="hero.subtitle">Game prototypes you can play in the browser.</p>
+                <!-- ============ SCREENS ============ -->
+                <main class="viewport" id="viewport">
+                    <section class="home" id="home">
+                        <div class="widget" id="widget"></div>
+                        <ul class="apps" id="apps"></ul>
+                        <p class="home__hint" data-i18n="os.hint"></p>
+                        <ul class="dock" id="dock"></ul>
+                    </section>
+                    <!-- app screens are injected here by app.js -->
+                </main>
 
-                <ul class="stats" id="stats"></ul>
-            </div>
-        </section>
+                <!-- ============ HOME INDICATOR ============ -->
+                <button class="homebar" id="homebar" type="button">
+                    <span class="homebar__grip" aria-hidden="true"></span>
+                </button>
 
-        <!-- ============ LIBRARY ============ -->
-        <section class="section" id="library">
-            <div class="shell">
-                <h2 class="section__title"><span data-i18n="sections.all">All prototypes</span></h2>
-                <div class="grid" id="grid"></div>
-            </div>
-        </section>
-
-        <!-- ============ PLAYABLE ADS ============ -->
-        <section class="section" id="ads">
-            <div class="shell">
-                <h2 class="section__title"><span data-i18n="sections.ads">Playable ads</span></h2>
-                <div id="campaigns"></div>
-            </div>
-        </section>
-
-        <!-- ============ THEME VARIANTS ============ -->
-        <section class="section" id="themes">
-            <div class="shell">
-                <h2 class="section__title"><span data-i18n="sections.series">Theme variants</span></h2>
-                <div id="series"></div>
-            </div>
-        </section>
-    </main>
-
-    <!-- ============ FOOTER ============ -->
-    <footer class="footer" id="contact">
-        <div class="shell footer__inner">
-            <p class="footer__rights" data-i18n="footer.rights"></p>
-            <div class="footer__right">
-                <a class="footer__mail" id="mailLink" href="#"></a>
-                <ul class="social" id="social"></ul>
-            </div>
-        </div>
-    </footer>
-
-    <!-- ============ PLAYER ============ -->
-    <div class="player" id="player" hidden role="dialog" aria-modal="true" aria-labelledby="playerTitle">
-        <div class="player__bar">
-            <div class="player__id">
-                <h2 id="playerTitle"></h2>
-                <p class="player__hint" data-i18n="labels.escHint"></p>
-            </div>
-            <div class="player__actions">
-                <button class="btn btn--ghost" id="fsBtn" type="button"></button>
-                <a class="btn btn--ghost" id="tabBtn" href="#" target="_blank" rel="noopener noreferrer"></a>
-                <button class="btn btn--ghost" id="closeBtn" type="button"></button>
-            </div>
-        </div>
-        <div class="player__stage" id="playerStage">
-            <div class="player__frame" id="playerFrame">
-                <div class="loader" id="loader"><span></span><span></span><span></span></div>
             </div>
         </div>
     </div>

@@ -10,6 +10,11 @@
 // Grouped entries: CONFIG.campaigns (ads for one shipped app) and
 // CONFIG.series (one core loop shipped under several themes) hold their
 // own `variants`, each of which is playable exactly like a prototype.
+//
+// NOTE: the builds have moved to games.malik3d.page, so this page no longer
+// renders `prototypes`, `campaigns` or `series` — the Games app links out
+// instead. The data and its TR/EN copy stay here intact for the games site to
+// pick up. What this page actually reads is `apps`, `assetPacks` and `stack`.
 // =========================================================
 
 const CONFIG = {
@@ -23,6 +28,9 @@ const CONFIG = {
     },
 
     email: "enesaksu9999@gmail.com",
+
+    // Chips in the About app. Straight from the README.
+    stack: ["Unity", "Blender", "C#", "Substance Painter", "Python"],
 
     // ========================================
     // PROTOTYPES (playable in the browser)
@@ -154,16 +162,91 @@ const CONFIG = {
     ],
 
     // ========================================
+    // OUTBOUND SITES
+    // ========================================
+    links: {
+        site: "https://malik3d.page",
+        games: "https://games.malik3d.page"
+    },
+
+    // ========================================
+    // ASSET PACKS — the storefronts, not the individual packs
+    // ========================================
+    assetPacks: [
+        { id: "fab", url: "https://www.fab.com/sellers/Zeatrex", accent: "#ff3a5e" },
+        { id: "unity", url: "https://assetstore.unity.com/publishers/91973", accent: "#54c39a" }
+    ],
+
+    // ========================================
+    // HOME SCREEN
+    //   kind "app"      opens the screen whose id matches, rendered in app.js
+    //   kind "external" opens `url` in a new tab
+    //   place "home"    the icon grid   |   "dock"  the bar along the bottom
+    // ========================================
+    apps: [
+        { id: "about", kind: "app", place: "home", accent: "#ff3a5e" },
+        { id: "assets", kind: "app", place: "home", accent: "#f5c640" },
+        { id: "contact", kind: "app", place: "home", accent: "#54c39a" },
+        { id: "games", kind: "external", place: "home", accent: "#8b6cf0", url: "https://games.malik3d.page" },
+        { id: "site", kind: "external", place: "dock", accent: "#ffffff", url: "https://malik3d.page" }
+    ],
+
+    // ========================================
     // TRANSLATIONS
     // ========================================
     translations: {
 
         tr: {
             meta: {
-                title: "Prototip Kütüphanesi",
-                description: "Tarayıcıda oynanabilir oyun prototipleri kütüphanesi. Kurulum yok, mağaza yok."
+                title: "Malik3D — Enes Aksu",
+                description: "Enes Aksu — Technical Animator & 3D Generalist. Asset paketleri, oyunlar ve iletişim; telefon arayüzü biçiminde bir mini portfolyo."
             },
-            a11y: { skip: "Kütüphaneye geç" },
+            a11y: { skip: "Ana ekrana geç" },
+            os: {
+                boot: "Açılıyor",
+                hint: "Bir uygulamaya dokun",
+                back: "Ana ekran",
+                external: "yeni sekmede açılır",
+                carrier: "MALIK3D",
+                langLabel: "EN"
+            },
+            about: {
+                name: "Enes Aksu",
+                role: "Technical Animator & 3D Generalist",
+                blurb: "Teknik mimariyi (C#/Unity) görsel yaklaşımla (Blender/animasyon) birleştirerek etkileşimli görsel sistemler ve karmaşık asset pipeline'ları kuruyorum ve optimize ediyorum. 3+ yıl.",
+                focusLabel: "Uzmanlık",
+                focus: [
+                    ["Durum makineleri ve mantık", "Unity Animator, node dizileri, FSM mimarileri"],
+                    ["Rigging ve skinning", "Oyunlar için karmaşık iskeletler ve weight painting"],
+                    ["Optimizasyon", "Mobil render pipeline'ları, ışıklandırma, URP Shader Graph"],
+                    ["Özel araçlar", "Pipeline'ı hızlandıran Python ve C# editör araçları"]
+                ],
+                stackLabel: "Araçlar",
+                caseLabel: "Ayrıca",
+                caseNote: "Mobil optimizasyon vaka çalışmaları: düşük donanımlı cihazlarda yüksek performans için ışıklandırma kurulumları, render optimizasyonları ve özel URP Shader Graph'ları."
+            },
+            appCopy: {
+                about: { title: "Hakkımda", sub: "Kimim, ne yapıyorum" },
+                assets: {
+                    title: "Asset Paketleri",
+                    sub: "Fab ve Unity Asset Store",
+                    lead: "Fab ve Unity Asset Store'da yayında 8+ 3D asset paketi: oyuna hazır modeller ve animasyonlar.",
+                    note: "Paketlerin tam listesi ve önizlemeler mağaza sayfalarında."
+                },
+                contact: {
+                    title: "İletişim",
+                    sub: "Bağlantılar ve e-posta",
+                    lead: "İş, iş birliği ya da sadece merak — yazabilirsin.",
+                    mailLabel: "E-posta",
+                    elsewhere: "Diğer yerler"
+                },
+                games: { title: "Oyunlar", sub: "games.malik3d.page" },
+                site: { title: "malik3d.page", sub: "Ana site" }
+            },
+            stores: {
+                fab: { name: "Fab", note: "Epic'in asset mağazası" },
+                unity: { name: "Unity Asset Store", note: "Yayıncı sayfası" }
+            },
             nav: {
                 library: "Kütüphane",
                 ads: "Reklamlar",
@@ -312,10 +395,55 @@ const CONFIG = {
 
         en: {
             meta: {
-                title: "Prototype Library",
-                description: "A library of game prototypes playable straight in the browser. No installs, no store pages."
+                title: "Malik3D — Enes Aksu",
+                description: "Enes Aksu — Technical Animator & 3D Generalist. Asset packs, games and contact, laid out as a small phone."
             },
-            a11y: { skip: "Skip to the library" },
+            a11y: { skip: "Skip to the home screen" },
+            os: {
+                boot: "Starting up",
+                hint: "Tap an app",
+                back: "Home",
+                external: "opens in a new tab",
+                carrier: "MALIK3D",
+                langLabel: "TR"
+            },
+            about: {
+                name: "Enes Aksu",
+                role: "Technical Animator & 3D Generalist",
+                blurb: "I build and optimise interactive visual systems and complex asset pipelines, pairing technical architecture (C#/Unity) with an artistic eye (Blender/animation). 3+ years in.",
+                focusLabel: "Core focus",
+                focus: [
+                    ["State machines and logic", "Unity Animator, node sequences, FSM architectures"],
+                    ["Rigging and skinning", "Complex skeletons and weight painting for games"],
+                    ["Optimisation", "Mobile rendering pipelines, lighting, URP Shader Graphs"],
+                    ["Custom tooling", "Python and C# editor tools that speed up the pipeline"]
+                ],
+                stackLabel: "Stack",
+                caseLabel: "Also",
+                caseNote: "Mobile optimisation case studies: lighting setups, render optimisations and custom URP Shader Graphs for high performance on low-end devices."
+            },
+            appCopy: {
+                about: { title: "About", sub: "Who I am, what I do" },
+                assets: {
+                    title: "Asset Packs",
+                    sub: "Fab and the Unity Asset Store",
+                    lead: "8+ 3D asset packs live on Fab and the Unity Asset Store: game-ready models and animations.",
+                    note: "The full list and previews live on the store pages."
+                },
+                contact: {
+                    title: "Contact",
+                    sub: "Links and email",
+                    lead: "Work, collaboration, or plain curiosity — all welcome.",
+                    mailLabel: "Email",
+                    elsewhere: "Elsewhere"
+                },
+                games: { title: "Games", sub: "games.malik3d.page" },
+                site: { title: "malik3d.page", sub: "Main site" }
+            },
+            stores: {
+                fab: { name: "Fab", note: "Epic's asset marketplace" },
+                unity: { name: "Unity Asset Store", note: "Publisher page" }
+            },
             nav: {
                 library: "Library",
                 ads: "Ads",
