@@ -6,6 +6,11 @@
   <meta name="theme-color" content="#6435e5">
   <meta name="description" content="RocketUP: roketini kur, dört kararla göğe tırman, uzak üsse darbe indir. Tarayıcıda oynanan mobil uyumlu arcade prototipi.">
   <title>RocketUP — Prototip 01</title>
+  <script>
+    // Embedded in a library page: the host already frames the game, so the page
+    // drops its own header and device frame instead of nesting a second one.
+    try { if (window.self !== window.top) document.documentElement.dataset.embed = "1"; } catch (e) { document.documentElement.dataset.embed = "1"; }
+  </script>
   <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%237f4cf0%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%234f2bb8%22%2F%3E%3C%2FlinearGradient%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22body%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%220%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23ff942a%22%2F%3E%3Cstop%20offset%3D%22.4%22%20stop-color%3D%22%23ffe663%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23f78823%22%2F%3E%3C%2FlinearGradient%3E%0A%20%20%3C%2Fdefs%3E%0A%20%20%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%22112%22%20fill%3D%22url(%23bg)%22%2F%3E%0A%20%20%3Ccircle%20cx%3D%22392%22%20cy%3D%22128%22%20r%3D%2246%22%20fill%3D%22%23fff38b%22%2F%3E%0A%20%20%3Cellipse%20cx%3D%22150%22%20cy%3D%22392%22%20rx%3D%22120%22%20ry%3D%2234%22%20fill%3D%22%23a2c5ff%22%20opacity%3D%22.55%22%2F%3E%0A%20%20%3Cellipse%20cx%3D%22350%22%20cy%3D%22430%22%20rx%3D%22150%22%20ry%3D%2240%22%20fill%3D%22%23ffffff%22%20opacity%3D%22.5%22%2F%3E%0A%20%20%3Cg%20transform%3D%22translate(256%20262)%20rotate(14)%22%20stroke%3D%22%23382568%22%20stroke-width%3D%2212%22%20stroke-linejoin%3D%22round%22%3E%0A%20%20%20%20%3Cpath%20d%3D%22M-34%2060%20L-70%20128%20L-30%20118%20Z%22%20fill%3D%22%237042cb%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M34%2060%20L70%20128%20L30%20118%20Z%22%20fill%3D%22%239b57ef%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M-30%20110%20L0%20190%20L30%20110%20Z%22%20fill%3D%22%23ff6234%22%20stroke%3D%22none%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M-16%20110%20L0%20160%20L16%20110%20Z%22%20fill%3D%22%23ffdc3d%22%20stroke%3D%22none%22%2F%3E%0A%20%20%20%20%3Crect%20x%3D%22-56%22%20y%3D%22-60%22%20width%3D%22112%22%20height%3D%22180%22%20rx%3D%2244%22%20fill%3D%22url(%23body)%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M-52%20-40%20Q-40%20-150%200%20-180%20Q40%20-150%2052%20-40%20Z%22%20fill%3D%22%23ff633f%22%2F%3E%0A%20%20%20%20%3Ccircle%20cx%3D%220%22%20cy%3D%22-20%22%20r%3D%2234%22%20fill%3D%22%235a3999%22%2F%3E%0A%20%20%20%20%3Ccircle%20cx%3D%220%22%20cy%3D%22-20%22%20r%3D%2224%22%20fill%3D%22%2323c9f6%22%20stroke%3D%22none%22%2F%3E%0A%20%20%20%20%3Ccircle%20cx%3D%22-8%22%20cy%3D%22-28%22%20r%3D%228%22%20fill%3D%22%23edffff%22%20stroke%3D%22none%22%2F%3E%0A%20%20%20%20%3Crect%20x%3D%22-46%22%20y%3D%2240%22%20width%3D%2292%22%20height%3D%2246%22%20rx%3D%2218%22%20fill%3D%22%232fd0ec%22%2F%3E%0A%20%20%3C%2Fg%3E%0A%3C%2Fsvg%3E%0A">
   <style>:root{--paper:#fff9ed;--paper-2:#ebe0ff;--accent:#6936de;--accent-dark:#4824a0;--navy:#29204f;--sky:#3bd9ff;--cyan:#19cdef;--coral:#ff5a76;--amber:#ffd34e;--white:#fff;--line:#d5c3f1;--shadow:0 12px 0 #4824a0,0 24px 48px #28115338}
 *{box-sizing:border-box}
@@ -66,6 +71,20 @@ body:not([data-phase=build]) .build-panel{display:none}body:not([data-phase=buil
 @media(min-width:801px){body:not([data-phase=build]) .site-header{display:none}body:not([data-phase=build]) .console-shell{margin:8px auto}body:not([data-phase=build]) #stage{width:min(420px,calc((100svh - 104px) * 21 / 34));margin:auto}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 @media(max-height:520px){.flight-hud{gap:6px}.flight-hud strong{font-size:13px;margin:1px 0 4px}.fuel-meter,.altitude-meter{padding:7px 9px}.flight-vitals{padding:7px 9px}}
+/* Embedded build: no duplicate header, no nested phone frame, and the space they used goes to the stage. */
+html[data-embed] .site-header,html[data-embed] .briefing{display:none}
+html[data-embed] body{background:linear-gradient(160deg,#6d3fe4,#8f5cf0);padding:0}
+html[data-embed] .console-shell{width:100%;margin:0;display:flex;flex-direction:column;gap:0;align-items:stretch}
+html[data-embed] .stage-column{order:1;width:100%}
+html[data-embed] .stage-frame,html[data-embed] body[data-phase=build] .stage-frame{width:auto;margin:0;padding:3px 0 0;border:0;border-radius:0;box-shadow:none;background:#452493}
+html[data-embed] .frame-label,html[data-embed] body[data-phase=build] .frame-label{padding:0 12px;height:21px;font-size:7px;letter-spacing:.04em}
+html[data-embed] #stage,html[data-embed] body[data-phase=build] #stage{width:min(100vw,430px,calc((100svh - 78px) * 21 / 34));margin:auto;border-radius:0;box-shadow:none}
+html[data-embed] body[data-phase=build] #stage{width:min(100vw,430px,calc(54svh * 21 / 34))}
+html[data-embed] .controls-caption,html[data-embed] body[data-phase=build] .controls-caption{font-size:8px;min-height:20px;margin:6px 0 0}
+html[data-embed] .build-column{order:2;width:min(100% - 18px,430px);margin:10px auto 18px;padding:14px;border-radius:20px}
+html[data-embed] .build-column .section-tag,html[data-embed] .build-panel h1,html[data-embed] .build-panel .intro{display:none}
+html[data-embed] body:not([data-phase=build]){height:100svh;overflow:hidden}
+html[data-embed] body:not([data-phase=build]) .console-shell{min-height:100svh;justify-content:center}
 </style>
 </head>
 <body data-phase="build">
