@@ -65,6 +65,18 @@ const CONFIG = {
             accent: "#ffd04b",
             art: "trafik-dedektifi",
             image: ""
+        },
+        {
+            id: "rocketup",
+            path: "games/rocketup/",
+            year: "2026",
+            status: "playable",
+            engine: "Canvas 2D",
+            tech: ["JavaScript", "Canvas", "Arcade physics", "Encounter design"],
+            frame: "portrait",
+            accent: "#ffd34e",
+            art: "rocketup",
+            image: ""
         }
     ],
 
@@ -254,6 +266,17 @@ const CONFIG = {
                 wip: "Geliştiriliyor"
             },
             games: {
+                rocketup: {
+                    title: "RocketUP",
+                    tagline: "Dört kararla tırman, uzak üsse tam merkezden vur.",
+                    description: "Tek mekaniğin üstüne kurulmuş bir tırmanış prototipi: uçuş boyunca yaptığın tek şey roketi sağa sola yöneltmek. Tırmanışın dört karar noktası var — aynı hizadaki yakıt ile itki arasında seçim, önleyicinin indiği şeritteki çift kapsül, iki şerit arasındaki dar geçit ve motor sustuktan sonra şeridine kilitlenen son önleyici. Karar irtifaları roketin yakıtına göre ölçekleniyor, yani geliştirilmiş rokette de dördü birden zirveden önce geliyor. İrtifa darbe gücüne dönüşüyor, dönüş yolunda gövden aşınıyor ve hedefi ne kadar ortaladığın hasarın ne kadarının ulaştığını belirliyor.",
+                    controls: [
+                        "Sürükle ya da A / D ile yön ver — tek hamlen bu",
+                        "Yakıt motor açıkken, itki süzülürken daha çok kazandırır",
+                        "Şerit uyarısını gördüğünde kapsülü al ve hemen çık",
+                        "Dalışta hedef şeridine gir; merkez daha sert vurur, ıska sıfır hasar"
+                    ]
+                },
                 kulah_kosesi: {
                     title: "Külah Köşesi",
                     tagline: "Topları önden hazırla, külah hizaya gelince servis olsun.",
@@ -426,6 +449,17 @@ const CONFIG = {
                 wip: "Work in progress"
             },
             games: {
+                rocketup: {
+                    title: "RocketUP",
+                    tagline: "Climb through four decisions, then hit the distant base dead centre.",
+                    description: "A climb prototype built on a single mechanic: steering left and right is the only thing you do in flight. The ascent carries four decision points — a fuel capsule or a boost at the same altitude, a pair of capsules parked in the lane an interceptor is diving down, a narrow gap between two marked lanes, and a last interceptor that locks onto your lane once the engine cuts out. The decision altitudes scale with the rocket's fuel, so an upgraded build still meets all four before its apex. Altitude turns into strike power, the hull wears down on the way back, and how well you centre the target decides how much of that power actually lands.",
+                    controls: [
+                        "Drag, or use A / D, to steer — that is your only move",
+                        "Fuel pays off while the engine burns; a boost pays off while coasting",
+                        "When a lane is marked, take the capsule and get out of it",
+                        "On the dive, enter the target lane — centre hits hardest, a miss deals nothing"
+                    ]
+                },
                 kulah_kosesi: {
                     title: "Cone Corner",
                     tagline: "Stock the scoops early, serve the cone as it lines up.",

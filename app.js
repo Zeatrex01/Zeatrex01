@@ -354,6 +354,85 @@
                 "</svg>";
         },
 
+        "rocketup": function (uid) {
+            // One climb: staged decision lanes, capsules to take and an interceptor to dodge.
+            var capsule = function (x, y, s) {
+                return '<g transform="translate(' + x + ' ' + y + ') scale(' + s + ')">' +
+                    '<circle cx="0" cy="0" r="27" fill="#e9ffff" opacity=".28"/>' +
+                    '<rect x="-8" y="-24" width="16" height="9" rx="3" fill="#4b46a0"/>' +
+                    '<rect x="-16" y="-15" width="32" height="36" rx="9" fill="#168ec8"/>' +
+                    '<rect x="-14" y="-16" width="28" height="33" rx="8" fill="#46e2ff"/>' +
+                    '<path d="M3-10-6 2h7l-3 12 10-14h-7z" fill="#2f7fae"/></g>';
+            };
+            var boost = function (x, y, s) {
+                return '<g transform="translate(' + x + ' ' + y + ') scale(' + s + ')">' +
+                    '<rect x="-21" y="-21" width="42" height="42" rx="12" ' +
+                    'transform="rotate(45)" fill="#ffcc2e" stroke="#e77b27" stroke-width="3"/>' +
+                    '<path d="M4-16-11 3h10l-4 15L14-4H3z" fill="#fffaf0"/></g>';
+            };
+            var lane = function (x, w) {
+                return '<rect x="' + (x - w / 2) + '" y="0" width="' + w + '" height="500" fill="#ff487a" opacity=".12"/>' +
+                    '<rect x="' + (x - w / 2) + '" y="0" width="' + w + '" height="500" fill="none" ' +
+                    'stroke="#fa3d72" stroke-opacity=".55" stroke-width="2" stroke-dasharray="6 9"/>';
+            };
+            var mark = function (y, text) {
+                return '<path d="M150 ' + y + 'H640" stroke="#ffe45e" stroke-opacity=".5" ' +
+                    'stroke-width="2" stroke-dasharray="4 11"/>' +
+                    '<rect x="536" y="' + (y - 21) + '" width="104" height="22" rx="11" fill="#ffe45e" opacity=".92"/>' +
+                    '<text x="588" y="' + (y - 6) + '" text-anchor="middle" font-family="system-ui,sans-serif" ' +
+                    'font-size="12" font-weight="800" fill="#4c2a6e">' + text + "</text>";
+            };
+            var cloud = function (x, y, s, o) {
+                return '<g transform="translate(' + x + ' ' + y + ') scale(' + s + ')" opacity="' + o + '">' +
+                    '<ellipse cx="0" cy="10" rx="62" ry="19" fill="#a2c5ff"/>' +
+                    '<ellipse cx="0" cy="0" rx="58" ry="16" fill="#fffaff"/>' +
+                    '<ellipse cx="-20" cy="-9" rx="26" ry="21" fill="#fffaff"/>' +
+                    '<ellipse cx="16" cy="-14" rx="35" ry="28" fill="#fffaff"/></g>';
+            };
+
+            return '' +
+                '<svg viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" role="img">' +
+                "<defs>" +
+                '<linearGradient id="sky-' + uid + '" x1="0" y1="0" x2="0" y2="1">' +
+                '<stop offset="0" stop-color="#6a45d8"/><stop offset=".42" stop-color="#42a7ff"/>' +
+                '<stop offset="1" stop-color="#7fe2ff"/></linearGradient>' +
+                '<linearGradient id="hull-' + uid + '" x1="0" y1="0" x2="1" y2="0">' +
+                '<stop offset="0" stop-color="#ff942a"/><stop offset=".36" stop-color="#ffe663"/>' +
+                '<stop offset="1" stop-color="#f78823"/></linearGradient>' +
+                '<linearGradient id="fade-' + uid + '" x1="0" y1="0" x2="0" y2="1">' +
+                '<stop offset=".58" stop-color="#06060a" stop-opacity="0"/>' +
+                '<stop offset="1" stop-color="#06060a" stop-opacity=".9"/></linearGradient>' +
+                "</defs>" +
+                '<rect width="800" height="500" fill="url(#sky-' + uid + ')"/>' +
+                '<circle cx="726" cy="70" r="40" fill="#fff38b" opacity=".85"/>' +
+                cloud(132, 60, .8, .45) + cloud(636, 252, 1, .4) + cloud(300, 402, 1.25, .5) +
+                lane(214, 74) + lane(470, 74) +
+                mark(96, "K4 &#183; ZIRVE") + mark(250, "K2 &#183; HAT") +
+                capsule(214, 132, 1) + capsule(214, 204, 1) + capsule(566, 168, .9) +
+                boost(470, 74, 1) + capsule(648, 286, .85) +
+                // Interceptor diving down the marked lane.
+                '<g transform="translate(470 212)" stroke="#382568" stroke-width="3" stroke-linejoin="round">' +
+                '<path d="M-9-34 0-66 9-34z" fill="#ffb843" stroke="none"/>' +
+                '<path d="M-8-27-23-38-21-11-8-6z" fill="#8d39a7"/>' +
+                '<path d="M8-27 23-38 21-11 8-6z" fill="#8d39a7"/>' +
+                '<rect x="-12" y="-37" width="24" height="46" rx="9" fill="#ff517b"/>' +
+                '<path d="M-11 7 0 32 11 7z" fill="#5a2d7e"/></g>' +
+                // The rocket, climbing out of the guarded lane.
+                '<g transform="translate(322 226) rotate(-9)" stroke="#382568" stroke-width="4" stroke-linejoin="round">' +
+                '<path d="M-13 40-14 66 0 56 14 66 13 40z" fill="#ff6234" stroke="none"/>' +
+                '<path d="M-9 41-7 62 0 80 7 62 9 41z" fill="#ffdc3d" stroke="none"/>' +
+                '<path d="M-15 9-36 29-35 49-14 39z" fill="#9b57ef"/>' +
+                '<path d="M15 9 36 29 35 49 14 39z" fill="#7042cb"/>' +
+                '<rect x="-20" y="-36" width="40" height="76" rx="15" fill="url(#hull-' + uid + ')"/>' +
+                '<path d="M-19-28Q-20-47 0-62 20-47 19-28z" fill="#ff633f"/>' +
+                '<rect x="-19" y="-5" width="38" height="27" rx="8" fill="#2fd0ec"/>' +
+                '<circle cx="0" cy="-18" r="9" fill="#5a3999"/>' +
+                '<circle cx="0" cy="-18" r="6.5" fill="#23c9f6" stroke="none"/>' +
+                '<circle cx="-2" cy="-20" r="2.6" fill="#edffff" stroke="none"/></g>' +
+                '<rect width="800" height="500" fill="url(#fade-' + uid + ')"/>' +
+                "</svg>";
+        },
+
         // Popcorn Pop Sort shares one scene; the two ad variants change the
         // opening beat rather than the theme.
         "popcorn-conveyor": function (uid) { return popcornArt(uid, "conveyor"); },

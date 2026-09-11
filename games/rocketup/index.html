@@ -1,0 +1,1234 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#6435e5">
+  <meta name="description" content="RocketUP: roketini kur, dört kararla göğe tırman, uzak üsse darbe indir. Tarayıcıda oynanan mobil uyumlu arcade prototipi.">
+  <title>RocketUP — Prototip 01</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%237f4cf0%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%234f2bb8%22%2F%3E%3C%2FlinearGradient%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22body%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%220%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23ff942a%22%2F%3E%3Cstop%20offset%3D%22.4%22%20stop-color%3D%22%23ffe663%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23f78823%22%2F%3E%3C%2FlinearGradient%3E%0A%20%20%3C%2Fdefs%3E%0A%20%20%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%22112%22%20fill%3D%22url(%23bg)%22%2F%3E%0A%20%20%3Ccircle%20cx%3D%22392%22%20cy%3D%22128%22%20r%3D%2246%22%20fill%3D%22%23fff38b%22%2F%3E%0A%20%20%3Cellipse%20cx%3D%22150%22%20cy%3D%22392%22%20rx%3D%22120%22%20ry%3D%2234%22%20fill%3D%22%23a2c5ff%22%20opacity%3D%22.55%22%2F%3E%0A%20%20%3Cellipse%20cx%3D%22350%22%20cy%3D%22430%22%20rx%3D%22150%22%20ry%3D%2240%22%20fill%3D%22%23ffffff%22%20opacity%3D%22.5%22%2F%3E%0A%20%20%3Cg%20transform%3D%22translate(256%20262)%20rotate(14)%22%20stroke%3D%22%23382568%22%20stroke-width%3D%2212%22%20stroke-linejoin%3D%22round%22%3E%0A%20%20%20%20%3Cpath%20d%3D%22M-34%2060%20L-70%20128%20L-30%20118%20Z%22%20fill%3D%22%237042cb%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M34%2060%20L70%20128%20L30%20118%20Z%22%20fill%3D%22%239b57ef%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M-30%20110%20L0%20190%20L30%20110%20Z%22%20fill%3D%22%23ff6234%22%20stroke%3D%22none%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M-16%20110%20L0%20160%20L16%20110%20Z%22%20fill%3D%22%23ffdc3d%22%20stroke%3D%22none%22%2F%3E%0A%20%20%20%20%3Crect%20x%3D%22-56%22%20y%3D%22-60%22%20width%3D%22112%22%20height%3D%22180%22%20rx%3D%2244%22%20fill%3D%22url(%23body)%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M-52%20-40%20Q-40%20-150%200%20-180%20Q40%20-150%2052%20-40%20Z%22%20fill%3D%22%23ff633f%22%2F%3E%0A%20%20%20%20%3Ccircle%20cx%3D%220%22%20cy%3D%22-20%22%20r%3D%2234%22%20fill%3D%22%235a3999%22%2F%3E%0A%20%20%20%20%3Ccircle%20cx%3D%220%22%20cy%3D%22-20%22%20r%3D%2224%22%20fill%3D%22%2323c9f6%22%20stroke%3D%22none%22%2F%3E%0A%20%20%20%20%3Ccircle%20cx%3D%22-8%22%20cy%3D%22-28%22%20r%3D%228%22%20fill%3D%22%23edffff%22%20stroke%3D%22none%22%2F%3E%0A%20%20%20%20%3Crect%20x%3D%22-46%22%20y%3D%2240%22%20width%3D%2292%22%20height%3D%2246%22%20rx%3D%2218%22%20fill%3D%22%232fd0ec%22%2F%3E%0A%20%20%3C%2Fg%3E%0A%3C%2Fsvg%3E%0A">
+  <style>:root{--paper:#fff9ed;--paper-2:#ebe0ff;--accent:#6936de;--accent-dark:#4824a0;--navy:#29204f;--sky:#3bd9ff;--cyan:#19cdef;--coral:#ff5a76;--amber:#ffd34e;--white:#fff;--line:#d5c3f1;--shadow:0 12px 0 #4824a0,0 24px 48px #28115338}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{background:#7947ee;color:var(--navy);font-family:"Trebuchet MS",ui-rounded,system-ui,-apple-system,"Segoe UI",sans-serif;overscroll-behavior:none;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
+body{margin:0;min-height:100vh;min-height:100svh;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);overscroll-behavior:none;background:radial-gradient(circle at 5% 20%,#aa73ff 0 130px,transparent 131px),radial-gradient(circle at 96% 82%,#ab78fa 0 180px,transparent 181px),linear-gradient(135deg,#7544e4,#9861f2)}
+button,a{font:inherit}button{color:inherit;touch-action:manipulation}
+button:focus-visible,a:focus-visible{outline:4px solid #ffbf00;outline-offset:4px}
+.site-header{height:86px;max-width:1210px;margin:auto;display:flex;align-items:center;padding:0 15px;color:#fff}
+.brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;line-height:.85;letter-spacing:-.05em;filter:drop-shadow(0 3px 0 #4824a0)}
+.brand svg{width:36px;height:43px;fill:#ffcf45;stroke:var(--navy);stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round;transform:rotate(15deg)}
+.brand span{display:grid;font-size:23px}.brand b{font-weight:950}.brand em{font-style:normal;font-weight:950;color:#ffe369;letter-spacing:.12em}
+.header-meta{margin-left:auto;display:flex;align-items:center;gap:16px;font-size:12px;font-weight:800}.header-meta strong{padding:9px 13px;background:#4b279e;border-radius:12px;font-size:10px;letter-spacing:.08em}
+.icon-button,.hud-button{display:grid;place-items:center;border:2px solid var(--navy);background:#fff;border-radius:14px;cursor:pointer;box-shadow:0 3px 0 var(--navy)}
+.icon-button{width:44px;height:44px;margin-left:18px}.icon-button svg{width:21px;fill:none;stroke:var(--navy);stroke-width:2;stroke-linecap:round}
+.console-shell{width:min(1210px,calc(100% - 32px));margin:15px auto 50px;display:grid;grid-template-columns:300px 460px 250px;gap:26px;justify-content:center;align-items:start}
+.build-column,.briefing{padding:23px 20px;background:var(--paper);border:3px solid var(--navy);border-radius:28px;box-shadow:0 7px 0 #4824a0}
+.section-tag{display:flex;align-items:center;gap:9px;margin-bottom:18px;font-size:10px;font-weight:900;letter-spacing:.06em}.section-tag span{display:grid;place-items:center;width:29px;height:29px;border:2px solid var(--navy);border-radius:10px;background:var(--amber);transform:rotate(-7deg)}
+h1,h2,p{margin-top:0}.build-panel h1,.briefing h2{font-size:37px;font-weight:950;line-height:1.04;letter-spacing:-.05em;margin-bottom:14px}.build-panel h1 em,.briefing h2 em{font-style:normal;color:#e13b69}.briefing h2{font-size:28px}
+.intro{font-size:13px;line-height:1.5;color:#635778;margin-bottom:18px}
+.tank-list{display:grid;gap:10px}
+.tank-card{width:100%;display:grid;grid-template-columns:42px 1fr 20px;gap:9px;align-items:center;text-align:left;padding:11px;border:2px solid #cdbde5;border-radius:18px;background:#fff;cursor:pointer;box-shadow:0 3px 0 #dfd2eb;transition:transform .15s,box-shadow .15s}
+.tank-card:hover{transform:translateY(-2px);border-color:var(--accent)}.tank-card[aria-pressed=true]{background:#fff2bd;border-color:var(--navy);box-shadow:0 4px 0 var(--navy);transform:rotate(-1deg)}
+.tank-card strong{display:block;font-size:15px}.tank-card small{display:block;margin-top:3px;font-size:10px;color:#635778;line-height:1.35}
+.tank-card>svg{width:20px;fill:none;stroke:#fff;stroke-width:3;background:var(--accent);border-radius:50%;opacity:0}.tank-card[aria-pressed=true]>svg{opacity:1}
+.tank-icon{height:45px;display:grid;place-items:center;background:#42ddf1;border-radius:12px;border:2px solid var(--navy)}.tank-icon i{display:block;border:2px solid var(--navy);background:linear-gradient(90deg,#fff 25%,#b6c0ff 26%);border-radius:6px;box-shadow:0 2px 0 #29204f50}.tank-icon-compact i{width:20px;height:24px}.tank-icon-large{background:#ff9cae}.tank-icon-large i{width:23px;height:33px}
+.workshop{margin-top:18px;padding:12px;border:2px solid #c9b6ed;border-radius:19px;background:#eee4ff}
+.workshop-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;font-size:9px;font-weight:900;line-height:1.4}.workshop-head>span{max-width:140px}.workshop-head strong{padding:5px 9px;background:#ffd54f;border:2px solid var(--navy);border-radius:10px;font-size:14px;white-space:nowrap}.workshop-head i{font-style:normal;color:#784711}
+.upgrade-list{display:grid;gap:8px}.upgrade-card{display:grid;grid-template-columns:32px 1fr auto;gap:8px;text-align:left;align-items:center;min-width:0;padding:9px;border:2px solid #d3c3ee;border-radius:13px;background:#fff;cursor:pointer}.upgrade-card:hover:not(:disabled){border-color:var(--accent);transform:translateY(-1px)}.upgrade-card:disabled{cursor:default;background:#f8f3ff}.upgrade-icon{display:grid;place-items:center;width:32px;height:32px;border:2px solid var(--navy);border-radius:10px;background:#ffca47;color:var(--navy);font-size:21px;font-weight:900}.upgrade-card:nth-child(2) .upgrade-icon{background:#64dcf9}.upgrade-card strong{display:flex;justify-content:space-between;gap:6px;font-size:12px}.upgrade-card strong i{font-size:9px;font-style:normal;color:#764ab5;white-space:nowrap}.upgrade-card small{display:block;font-size:9px;color:#706284;margin-top:3px}.upgrade-card>b{font-size:10px;color:#6331af;white-space:nowrap}.upgrade-card>b:before{content:"◆ ";color:#a86b00}
+.selection-copy{margin:15px 0;padding:12px;border:2px dashed #cfb8ed;border-radius:14px;background:#fff}.selection-copy span,.mission-standby span,.controls-card>span{display:block;font-size:9px;font-weight:900;letter-spacing:.08em;color:var(--accent);margin-bottom:5px}.selection-copy strong{font-size:13px}.selection-copy p,.mission-standby p{font-size:11px;line-height:1.5;margin:4px 0 0;color:#685779}
+.launch-button{width:100%;min-height:52px;display:flex;align-items:center;justify-content:center;gap:12px;border:2px solid var(--navy);border-radius:17px;background:linear-gradient(#ffe371,#ffc532);color:var(--navy);font-weight:950;font-size:14px;cursor:pointer;box-shadow:0 5px 0 #a96824;transition:transform .12s,box-shadow .12s}.launch-button:hover:not(:disabled){background:#ffe575;transform:translateY(-2px);box-shadow:0 7px 0 #a96824}.launch-button:active:not(:disabled){transform:translateY(3px);box-shadow:0 2px 0 #a96824}.launch-button svg{width:20px;fill:none;stroke:currentColor;stroke-width:3}.launch-button:disabled{background:#e1d7ed;border-color:#b7a8c8;color:#766884;box-shadow:0 4px 0 #b7a8c8;cursor:not-allowed}
+.text-button{display:block;margin:13px auto 0;padding:5px;border:0;background:transparent;text-decoration:underline;text-underline-offset:3px;font-size:12px;font-weight:800;cursor:pointer}
+.mission-standby{display:none;padding:16px;border:2px solid var(--navy);border-radius:19px;background:#fff2c4;box-shadow:0 4px 0 #e5c779}.mission-standby strong{display:block;font-size:23px}
+.status-label{margin-top:15px;font-size:10px;color:#746382}
+.stage-frame{background:#452493;border:3px solid #29204f;padding:10px 17px 15px;border-radius:31px;box-shadow:var(--shadow)}
+.frame-label{height:28px;display:flex;align-items:center;gap:8px;color:#f5eaff;font-size:8px;font-weight:900;letter-spacing:.06em}.frame-label i{width:7px;height:7px;border-radius:50%;background:#ffdb47;box-shadow:0 0 0 3px #ffd34e30}.frame-label span:last-child{margin-left:auto}
+#stage{position:relative;width:420px;max-width:100%;aspect-ratio:21/34;overflow:hidden;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;border-radius:19px;background:linear-gradient(#32c4ff,#85e9fb);isolation:isolate;box-shadow:0 0 0 2px #29204f}
+#game-canvas{display:block;width:100%;height:100%;touch-action:none}
+.flight-hud{position:absolute;inset:12px 12px auto;display:grid;grid-template-columns:1fr 1fr 40px;gap:8px;z-index:3;pointer-events:none}.flight-hud button{pointer-events:auto}.fuel-meter,.altitude-meter{padding:9px 11px;background:#fffcf1f5;border:2px solid var(--navy);border-radius:14px;box-shadow:0 3px 0 #29204f40}
+.flight-hud span{display:block;font-size:9px;font-weight:900;letter-spacing:.06em}.flight-hud strong{display:block;font-size:17px;margin:2px 0 5px}.flight-hud div div{height:6px;background:#e0d4ed;border-radius:9px;overflow:hidden}.flight-hud div i{display:block;width:100%;height:100%;background:var(--cyan)}.altitude-meter div i{background:#a053f5;width:0}
+.flight-vitals{grid-column:1/-1;display:grid!important;grid-template-columns:1fr .8fr 1.2fr;gap:10px;padding:9px 11px;background:#392165eb;color:#fff;border:2px solid #26194c;border-radius:13px;box-shadow:0 3px 0 #29204f30}.flight-vitals>div{height:auto!important;background:none!important;overflow:visible!important}.flight-vitals strong{font-size:13px;margin:3px 0 0}.flight-vitals span{font-size:8px;color:#ebdfff;letter-spacing:.02em}.integrity-meter>div{margin-top:4px;height:4px!important;background:#ffffff30!important}.integrity-meter>div i{background:var(--amber)!important}
+.hud-button{width:40px;height:40px;background:#ffdc64}.hud-button svg{width:20px;fill:none;stroke:currentColor;stroke-width:3}
+.flight-hint,.toast{position:absolute;z-index:4;left:50%;transform:translateX(-50%);background:#452493;color:#fff;border:2px solid var(--navy);border-radius:15px;padding:10px 13px;font-size:11px;font-weight:900;max-width:92%;text-align:center;pointer-events:none;box-shadow:0 4px 0 #29204f35}.flight-hint{bottom:110px;white-space:normal}.toast{top:40%;background:#ffdd5e;color:var(--navy);white-space:nowrap;transform:translateX(-50%) rotate(-3deg)}
+.brake-button{position:absolute;z-index:4;right:13px;bottom:18%;min-height:46px;max-width:58%;padding:10px 13px;border:2px solid var(--navy);border-radius:15px;background:#ffe069;color:var(--navy);font-size:10px;font-weight:950;box-shadow:0 4px 0 #a46b23;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}.brake-button:active,.brake-button[aria-pressed=true],.brake-button.is-active{background:#fff4c5;transform:translateY(3px);box-shadow:0 1px 0 #a46b23}.brake-button:disabled{opacity:.55;cursor:default}
+.modal-card{position:absolute;z-index:5;inset:50% auto auto 50%;transform:translate(-50%,-50%);width:calc(100% - 44px);padding:23px;background:#fff9edf9;border:3px solid var(--navy);border-radius:27px;text-align:center;box-shadow:0 8px 0 #29204f55,0 18px 50px #29204f40}.modal-card>span{font-size:10px;font-weight:900;letter-spacing:.1em;color:var(--accent)}.modal-card h2{font-size:33px;letter-spacing:-.04em;margin:8px 0}.modal-card>p{font-size:12px;line-height:1.5;color:#6a597e}
+.damage-hero{margin:15px 0 12px;padding:16px;background:linear-gradient(135deg,#843feb,#5429b9);color:#fff;border:2px solid var(--navy);border-radius:20px;box-shadow:0 5px 0 #d6c2ea;transform:rotate(-2deg)}.damage-hero strong{display:block;font-size:55px;font-weight:950;line-height:.95;letter-spacing:-.05em;color:#ffe269;text-shadow:0 3px 0 #452493}.damage-hero span{display:block;margin-top:6px;font-size:10px;font-weight:900;letter-spacing:.15em}.modal-card dl{display:grid;grid-template-columns:repeat(2,1fr);margin:16px 0 20px;gap:7px}.modal-card dl div{background:#eee3ff;padding:9px;border-radius:12px}.modal-card dt{font-size:8px;font-weight:800;letter-spacing:.06em}.modal-card dd{margin:4px 0 0;font-size:16px;font-weight:900}
+.controls-caption{text-align:center;color:#dfd0fb;font-size:9px;margin:14px 0 0;line-height:1.4}.controls-caption b{color:#fff0a6}.controls-caption span{margin:0 4px}
+.briefing ol{list-style:none;padding:0;margin:19px 0}.briefing li{display:flex;gap:11px;padding:13px 0;border-bottom:2px dashed #dccce9}.briefing li>b{display:grid;place-items:center;flex:0 0 28px;height:28px;font-size:11px;background:#ffcae1;border:2px solid var(--navy);border-radius:10px;transform:rotate(-6deg)}.briefing li:nth-child(2)>b{background:#66e1f0;transform:rotate(7deg)}.briefing li:nth-child(3)>b{background:#ffdf63}.briefing li strong{display:block;font-size:13px;color:var(--navy);margin-bottom:3px}.briefing li span{font-size:11px;line-height:1.45;color:#715c85}
+.legend{display:grid;gap:10px}.legend>div{display:flex;gap:10px;align-items:center;padding:10px;background:#fff;border:2px solid #dfcfef;border-radius:16px}.legend p{margin:0}.legend strong,.legend small{display:block;font-size:9px}.legend small{margin-top:4px;color:#705d85;line-height:1.4}
+.pickup-mark,.threat-mark{flex:0 0 34px;width:34px;height:37px;display:grid;place-items:center;font-size:21px;font-weight:950;border-radius:12px;border:2px solid var(--navy);background:var(--cyan);box-shadow:inset 0 3px 0 #ffffff70,0 3px 0 #29204f30;transform:rotate(-8deg)}.boost-mark{background:var(--amber);transform:rotate(7deg)}.threat-mark{background:#ff748c;border-radius:50% 50% 9px 9px;transform:rotate(10deg)}
+.controls-card{margin-top:18px;padding:14px;background:#eee4ff;border-radius:16px;border:2px solid #d9c6ef}.controls-card p{font-size:11px;line-height:1.5;margin:8px 0;color:#705d85}.controls-card b{color:var(--navy)}
+body:not([data-phase=build]) .build-panel{display:none}body:not([data-phase=build]) .mission-standby{display:block}
+.impact{animation:impact-pulse .32s ease-out}.pickup-flash{animation:pickup-pulse .42s ease-out}.milestone{animation:milestone-pulse .6s ease-out}@keyframes impact-pulse{50%{filter:brightness(1.35);transform:scale(.992)}}@keyframes pickup-pulse{50%{box-shadow:inset 0 0 55px #24dfffaa}}@keyframes milestone-pulse{50%{box-shadow:inset 0 0 70px #ffce55aa}}
+#fuel-fill.low{background:var(--coral)}#integrity-fill.low{background:var(--coral)!important}#game-canvas:focus-visible{outline:3px solid var(--amber);outline-offset:-4px}
+@media(max-width:1120px){.console-shell{grid-template-columns:290px 460px}.briefing{display:none}}
+@media(max-width:800px){body:not([data-phase=build]){height:100svh;overflow:hidden}body:not([data-phase=build]) .stage-frame{touch-action:none}.hud-button{width:44px;height:44px}.flight-hud{grid-template-columns:1fr 1fr 44px}.site-header{height:58px;padding:0 16px}.brand svg{width:25px;height:31px}.brand span{font-size:16px}.header-meta span{display:none}.header-meta strong{font-size:8px;padding:7px 9px}.icon-button{width:35px;height:35px;margin-left:11px;border-radius:11px}.console-shell{width:100%;margin:0;display:flex;flex-direction:column;gap:0}.stage-column{order:1;width:100%}.stage-frame{padding:5px 0 0;border:0;border-radius:0;box-shadow:none}.frame-label{padding:0 13px;height:25px;font-size:7px}#stage{width:min(100vw,420px,calc((100svh - 122px) * 21 / 34));margin:auto;border-radius:0;box-shadow:none}.controls-caption{min-height:30px;margin:9px 0 0;font-size:9px}.build-column{order:2;width:min(100% - 24px,420px);margin:14px auto 24px;padding:16px;border-radius:23px}.build-column .section-tag,.build-panel h1,.build-panel .intro{display:none}.briefing{display:none}.mission-standby{margin-bottom:14px}body:not([data-phase=build]) .build-column{display:none}body[data-phase=build] #stage{width:min(100vw,420px,calc(39svh * 21 / 34));border-radius:15px}body[data-phase=build] .stage-frame{width:fit-content;margin:12px auto 0;border:2px solid var(--navy);border-radius:23px;padding:4px 10px 0;box-shadow:0 5px 0 #4824a0}body[data-phase=build] .frame-label{font-size:6px;letter-spacing:0;padding:0 2px}body[data-phase=build] .controls-caption{font-size:7px;min-height:25px;margin-top:7px}.tank-list{grid-template-columns:1fr 1fr;gap:9px}.tank-card{grid-template-columns:32px 1fr;gap:8px;padding:10px 8px;border-radius:14px}.tank-card>svg{display:none}.tank-icon{height:38px;border-radius:10px}.tank-card strong{font-size:13px}.tank-card small{font-size:9px}.workshop{margin-top:14px;padding:10px}.workshop-head>span{max-width:none;font-size:8px}.upgrade-list{grid-template-columns:1fr 1fr;gap:8px}.upgrade-card{grid-template-columns:28px 1fr;gap:6px;padding:8px}.upgrade-icon{width:28px;height:30px;font-size:19px}.upgrade-card strong{font-size:11px}.upgrade-card strong i{font-size:8px}.upgrade-card small{font-size:8px;line-height:1.4}.upgrade-card>b{grid-column:1/-1;text-align:right}.selection-copy{margin:12px 0;padding:9px}.selection-copy span{display:none}.selection-copy strong{font-size:12px}.selection-copy p{font-size:11px}.status-label{font-size:9px;margin-top:12px}.flight-hud{inset:10px 10px auto}.fuel-meter,.altitude-meter{padding:8px 9px}.flight-hint{font-size:10px}.brake-button{right:10px;bottom:18%;font-size:9px;min-height:44px}}
+@media(max-width:370px){.header-meta strong{font-size:7px}.flight-hud{inset:8px 8px auto;gap:6px;grid-template-columns:1fr 1fr 38px}.flight-hud strong{font-size:14px}.flight-vitals{gap:5px;padding:8px}.flight-vitals strong{font-size:11px}.flight-vitals span{font-size:7px}.modal-card{padding:18px;width:calc(100% - 30px)}.modal-card h2{font-size:29px}.controls-caption{font-size:8px}.brake-button{font-size:8px;padding:9px}}
+@media(min-width:801px){body:not([data-phase=build]) .site-header{display:none}body:not([data-phase=build]) .console-shell{margin:8px auto}body:not([data-phase=build]) #stage{width:min(420px,calc((100svh - 104px) * 21 / 34));margin:auto}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+@media(max-height:520px){.flight-hud{gap:6px}.flight-hud strong{font-size:13px;margin:1px 0 4px}.fuel-meter,.altitude-meter{padding:7px 9px}.flight-vitals{padding:7px 9px}}
+</style>
+</head>
+<body data-phase="build">
+  <header class="site-header">
+    <a class="brand" href="#main" aria-label="RocketUP ana ekran">
+      <svg viewBox="0 0 40 46" aria-hidden="true"><path d="M20 2c7 6 11 14 11 23v8H9v-8C9 16 13 8 20 2Z"/><circle cx="20" cy="20" r="5"/><path d="m9 25-6 9 6-1m22-8 6 9-6-1M15 33l5 11 5-11"/></svg>
+      <span><b>ROCKET</b><em>UP</em></span>
+    </a>
+    <div class="header-meta"><span>Gökyüzü yetmez.</span><strong>UÇUŞ SAHASI 01</strong></div>
+    <button id="sound-button" class="icon-button" type="button" aria-label="Sesi aç" aria-pressed="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Zm12-1 5 8m0-8-5 8"/></svg>
+    </button>
+  </header>
+
+  <main id="main" class="console-shell">
+    <aside class="build-column" aria-label="Roket kurulumu">
+      <div class="section-tag"><span>01</span> ROKET ATÖLYESİ</div>
+      <section id="build-panel" class="build-panel">
+        <h1>Göğe çık.<br><em>Sert dön!</em></h1>
+        <p class="intro">Tankını tak, yakıtı kap, bulutları geç. Tırmanışta dört karar seni bekliyor; ne kadar yükselirsen darben o kadar büyür!</p>
+        <div class="tank-list" role="group" aria-label="Yakıt tankı seçimi">
+          <button class="tank-card" type="button" data-tank="compact" aria-pressed="false">
+            <span class="tank-icon tank-icon-compact" aria-hidden="true"><i></i></span>
+            <span><strong>Kompakt</strong><small>6 sn itiş · Çevik</small></span>
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 10 3 3 7-7"/></svg>
+          </button>
+          <button class="tank-card" type="button" data-tank="large" aria-pressed="false">
+            <span class="tank-icon tank-icon-large" aria-hidden="true"><i></i></span>
+            <span><strong>Büyük</strong><small>7,5 sn itiş · Yavaş manevra</small></span>
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 10 3 3 7-7"/></svg>
+          </button>
+        </div>
+        <section class="workshop" aria-labelledby="workshop-title">
+          <div class="workshop-head"><span id="workshop-title">BİR SONRAKİ UÇUŞ DAHA İYİ</span><strong><i aria-hidden="true">◆</i> <span id="credits-value">0</span></strong></div>
+          <div class="upgrade-list">
+            <button id="upgrade-engine" class="upgrade-card" type="button">
+              <span class="upgrade-icon" aria-hidden="true">↟</span>
+              <span><strong>Motor <i id="engine-level">0 / 3</i></strong><small>Daha yükseğe tırman</small></span>
+              <b id="engine-cost">10</b>
+            </button>
+            <button id="upgrade-armor" class="upgrade-card" type="button">
+              <span class="upgrade-icon" aria-hidden="true">⬡</span>
+              <span><strong>Zırh <i id="armor-level">0 / 3</i></strong><small>Dalışta gövdeyi koru</small></span>
+              <b id="armor-cost">10</b>
+            </button>
+          </div>
+        </section>
+        <div class="selection-copy" aria-live="polite">
+          <span>SEÇİLİ PARÇA</span>
+          <strong id="tank-name">Tank bekleniyor</strong>
+          <p id="tank-description">Uçuş karakterini görmek için bir tank seç.</p>
+        </div>
+        <button id="launch-button" class="launch-button" type="button" disabled>
+          <span>Depoyu seç ve hazırlan</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13m-5-5 5 5-5 5"/></svg>
+        </button>
+        <button id="layout-button" class="text-button" type="button">Rota 01</button>
+      </section>
+      <section class="mission-standby" aria-label="Görev hedefi">
+        <span>HEDEFİ ORTALA</span><strong>Yükseklik = darbe</strong>
+        <p>Dönüşte hedefe yönel. Merkeze vurmak daha güçlü; ıskalamak sıfır hasar. Frenle zaman kazan, ama gövden aşınmaya devam eder.</p>
+      </section>
+      <div id="status-label" class="status-label" role="status">Montaj için hazır</div>
+    </aside>
+
+    <section class="stage-column" aria-label="Uçuş ekranı">
+      <div class="stage-frame">
+        <div class="frame-label"><span id="route-label">CANLI ROTA · 01</span><i></i><span>GÖKYÜZÜ SENİN</span></div>
+        <div id="stage">
+          <canvas id="game-canvas" width="420" height="680" tabindex="0" aria-label="RocketUP uçuş sahası" aria-describedby="controls-caption"></canvas>
+          <div id="flight-hud" class="flight-hud" hidden>
+            <div class="fuel-meter"><span>YAKIT</span><strong id="fuel-value">6.0 sn</strong><div><i id="fuel-fill"></i></div></div>
+            <div class="altitude-meter"><span>İRTİFA</span><strong id="altitude-value">0 m</strong><div><i id="progress-fill"></i></div></div>
+            <button id="pause-button" class="hud-button" type="button" aria-label="Oyunu duraklat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6v12m8-12v12"/></svg></button>
+            <div class="flight-vitals">
+              <div class="integrity-meter"><span>GÖVDE</span><strong id="integrity-value">100%</strong><div><i id="integrity-fill"></i></div></div>
+              <div><span>DARBE GÜCÜ</span><strong id="damage-value">0</strong></div>
+              <div><span id="flight-phase">TIRMANIŞ</span><strong id="distance-value">Hedef 0 m</strong></div>
+            </div>
+          </div>
+          <div id="flight-hint" class="flight-hint" hidden>Sağa ve sola sürükle</div>
+          <div id="toast" class="toast" role="status" hidden>+0,6 sn itki</div>
+          <button id="brake-button" class="brake-button" type="button" aria-label="Hava freni: düşüşü yavaşlatmak için basılı tut. Gövde aşınmaya devam eder." hidden>HAVA FRENİ · BASILI TUT</button>
+          <section id="result-panel" class="modal-card" aria-labelledby="result-title" hidden>
+            <span id="result-kicker">GÖREV TAMAMLANDI</span>
+            <h2 id="result-title">Tam isabet.</h2>
+            <p id="result-description">Uzak hedefe darbe ulaştı.</p>
+            <div class="damage-hero"><strong id="result-damage">0</strong><span>HASAR</span></div>
+            <dl class="result-stats"><div><dt>EN YÜKSEK</dt><dd id="result-altitude">0 m</dd></div><div><dt>GÖVDE</dt><dd id="result-integrity">0%</dd></div><div><dt>KAPSÜL</dt><dd id="result-pickups">0</dd></div><div><dt>PARÇA</dt><dd id="result-credits">+0</dd></div></dl>
+            <button id="retry-button" class="launch-button" type="button">Aynı roketle tekrar</button>
+            <button id="rebuild-button" class="text-button" type="button">Tankı değiştir</button>
+          </section>
+          <section id="pause-panel" class="modal-card" aria-labelledby="pause-title" hidden>
+            <span>UÇUŞ BEKLEMEDE</span><h2 id="pause-title">Kısa mola.</h2>
+            <button id="resume-button" class="launch-button" type="button">Uçuşa dön</button>
+            <button id="pause-rebuild-button" class="text-button" type="button">Hangara dön</button>
+          </section>
+        </div>
+        <p id="controls-caption" class="controls-caption"><b>SÜRÜKLE / A D</b> yön ver <span>·</span> <b>4 KARAR</b> tırmanışta <span>·</span> <b>BOŞLUK</b> inişte fren</p>
+      </div>
+    </section>
+
+    <aside class="briefing" aria-label="Görev brifingi">
+      <div class="section-tag"><span>02</span> UÇUŞ PLANI</div>
+      <h2>Daha yükseğe.<br><em>Daha büyük darbe.</em></h2>
+      <ol>
+        <li><b>01</b><span><strong>Tankını tak</strong>Yakıt ya da çeviklik seç.</span></li>
+        <li><b>02</b><span><strong>Dört kararı ver</strong>Rota · Korunan hat · Bariyer · Zirve. Tek hamle: yön ver. Yakıt/itki al, önleyiciden kaç.</span></li>
+        <li><b>03</b><span><strong>Hedefi ortala</strong>Düşerken yön ver. Merkez daha güçlü, ıska sıfır hasar.</span></li>
+      </ol>
+      <div class="legend">
+        <div><span class="pickup-mark" aria-hidden="true">+</span><p><strong>YAKIT KAPSÜLÜ</strong><small>+0,6 sn motor süresi · motor açıkken en değerli</small></p></div>
+        <div><span class="pickup-mark boost-mark" aria-hidden="true">↑</span><p><strong>İTKİ KAPSÜLÜ</strong><small>Kısa hız artışı · süzülüşte tam kazanç</small></p></div>
+        <div><span class="threat-mark" aria-hidden="true">!</span><p><strong>ÖNLEYİCİ</strong><small>Şeritli uyarıdan uzaklaş · zirvede şeridine kilitlenir</small></p></div>
+      </div>
+      <div class="controls-card"><span>KONTROLLER</span><p><b>Sürükle / A D / ← →</b> yön ver</p><p><b>Düşüşte Boşluk / hava freni</b> basılı tut</p><p>Fren düşüşü yavaşlatır, nişan almak için zaman kazandırır. Gövde aşınması sürer!</p></div>
+    </aside>
+  </main>
+
+  <script>
+(function (root, factory) {
+  var api = factory();
+  if (typeof module === "object" && module.exports) module.exports = api;
+  if (root) root.RocketSim = api;
+})(typeof window !== "undefined" ? window : globalThis, function () {
+  "use strict";
+
+  var MIN_X = 0.08, MAX_X = 0.92, MAX_STEP = 1 / 120;
+  var GRAVITY = 42, THRUST = 72, MAX_UP_SPEED = 200, BOOST_MAX_SPEED = 240;
+  // A boost above the powered speed cap is a short surge: it fades toward the cap while the engine runs.
+  var BOOST_IMPULSE = 35, BOOST_FADE = 1.6;
+  // 1M4C encounter: one mechanic (steer) and four staged decisions during ascent.
+  // Stage altitudes scale with the build's no-pickup engine cutoff altitude so every build meets all four.
+  var STAGE_TEACH = 0.2, STAGE_ROUTE = 0.4, STAGE_GUARDED = 0.75, GUARD_WARN_LEAD = 330;
+  var WARNING_LEAD = 0.7, STAGE_THREAT_GAP = 400, APEX_THREAT_GAP = 650;
+  var PICKUP_X_RADIUS = 0.055, PICKUP_ALT_RADIUS = 26;
+  var THREAT_X_RADIUS = 0.055, THREAT_ALT_RADIUS = 28;
+  var TARGET_RADIUS = 0.13, EPSILON = 1e-9;
+
+  var TANKS = Object.freeze({
+    compact: Object.freeze({ label: "Compact", capacity: 6, speed: 0.75 }),
+    large: Object.freeze({ label: "Large", capacity: 7.5, speed: 0.48 })
+  });
+
+  function mirror(x, layout) { return layout === 1 ? 1 - x : x; }
+
+  function makeThreat(id, x, warnAltitude, spawnWhen, spawnGap) {
+    return {
+      id: id, x: x, lockX: false, stage: null,
+      warnAltitude: warnAltitude, spawnWhen: spawnWhen, spawnGap: spawnGap,
+      warningAt: null, spawnAt: null,
+      verticalSpeed: 220, active: false, altitude: null, spawnAltitude: null,
+      warned: false, passed: false
+    };
+  }
+
+  // Altitude where an unassisted powered ascent runs out of fuel (closed form of verticalResult).
+  function cutoffAltitude(capacity, engine) {
+    var acceleration = THRUST + engine * 4 - GRAVITY;
+    var toCap = Math.min(capacity, (MAX_UP_SPEED - 80) / acceleration);
+    return 20 + 80 * toCap + 0.5 * acceleration * toCap * toCap + MAX_UP_SPEED * (capacity - toCap);
+  }
+
+  function createRun(tankId, layout, upgrades) {
+    if (layout === undefined) layout = 0;
+    upgrades = upgrades || {};
+    var engine = clamp(Math.floor(upgrades.engine || 0), 0, 3);
+    var armor = clamp(Math.floor(upgrades.armor || 0), 0, 3);
+    var tank = TANKS[tankId];
+    if (!tank) throw new Error("Unknown tank: " + tankId);
+    var capacity = tank.capacity + engine;
+    var cutoff = cutoffAltitude(capacity, engine);
+    var maxIntegrity = (tankId === "compact" ? 90 : 110) + armor * 25;
+    return {
+      tankId: tankId, phase: "flying", time: 0, x: mirror(0.28, layout),
+      vx: 0, bank: 0, braking: false, aimQuality: 0,
+      fuel: capacity, capacity: capacity,
+      altitude: 20, vy: 80, peakAltitude: 20, flightMode: "powered",
+      integrity: maxIntegrity, maxIntegrity: maxIntegrity,
+      potentialDamage: 33, damage: 0, distance: 0, targetDistance: 4800,
+      creditsEarned: 0, upgrades: { engine: engine, armor: armor },
+      target: { x: mirror(0.72, layout), altitude: 0, radius: TARGET_RADIUS, distance: 4800, revealed: false },
+      pickups: [
+        // Teaching capsule: the fuel bar visibly refills before the first decision.
+        fuelPickup("fuel-teach", mirror(0.5, layout), cutoff * STAGE_TEACH),
+        // Decision 1 (route): fuel or boost at the same altitude; both cannot be reached.
+        fuelPickup("fuel-route", mirror(0.28, layout), cutoff * STAGE_ROUTE),
+        boostPickup("boost-route", mirror(0.72, layout), cutoff * STAGE_ROUTE),
+        // Decision 2 (guarded): two capsules stacked in an interceptor lane.
+        fuelPickup("fuel-guarded-1", mirror(0.34, layout), cutoff * STAGE_GUARDED - 70),
+        fuelPickup("fuel-guarded-2", mirror(0.34, layout), cutoff * STAGE_GUARDED),
+        // Decision 3 (barrier): two capsules between two interceptor lanes, one capsule wide.
+        fuelPickup("fuel-gap-1", mirror(0.5, layout), cutoff + 90),
+        fuelPickup("fuel-gap-2", mirror(0.5, layout), cutoff + 160),
+        fuelPickup("fuel-wide", mirror(0.84, layout), cutoff + 125)
+      ],
+      threats: [
+        stageThreat("interceptor-guard", mirror(0.34, layout), 2,
+          cutoff * STAGE_GUARDED - GUARD_WARN_LEAD, cutoff * STAGE_GUARDED - 70, STAGE_THREAT_GAP),
+        stageThreat("interceptor-barrier-1", mirror(0.36, layout), 3, cutoff - 350, cutoff - 60, STAGE_THREAT_GAP),
+        stageThreat("interceptor-barrier-2", mirror(0.64, layout), 3, cutoff - 350, cutoff - 60, STAGE_THREAT_GAP)
+      ],
+      // Decision 4 (apex) spawns once the engine is off above the cutoff band: see emitTriggers.
+      stages: {
+        cutoffAltitude: cutoff,
+        announce: { route: cutoff * STAGE_ROUTE - 200, guarded: cutoff * STAGE_GUARDED - GUARD_WARN_LEAD, barrier: cutoff - 350 },
+        marks: { route: cutoff * STAGE_ROUTE, guarded: cutoff * STAGE_GUARDED, barrier: cutoff + 125, apex: null },
+        apexTrigger: cutoff + 260, announced: {}, apexSpawned: false
+      },
+      stage: 0,
+      events: [], outcome: null, collected: 0,
+      _engineOn: true, _apexRecorded: false, _milestone: 500
+    };
+  }
+
+  function stageThreat(id, x, stage, warnAltitude, spawnWhen, spawnGap) {
+    var threat = makeThreat(id, x, warnAltitude, spawnWhen, spawnGap);
+    threat.stage = stage;
+    return threat;
+  }
+
+  function fuelPickup(id, x, altitude) {
+    return { id: id, type: "fuel", kind: "fuel", x: x, altitude: altitude, collected: false };
+  }
+
+  function boostPickup(id, x, altitude) {
+    return { id: id, type: "boost", kind: "boost", x: x, altitude: altitude, collected: false };
+  }
+
+  function clamp(value, low, high) { return Math.max(low, Math.min(high, value)); }
+
+  function bandInterval(start, end, center, radius) {
+    var delta = end - start;
+    if (Math.abs(delta) <= EPSILON) {
+      return Math.abs(start - center) <= radius + EPSILON ? [0, 1] : null;
+    }
+    var a = (center - radius - start) / delta;
+    var b = (center + radius - start) / delta;
+    var low = Math.max(0, Math.min(a, b));
+    var high = Math.min(1, Math.max(a, b));
+    return low <= high + EPSILON ? [low, high] : null;
+  }
+
+  function sweptContact(x0, x1, x, xRadius, y0, y1, y, yRadius) {
+    var horizontal = bandInterval(x0, x1, x, xRadius);
+    var vertical = bandInterval(y0, y1, y, yRadius);
+    if (!horizontal || !vertical) return null;
+    var first = Math.max(horizontal[0], vertical[0]);
+    return first <= Math.min(horizontal[1], vertical[1]) + EPSILON ? first : null;
+  }
+
+  function announceStage(run, stage, id) {
+    if (!run.stages || run.stages.announced[id]) return;
+    run.stages.announced[id] = true;
+    run.stage = Math.max(run.stage, stage);
+    run.events.push({ type: "stage", time: run.time, x: run.x, stage: stage, id: id });
+  }
+
+  function emitTriggers(run) {
+    var ascending = run.vy > 0;
+    if (run.stages && ascending) {
+      var announce = run.stages.announce;
+      if (run.altitude >= announce.route - EPSILON) announceStage(run, 1, "route");
+      if (run.altitude >= announce.guarded - EPSILON) announceStage(run, 2, "guarded");
+      if (run.altitude >= announce.barrier - EPSILON) announceStage(run, 3, "barrier");
+      if (!run.stages.apexSpawned && run.fuel <= EPSILON && run.altitude >= run.stages.apexTrigger - EPSILON) {
+        spawnApexDecision(run);
+      }
+    }
+    run.threats.forEach(function (threat) {
+      if (!threat.warned) {
+        var due = threat.warnAltitude != null
+          ? ascending && run.altitude >= threat.warnAltitude - EPSILON
+          : threat.warningAt != null && run.time >= threat.warningAt - EPSILON;
+        if (!due) return;
+        threat.warned = true;
+        if (threat.warningAt == null) threat.warningAt = run.time;
+        if (threat.lockX) threat.x = clamp(run.x, MIN_X, MAX_X);
+        if (threat.spawnWhen == null && threat.spawnAt == null) threat.spawnAt = threat.warningAt + WARNING_LEAD;
+        run.events.push({ type: "warning", time: threat.warningAt, x: threat.x, stage: threat.stage });
+      }
+      if (!threat.active && !threat.passed) {
+        var spawn = threat.spawnWhen != null
+          ? run.altitude >= threat.spawnWhen - EPSILON
+          : threat.spawnAt != null && run.time >= threat.spawnAt - EPSILON;
+        if (!spawn) return;
+        threat.active = true;
+        threat.altitude = run.altitude + (threat.spawnGap || 650);
+        threat.spawnAltitude = threat.altitude;
+      }
+    });
+  }
+
+  // Decision 4: after engine cutoff an interceptor locks onto the current lane. A boost waits
+  // in that lane (large gain while coasting); a fuel capsule waits safely to the side.
+  function spawnApexDecision(run) {
+    run.stages.apexSpawned = true;
+    run.stages.marks.apex = run.altitude + 170;
+    var laneX = clamp(run.x, MIN_X, MAX_X);
+    var sideX = clamp(laneX + (laneX < 0.5 ? 0.24 : -0.24), MIN_X, MAX_X);
+    run.pickups.push(boostPickup("boost-apex", laneX, run.altitude + 170));
+    run.pickups.push(fuelPickup("fuel-apex", sideX, run.altitude + 190));
+    var threat = makeThreat("interceptor-apex", laneX, null, null, APEX_THREAT_GAP);
+    threat.stage = 4; threat.lockX = true;
+    threat.warned = true; threat.warningAt = run.time; threat.spawnAt = run.time + WARNING_LEAD;
+    run.threats.push(threat);
+    run.events.push({ type: "warning", time: run.time, x: laneX, stage: 4 });
+    announceStage(run, 4, "apex");
+  }
+
+  function nextBoundary(run, maximum) {
+    var boundary = maximum;
+    run.threats.forEach(function (threat) {
+      if (!threat.warned && threat.warningAt != null && threat.warningAt > run.time + EPSILON) {
+        boundary = Math.min(boundary, threat.warningAt - run.time);
+      }
+      if (threat.warned && !threat.active && !threat.passed && threat.spawnAt != null && threat.spawnAt > run.time + EPSILON) {
+        boundary = Math.min(boundary, threat.spawnAt - run.time);
+      }
+    });
+    if (run.fuel > EPSILON) boundary = Math.min(boundary, run.fuel);
+    return boundary;
+  }
+
+  function finish(run, time, x, outcome, altitude, vy) {
+    run.time = time; run.x = x;
+    run.altitude = altitude === undefined ? 0 : altitude;
+    run.vy = vy === undefined ? 0 : vy;
+    run.phase = "finished"; run.outcome = outcome;
+    run.damage = outcome === "success"
+      ? Math.round(run.potentialDamage * (0.25 + 0.75 * run.integrity / run.maxIntegrity) * run.aimQuality) : 0;
+    run.creditsEarned = Math.max(3, Math.floor(run.peakAltitude / 180)) +
+      Math.floor(run.damage / 14);
+    run.events.push({ type: "finish", time: time, x: x, outcome: outcome });
+  }
+
+  function verticalResult(run, duration) {
+    var powered = run.fuel > EPSILON;
+    var acceleration = powered ? (THRUST + run.upgrades.engine * 4) * Math.cos(run.bank) - GRAVITY : -GRAVITY;
+    if (run.braking) acceleration += Math.max(0, -run.vy - 105) * 2.8;
+    var oldVy = run.vy, newVy = oldVy + acceleration * duration;
+    var gain;
+    if (powered && oldVy > MAX_UP_SPEED + EPSILON) {
+      var excess = oldVy - MAX_UP_SPEED, keep = Math.exp(-duration / BOOST_FADE);
+      newVy = MAX_UP_SPEED + excess * keep;
+      gain = MAX_UP_SPEED * duration + excess * BOOST_FADE * (1 - keep);
+    } else if (powered && oldVy >= MAX_UP_SPEED - EPSILON) {
+      gain = oldVy * duration;
+      newVy = oldVy;
+    } else if (powered && oldVy < MAX_UP_SPEED && newVy > MAX_UP_SPEED) {
+      var toCap = (MAX_UP_SPEED - oldVy) / acceleration;
+      gain = oldVy * toCap + 0.5 * acceleration * toCap * toCap;
+      gain += MAX_UP_SPEED * (duration - toCap);
+      newVy = MAX_UP_SPEED;
+    } else {
+      if (powered) newVy = Math.min(newVy, MAX_UP_SPEED);
+      gain = oldVy * duration + 0.5 * acceleration * duration * duration;
+    }
+    return { altitude: run.altitude + gain, vy: newVy, oldVy: oldVy };
+  }
+
+  function simulateSlice(run, duration, desiredX, brake) {
+    var oldTime = run.time, oldX = run.x, oldAltitude = run.altitude;
+    var targetX = clamp(Number.isFinite(desiredX) ? desiredX : oldX, MIN_X, MAX_X);
+    var speed = TANKS[run.tankId].speed;
+    var desiredVelocity = clamp((targetX - oldX) * 6, -speed, speed);
+    var response = run.tankId === "compact" ? 8 : 5;
+    run.vx += (desiredVelocity - run.vx) * (1 - Math.exp(-response * duration));
+    var newX = clamp(oldX + run.vx * duration, MIN_X, MAX_X);
+    if (newX === MIN_X || newX === MAX_X) run.vx = 0;
+    run.bank += (clamp(run.vx * 1.2, -0.55, 0.55) - run.bank) * (1 - Math.exp(-8 * duration));
+    run.braking = Boolean(brake && run.vy < 0);
+    var vertical = verticalResult(run, duration);
+    var newAltitude = vertical.altitude;
+
+    if (run.fuel > EPSILON) run.fuel = Math.max(0, run.fuel - duration);
+    run.threats.forEach(function (threat) {
+      if (threat.active) threat.altitude -= threat.verticalSpeed * duration;
+    });
+
+    var contacts = [];
+    // Pickups belong to the ascent decisions; the descent is for aiming, so a skipped fork item stays skipped.
+    var collecting = vertical.oldVy > 0 || vertical.vy > 0;
+    run.pickups.forEach(function (pickup) {
+      if (pickup.collected || !collecting) return;
+      var fraction = sweptContact(oldX, newX, pickup.x, PICKUP_X_RADIUS,
+        oldAltitude, newAltitude, pickup.altitude, PICKUP_ALT_RADIUS);
+      if (fraction !== null) contacts.push({ type: "pickup", fraction: fraction, item: pickup });
+    });
+    run.threats.forEach(function (threat) {
+      if (!threat.active || threat.passed) return;
+      var oldThreatAltitude = threat.altitude + threat.verticalSpeed * duration;
+      var fraction = sweptContact(oldX, newX, threat.x, THREAT_X_RADIUS,
+        oldAltitude - oldThreatAltitude, newAltitude - threat.altitude, 0, THREAT_ALT_RADIUS);
+      if (fraction !== null) contacts.push({ type: "threat", fraction: fraction, item: threat });
+    });
+    contacts.sort(function (a, b) {
+      return a.fraction - b.fraction || (a.type === "threat" ? -1 : 1);
+    });
+
+    for (var i = 0; i < contacts.length; i += 1) {
+      var contact = contacts[i];
+      if (contact.type === "threat" && !contact.item.passed) {
+        contact.item.active = false; contact.item.passed = true;
+        run.integrity = Math.max(0, run.integrity - 25);
+        run.events.push({ type: "damage", time: oldTime + duration * contact.fraction,
+          x: contact.item.x, amount: 25, source: "interceptor" });
+        if (run.integrity <= EPSILON) {
+          finish(run, oldTime + duration * contact.fraction,
+            oldX + (newX - oldX) * contact.fraction, "destroyed",
+            oldAltitude + (newAltitude - oldAltitude) * contact.fraction,
+            vertical.oldVy + (vertical.vy - vertical.oldVy) * contact.fraction);
+          return;
+        }
+        continue;
+      }
+      if (!contact.item.collected) {
+        contact.item.collected = true;
+        var amount = contact.item.kind === "boost" ? BOOST_IMPULSE : Math.min(0.6, run.capacity - run.fuel);
+        if (contact.item.kind === "boost") {
+          vertical.vy = Math.min(BOOST_MAX_SPEED, vertical.vy + amount);
+        }
+        else run.fuel += amount;
+        run.collected += 1; run._engineOn = run.fuel > EPSILON;
+        run.events.push({ type: "pickup", time: oldTime + duration * contact.fraction,
+          x: contact.item.x, kind: contact.item.kind, amount: amount, id: contact.item.id });
+      }
+    }
+
+    if (run.phase !== "flying") return;
+    run.time = oldTime + duration; run.x = newX;
+    run.altitude = newAltitude; run.vy = vertical.vy;
+
+    if (!run._apexRecorded && vertical.oldVy > 0 && run.vy <= 0) {
+      var acceleration = (vertical.vy - vertical.oldVy) / duration;
+      var apexOffset = -vertical.oldVy / acceleration;
+      var apexAltitude = oldAltitude + vertical.oldVy * apexOffset +
+        0.5 * acceleration * apexOffset * apexOffset;
+      run._apexRecorded = true;
+      run.target.revealed = true;
+      run.peakAltitude = Math.max(run.peakAltitude, apexAltitude);
+      run.events.push({ type: "apex", time: oldTime + apexOffset, x: newX });
+    } else {
+      run.peakAltitude = Math.max(run.peakAltitude, run.altitude);
+    }
+    run.potentialDamage = Math.round(30 + run.peakAltitude * 0.16);
+
+    while (run.altitude >= run._milestone && vertical.oldVy > 0) {
+      run.events.push({ type: "altitude_milestone", time: run.time, x: run.x,
+        altitude: run._milestone, damage: Math.round(30 + run._milestone * 0.16) });
+      run._milestone += 500;
+    }
+
+    if (run._engineOn && run.fuel <= EPSILON) {
+      run._engineOn = false;
+      run.events.push({ type: "engine_cutoff", time: run.time, x: run.x });
+    }
+    run.flightMode = run.fuel > EPSILON ? "powered" : run.vy > 0 ? "coasting" : "descending";
+
+    var descendingDuration = 0;
+    if (vertical.oldVy < 0) descendingDuration = duration;
+    else if (run.vy < 0) descendingDuration = duration * (-run.vy / (vertical.oldVy - run.vy));
+    // Provisional tuning: wear grows with speed and peak height, but slower than potential damage,
+    // so surviving extra altitude is rewarded while interceptor hits stay costly.
+    var wear = descendingDuration *
+      (1.5 + Math.abs(Math.min(run.vy, 0)) / 140 + run.peakAltitude / 3000) /
+      (1 + run.upgrades.armor * 0.12);
+    var integrityBeforeWear = run.integrity;
+    run.integrity = Math.max(0, run.integrity - wear);
+
+    if (run.integrity <= EPSILON) {
+      var wearFraction = integrityBeforeWear > 0 && wear > 0
+        ? 1 - descendingDuration / duration + descendingDuration / duration * integrityBeforeWear / wear
+        : 1;
+      finish(run, oldTime + duration * wearFraction,
+        oldX + (newX - oldX) * wearFraction, "destroyed",
+        oldAltitude + (newAltitude - oldAltitude) * wearFraction,
+        vertical.oldVy + (run.vy - vertical.oldVy) * wearFraction);
+      return;
+    }
+
+    run.distance = Math.max(run.distance, run._apexRecorded && run.peakAltitude > 0
+      ? Math.min(run.targetDistance, 1800 + 3000 * (1 - Math.max(0, run.altitude) / run.peakAltitude))
+      : Math.min(1800, run.altitude));
+
+    if (oldAltitude > 0 && run.altitude <= 0 && vertical.oldVy < 0) {
+      var groundFraction = oldAltitude / (oldAltitude - run.altitude);
+      var groundX = oldX + (newX - oldX) * groundFraction;
+      var aimError = Math.abs(groundX - run.target.x) / run.target.radius;
+      run.aimQuality = aimError <= 1 ? 1 - 0.45 * aimError : 0;
+      run.distance = run.targetDistance;
+      finish(run, oldTime + duration * groundFraction, groundX, aimError <= 1 ? "success" : "miss");
+      return;
+    }
+    run.threats.forEach(function (threat) {
+      if (threat.active && !threat.nearMiss && threat.altitude < run.altitude - THREAT_ALT_RADIUS) {
+        threat.nearMiss = true;
+        if (Math.abs(threat.x - run.x) < 0.18) {
+          run.events.push({ type: "near_miss", time: run.time, x: run.x });
+        }
+      }
+      if (threat.active && threat.altitude < -THREAT_ALT_RADIUS) {
+        threat.active = false; threat.passed = true;
+      }
+    });
+  }
+
+  function step(run, dt, desiredX, brake) {
+    if (run.phase !== "flying" || !(dt > 0)) return run;
+    var remaining = dt;
+    while (remaining > EPSILON && run.phase === "flying") {
+      emitTriggers(run);
+      var duration = nextBoundary(run, Math.min(MAX_STEP, remaining));
+      if (duration <= EPSILON) duration = Math.min(MAX_STEP, remaining);
+      simulateSlice(run, duration, desiredX, brake);
+      remaining -= duration;
+      if (run.phase === "flying") emitTriggers(run);
+    }
+    return run;
+  }
+
+  function setPaused(run, paused) {
+    if (run.phase === "finished") return run;
+    run.phase = paused ? "paused" : "flying";
+    return run;
+  }
+
+  return { TANKS: TANKS, createRun: createRun, step: step, setPaused: setPaused, cutoffAltitude: cutoffAltitude };
+});
+
+</script>
+  <script>
+/* Original vector art. Canvas coordinates are always 420 x 680. */
+(() => {
+  const W = 420, H = 680, WORLD_SCALE = .55;
+  const ink = '#382568', accent = '#ff8b24', cream = '#fff8df';
+  const mix = (a, b, t) => `rgb(${a.map((v, i) => Math.round(v + (b[i] - v) * t)).join(',')})`;
+  function rounded(ctx, x, y, w, h, r, fill, stroke) {
+    ctx.beginPath(); ctx.roundRect(x, y, w, h, r);
+    if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+    if (stroke) { ctx.strokeStyle = stroke; ctx.stroke(); }
+  }
+  function path(ctx, points, fill, stroke) {
+    ctx.beginPath(); points.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y));
+    ctx.closePath(); if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+    if (stroke) { ctx.strokeStyle = stroke; ctx.stroke(); }
+  }
+  function label(ctx, text, x, y, size = 11, color = ink, align = 'left') {
+    ctx.font = `800 ${size}px system-ui, sans-serif`; ctx.fillStyle = color;
+    ctx.textAlign = align; ctx.fillText(text, x, y);
+  }
+  function cloud(ctx, x, y, s, opacity) {
+    ctx.save(); ctx.translate(x, y); ctx.scale(s, s); ctx.globalAlpha = opacity;
+    ctx.fillStyle = '#a2c5ff'; ctx.beginPath();
+    ctx.ellipse(0, 13, 47, 17, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#fffaff'; ctx.beginPath();
+    ctx.ellipse(0, 5, 44, 13, 0, 0, Math.PI * 2);
+    ctx.ellipse(-15, -2, 20, 17, 0, 0, Math.PI * 2);
+    ctx.ellipse(12, -7, 27, 23, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+  }
+  function rocket(ctx, x, y, tank, flame, clock, scale = 1, lean = 0) {
+    ctx.save(); ctx.translate(x, y); ctx.rotate(lean); ctx.scale(scale, scale);
+    ctx.lineWidth = 2.5; ctx.lineJoin = 'round';
+    const heavy = tank === 'large', half = heavy ? 23 : 18;
+    if (flame) {
+      const f = 6 * Math.sin(clock * 41), length = 40 + f;
+      const glow = ctx.createRadialGradient(0, 68, 2, 0, 68, 52);
+      glow.addColorStop(0, '#ff9a2490'); glow.addColorStop(1, '#ff9a2400');
+      ctx.fillStyle = glow; ctx.fillRect(-52, 32, 104, 110);
+      path(ctx, [[-13, 43], [-12, 68], [0, 56 + length], [12, 68], [13, 43]], '#ff6234');
+      path(ctx, [[-9, 44], [-7, 64], [0, 83 + f / 2], [7, 64], [9, 44]], '#ffdc3d');
+      path(ctx, [[-4, 44], [0, 67 + f / 2], [4, 44]], '#fffbe8');
+    }
+    path(ctx, [[-15, 9], [-36, 29], [-35, 49], [-14, 39]], '#9b57ef', ink);
+    path(ctx, [[15, 9], [36, 29], [35, 49], [14, 39]], '#7042cb', ink);
+    path(ctx, [[-19, 20], [-30, 33], [-30, 40], [-22, 35]], '#d6a1ff');
+    rounded(ctx, -14, 32, 28, 17, 5, '#53308c', ink);
+    rounded(ctx, -11, 45, 22, 6, 3, '#2c2256');
+    const body = ctx.createLinearGradient(-half, 0, half, 0);
+    body.addColorStop(0, '#ff942a'); body.addColorStop(.34, '#ffe663'); body.addColorStop(.65, '#ffcd36'); body.addColorStop(1, '#f78823');
+    rounded(ctx, -half, -36, half * 2, 76, 15, body, ink);
+    ctx.beginPath(); ctx.moveTo(-half + 1, -28); ctx.quadraticCurveTo(-half, -47, 0, -62);
+    ctx.quadraticCurveTo(half, -47, half - 1, -28); ctx.closePath(); ctx.fillStyle = '#ff633f'; ctx.fill();
+    ctx.strokeStyle = ink; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-half + 7, -33); ctx.quadraticCurveTo(-half + 6, -43, -3, -52);
+    ctx.strokeStyle = '#ffbc8a'; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.stroke(); ctx.lineWidth = 2.5;
+    rounded(ctx, -half + 1, -5, half * 2 - 2, heavy ? 32 : 25, 7, tank ? '#2fd0ec' : '#eee2ff', ink);
+    if (!tank) {
+      ctx.save(); ctx.setLineDash([3, 3]); rounded(ctx, -half - 3, -10, half * 2 + 6, 32, 6, null, '#8c64ce'); ctx.restore();
+      label(ctx, '+', 0, 12, 17, ink, 'center');
+    } else {
+      rounded(ctx, -half + 5, 0, 4, 15, 2, '#b6ffff');
+      label(ctx, heavy ? 'L' : 'S', 4, 14, 12, '#24547a', 'center');
+    }
+    ctx.beginPath(); ctx.arc(0, -18, 9, 0, Math.PI * 2); ctx.fillStyle = '#5a3999'; ctx.fill();
+    ctx.beginPath(); ctx.arc(0, -18, 6.5, 0, Math.PI * 2); ctx.fillStyle = '#23c9f6'; ctx.fill();
+    ctx.beginPath(); ctx.arc(-2, -20, 2.6, 0, Math.PI * 2); ctx.fillStyle = '#edffff'; ctx.fill();
+    rounded(ctx, -3, 23, 6, 19, 3, '#8650dc', ink); ctx.restore();
+  }
+  function fuel(ctx, x, y, clock, kind = 'fuel') {
+    ctx.save(); ctx.translate(x, y); ctx.rotate(Math.sin(clock * 2) * .06); ctx.lineWidth = 2.5;
+    if (kind === 'boost') {
+      ctx.rotate(Math.PI / 4); rounded(ctx, -19, -15, 38, 38, 10, '#bf6421'); rounded(ctx, -19, -19, 38, 38, 10, '#ffcc2e', '#e77b27'); ctx.rotate(-Math.PI / 4);
+      path(ctx, [[3, -14], [-9, 2], [-1, 2], [-4, 14], [10, -3], [2, -3]], '#fffaf0');
+      label(ctx, 'İTKİ', 0, 37, 10, '#5c2d83', 'center'); ctx.restore(); return;
+    }
+    ctx.beginPath(); ctx.arc(0, 0, 24 + Math.sin(clock * 3) * 2, 0, Math.PI * 2);
+    ctx.fillStyle = '#e9ffff77'; ctx.fill(); ctx.strokeStyle = '#ffffffaa'; ctx.stroke();
+    rounded(ctx, -7, -21, 14, 8, 3, '#4b46a0');
+    rounded(ctx, -14, -13, 28, 32, 8, '#168ec8', '#3c4190');
+    rounded(ctx, -13, -14, 26, 29, 7, '#46e2ff', '#3c4190');
+    rounded(ctx, -9, -10, 4, 11, 2, '#cfffff');
+    path(ctx, [[2, -9], [-6, 2], [0, 2], [-2, 11], [7, -1], [1, -1]], '#409bc5');
+    label(ctx, '+0,6', 0, 36, 10, '#373071', 'center'); ctx.restore();
+  }
+  function interceptor(ctx, x, y) {
+    ctx.save(); ctx.translate(x, y); ctx.lineWidth = 2.5;
+    path(ctx, [[-8, -30], [0, -60], [8, -30]], '#ffb843');
+    path(ctx, [[-4, -30], [0, -46], [4, -30]], '#fff4b8');
+    path(ctx, [[-7, -24], [-21, -35], [-19, -10], [-7, -5]], '#8d39a7', ink);
+    path(ctx, [[7, -24], [21, -35], [19, -10], [7, -5]], '#8d39a7', ink);
+    rounded(ctx, -11, -33, 22, 42, 8, '#ff517b', ink);
+    rounded(ctx, -7, -28, 4, 18, 2, '#ffb5cd');
+    path(ctx, [[-10, 6], [0, 29], [10, 6]], '#5a2d7e', ink);
+    rounded(ctx, -9, -5, 18, 6, 2, '#fff1ab'); ctx.restore();
+  }
+  function target(ctx, x, y, clock) {
+    ctx.save(); ctx.translate(x, y); ctx.lineWidth = 3;
+    ctx.fillStyle = '#59368b55'; ctx.beginPath(); ctx.ellipse(0, 24, 57, 12, 0, 0, Math.PI * 2); ctx.fill();
+    rounded(ctx, -43, -14, 86, 39, 12, '#8853c9', ink);
+    rounded(ctx, -36, -23, 72, 31, 11, '#c697fc', ink);
+    rounded(ctx, -44, 20, 88, 9, 4, '#572e90');
+    rounded(ctx, -41, 5, 82, 7, 3, '#ffc940');
+    ctx.beginPath(); ctx.ellipse(0, -12, 23, 14, 0, 0, Math.PI * 2); ctx.fillStyle = '#ff546d'; ctx.fill();
+    ctx.beginPath(); ctx.ellipse(0, -12, 15, 9, 0, 0, Math.PI * 2); ctx.fillStyle = '#fff4c9'; ctx.fill();
+    ctx.beginPath(); ctx.ellipse(0, -12, 7, 4, 0, 0, Math.PI * 2); ctx.fillStyle = '#ff546d'; ctx.fill();
+    path(ctx, [[-8, -48], [0, -39], [8, -48]], '#ff546d');
+    rounded(ctx, -44, -79, 88, 22, 10, '#fff5d9', '#c56a8e');
+    label(ctx, 'UZAK ÜS', 0, -63, 11, '#713065', 'center'); ctx.restore();
+  }
+  class Renderer {
+    constructor(canvas) {
+      this.canvas = canvas; this.ctx = canvas.getContext('2d'); this.particles = [];
+      this.previousX = .5; this.visualClock = 0; this.cameraAltitude = 0; this.playerY = 630;
+      this.trail = []; this.floats = []; this.shake = 0; this.flash = 0; this.rings = [];
+      this.heading = 0;
+      this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    }
+    resize() {
+      const ratio = Math.min(window.devicePixelRatio || 1, 2);
+      if (this.canvas.width !== W * ratio) { this.canvas.width = W * ratio; this.canvas.height = H * ratio; }
+      this.ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    }
+    burst(x, y, kind) {
+      this.shake = this.reducedMotion ? 0 : kind === 'success' ? 13 : kind === 'damage' ? 7 : 2;
+      this.flash = kind === 'success' ? .48 : kind === 'damage' ? .18 : .06;
+      this.rings.push({ x, y, radius: 8, life: 1, color: kind === 'damage' ? '#ff547c' : '#fff384' });
+      for (let i = 0; i < (kind === 'success' ? 100 : 24); i++) {
+        const a = i * 2.399, speed = 24 + (i % 7) * 17;
+        this.particles.push({ x, y, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed,
+          life: 1, color: kind === 'pickup' ? (i % 2 ? '#43ecff' : '#ffffff') : ['#ff7240', '#ffdc40', '#fb60ba', '#ffffff'][i % 4] });
+      }
+    }
+    pop(text, x, y, color = '#fff4bd', size = 23) {
+      this.floats.push({ text, x, y, color, size, life: 1.4 });
+    }
+    background(time, build) {
+      const c = this.ctx, shift = build ? 0 : this.cameraAltitude * .38;
+      const bg = c.createLinearGradient(0, 0, 0, H);
+      const space = Math.max(0, Math.min(1, (this.cameraAltitude - 450) / 1800));
+      bg.addColorStop(0, mix([42, 158, 255], [44, 23, 113], space));
+      bg.addColorStop(.6, mix([93, 210, 255], [108, 70, 214], space));
+      bg.addColorStop(1, mix([186, 239, 255], [208, 114, 226], space));
+      c.fillStyle = bg; c.fillRect(0, 0, W, H);
+      c.save(); c.globalAlpha = 1 - space * .85;
+      c.fillStyle = '#fff38b'; c.beginPath(); c.arc(345, 170 + shift * .04, 35, 0, Math.PI * 2); c.fill();
+      c.strokeStyle = '#fff5a680'; c.lineWidth = 10; c.beginPath(); c.arc(345, 170 + shift * .04, 44, 0, Math.PI * 2); c.stroke(); c.restore();
+      if (space > 0) {
+        c.save(); c.globalAlpha = space;
+        for (let i = 0; i < 44; i++) {
+          const x = (i * 97 + 13) % W, y = ((i * 173 + shift * .18) % 820) - 70;
+          const r = i % 7 === 0 ? 3 : 1.4;
+          c.fillStyle = i % 3 ? '#ffffff' : '#ffed91'; c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill();
+          if (r === 3) { c.fillRect(x - 6, y - .7, 12, 1.4); c.fillRect(x - .7, y - 6, 1.4, 12); }
+        }
+        c.restore();
+      }
+      for (let i = 0; i < 10; i++) {
+        const y = ((i * 149 + shift * (i % 2 ? .75 : 1.15) + 50) % 850) - 90;
+        cloud(c, (i * 139 + 30) % 460, y, .6 + (i % 3) * .35, (.42 + (i % 2) * .18) * (1 - space));
+      }
+      if (this.cameraAltitude < 250 || build) {
+        const ground = build ? 555 : 650 + this.cameraAltitude * WORLD_SCALE;
+        c.fillStyle = '#8594ed'; c.beginPath(); c.moveTo(0, ground);
+        c.bezierCurveTo(70, ground - 195, 128, ground - 10, 211, ground - 79);
+        c.bezierCurveTo(292, ground - 168, 340, ground - 58, 420, ground - 95); c.lineTo(420, 1000); c.lineTo(0, 1000); c.fill();
+        c.fillStyle = '#6779d7'; c.beginPath(); c.moveTo(0, ground + 20);
+        c.bezierCurveTo(100, ground - 95, 160, ground + 11, 252, ground - 22);
+        c.bezierCurveTo(325, ground - 81, 390, ground - 7, 420, ground - 28); c.lineTo(420, 1000); c.lineTo(0, 1000); c.fill();
+        c.fillStyle = '#ffc984'; c.fillRect(0, ground, W, 400); c.fillStyle = '#ffe5a9'; c.fillRect(0, ground, W, 8);
+        if (!this.destination) {
+        rounded(c, 18, ground - 38, 78, 41, 9, '#8b4ec6', ink);
+        rounded(c, 15, ground - 44, 84, 12, 5, '#b790ec', ink);
+        c.fillStyle = '#87f0ff'; for (let i = 0; i < 4; i++) rounded(c, 28 + i * 16, ground - 26, 9, 12, 3, '#87f0ff');
+        c.strokeStyle = '#5b3e99'; c.lineWidth = 3; c.beginPath(); c.moveTo(64, ground - 44); c.lineTo(64, ground - 90); c.stroke();
+        path(c, [[64, ground - 86], [89, ground - 80], [64, ground - 72]], '#ff6378');
+        const padX = build ? 210 : 118;
+        c.fillStyle = '#7c5ac2'; c.beginPath(); c.ellipse(padX, ground + 31, build ? 101 : 50, 23, 0, 0, Math.PI * 2); c.fill();
+        c.strokeStyle = '#ffe266'; c.lineWidth = 5; c.beginPath(); c.ellipse(padX, ground + 27, build ? 74 : 38, 15, 0, 0, Math.PI * 2); c.stroke();
+        }
+      }
+      if (!build) { c.fillStyle = '#ffffff80'; for (let y = 180; y < 630; y += 20) c.fillRect(12, y, y % 100 === 0 ? 9 : 4, 1); }
+    }
+    draw(run, tankId, dt, now) {
+      this.resize(); const c = this.ctx, build = !run;
+      if (run?.phase === 'paused') dt = 0;
+      this.destination = Boolean(run && run.distance > 3000);
+      if (!run || run.phase === 'flying') this.visualClock += dt;
+      const clock = this.visualClock;
+      if (build) { this.cameraAltitude = 0; this.heading = 0; }
+      else {
+        const anchor = run.vy >= 0 ? 470 : 235;
+        const desiredCamera = Math.max(0, run.altitude - (650 - anchor) / WORLD_SCALE);
+        if (run.phase !== 'paused') this.cameraAltitude += (desiredCamera - this.cameraAltitude) * Math.min(1, dt * 5);
+        this.playerY = 650 - (run.altitude - this.cameraAltitude) * WORLD_SCALE;
+      }
+      c.save();
+      if (this.shake > .1) {
+        c.translate(Math.sin(clock * 90) * this.shake, Math.cos(clock * 70) * this.shake * .6);
+        this.shake *= Math.max(0, 1 - dt * 10);
+      }
+      this.background(run?.time || 0, build);
+      if (build) {
+        rounded(c, 21, 23, 69, 27, 12, '#fff1ba', '#ffae52');
+        label(c, 'R / 01', 55, 42, 13, '#694088', 'center'); label(c, 'FIRLATMA ALANI', 392, 41, 10, '#294b98', 'right');
+        c.strokeStyle = '#ffffff90'; c.lineWidth = 3; c.setLineDash([5, 10]);
+        c.beginPath(); c.ellipse(210, 315, 109, 150, 0, 0, Math.PI * 2); c.stroke(); c.setLineDash([]);
+        rocket(c, 210, 331 + Math.sin(clock * 1.3) * 2, tankId, false, clock, 2.15);
+        c.strokeStyle = '#6758b4'; c.lineWidth = 2;
+        c.beginPath(); c.moveTo(248, 339); c.lineTo(294, 316); c.lineTo(381, 316); c.stroke();
+        label(c, tankId ? 'DEPO TAKILDI' : 'DEPO YUVASI', 381, 305, 9, '#493b85', 'right');
+        label(c, tankId === 'large' ? 'UZUN MENZİL' : tankId ? 'ÇEVİK UÇUŞ' : 'SEÇİM BEKLİYOR', 381, 330, 8, '#514793', 'right');
+        rounded(c, 124, 478, 172, 29, 14, '#6799cc');
+        rounded(c, 124, 473, 172, 29, 14, '#fff3bd', '#eca941');
+        label(c, tankId ? 'UÇUŞ İÇİN HAZIR!' : 'ROKETİNİ HAZIRLA', 210, 492, 10, '#6b3986', 'center');
+        label(c, '01', 28, 626, 36, '#fff5d3'); label(c, 'YER KONTROL', 84, 614, 9, '#7d488e');
+        label(c, 'Küçük roket. Kocaman darbe.', 84, 633, 12, '#613d85');
+      } else {
+        const time = run.time;
+        if (run.phase === 'flying' && run.fuel > 0) {
+          this.trail.push({ x: run.x * W, altitude: run.altitude - 75, life: .7 });
+        }
+        for (const point of this.trail) {
+          if (run.phase !== 'paused') point.life -= dt;
+          const y = 650 - (point.altitude - this.cameraAltitude) * WORLD_SCALE;
+          c.globalAlpha = Math.max(0, point.life * .55);
+          c.fillStyle = point.life > .4 ? '#ffd845' : '#ff9d71'; c.beginPath(); c.arc(point.x, y, 5 + (1 - point.life) * 11, 0, Math.PI * 2); c.fill();
+        }
+        this.trail = this.trail.filter(p => p.life > 0); c.globalAlpha = 1;
+        const speed = Math.min(1, Math.abs(run.vy) / 250);
+        c.strokeStyle = `rgba(255,255,255,${speed * .45})`; c.lineWidth = 2;
+        for (let i = 0; i < 20 && !this.reducedMotion; i++) {
+          const x = (i * 73 + 23) % W;
+          const y = ((i * 127 + time * run.vy * .65) % H + H) % H;
+          c.beginPath(); c.moveTo(x, y); c.lineTo(x, y + 12 + speed * 27); c.stroke();
+        }
+        for (let mark = 500; mark <= 4000; mark += 500) {
+          const y = 650 - (mark - this.cameraAltitude) * WORLD_SCALE;
+          if (y < 150 || y > H) continue;
+          c.strokeStyle = '#ffffff65'; c.setLineDash([10, 12]); c.beginPath(); c.moveTo(35, y); c.lineTo(W - 35, y); c.stroke(); c.setLineDash([]);
+          rounded(c, 22, y - 28, 79, 23, 11, '#5b43a0b0');
+          label(c, `${mark.toLocaleString('tr-TR')} m`, 61, y - 12, 12, '#ffffff', 'center');
+        }
+        if (run.stages) {
+          const names = { route: 'K1 · ROTA', guarded: 'K2 · KORUNAN HAT', barrier: 'K3 · BARİYER', apex: 'K4 · ZİRVE' };
+          for (const [id, altitude] of Object.entries(run.stages.marks)) {
+            if (altitude == null) continue;
+            const y = 650 - (altitude - this.cameraAltitude) * WORLD_SCALE;
+            if (y < 150 || y > H + 20) continue;
+            const done = run.altitude > altitude + 60;
+            c.strokeStyle = done ? '#ffffff30' : '#ffe45e88'; c.setLineDash([3, 9]); c.lineWidth = 2;
+            c.beginPath(); c.moveTo(110, y); c.lineTo(W - 20, y); c.stroke(); c.setLineDash([]);
+            rounded(c, W - 128, y - 24, 108, 20, 9, done ? '#5b43a060' : '#ffe45ee6', done ? null : '#8a4a9c');
+            label(c, names[id], W - 74, y - 10, 9, done ? '#ffffffb0' : '#4c2a6e', 'center');
+          }
+        }
+        for (const t of run.threats) {
+          if (!t.warned || t.passed) continue;
+          const x = t.x * W;
+          if (t.altitude == null || t.altitude > run.altitude - 100) {
+            c.fillStyle = '#ff487a1c'; c.fillRect(x - 24, 170, 48, H - 185);
+            c.strokeStyle = '#fa3d7299'; c.lineWidth = 2; c.setLineDash([5, 7]);
+            c.strokeRect(x - 24, 170, 48, H - 185); c.setLineDash([]);
+            rounded(c, x - 20, 173, 40, 31, 11, t.lockX ? '#ff2d55' : '#ff4d79', '#a52b73');
+            label(c, '!', x, 195, 22, '#ffffff', 'center');
+            if (t.lockX) { rounded(c, x - 27, 206, 54, 15, 7, '#3a1d5f'); label(c, 'KİLİT', x, 217, 8, '#ffd6e2', 'center'); }
+          }
+          if (t.altitude != null) {
+            const y = 650 - (t.altitude - this.cameraAltitude) * WORLD_SCALE;
+            if (y > -70 && y < H + 70) interceptor(c, x, y);
+          }
+        }
+        for (const p of run.pickups) {
+          const y = 650 - (p.altitude - this.cameraAltitude) * WORLD_SCALE;
+          if (!p.collected && y > -50 && y < H + 50) fuel(c, p.x * W, y, clock, p.kind || p.type);
+        }
+        const targetY = 650 - (run.target.altitude - this.cameraAltitude) * WORLD_SCALE;
+        if (run.target.revealed && run.phase !== 'finished') {
+          // Project the ground aim zone; this is not an airborne target.
+          const tx = run.target.x * W, radius = (run.target.radius || .13) * W;
+          const aligned = Math.abs(run.x - run.target.x) < (run.target.radius || .13);
+          const bottom = Math.min(H - 66, targetY - 65);
+          if (bottom > this.playerY + 50) {
+            const corridor = c.createLinearGradient(0, this.playerY + 45, 0, bottom);
+            corridor.addColorStop(0, '#fff39400'); corridor.addColorStop(1, '#fff39434');
+            c.fillStyle = corridor; c.fillRect(tx - radius, this.playerY + 45, radius * 2, bottom - this.playerY - 45);
+            c.save(); c.setLineDash([5, 10]); c.strokeStyle = '#fff3a377'; c.lineWidth = 1.5;
+            for (const edge of [tx - radius, tx + radius]) { c.beginPath(); c.moveTo(edge, this.playerY + 50); c.lineTo(edge, bottom); c.stroke(); }
+            c.restore();
+          }
+          if (targetY > H - 65) {
+            rounded(c, tx - radius, H - 68, radius * 2, 6, 3, aligned ? '#fff08d' : '#ffa0c5');
+            path(c, [[run.x * W - 5, H - 79], [run.x * W + 5, H - 79], [run.x * W, H - 69]], '#ffffff');
+            rounded(c, tx - 52, H - 56, 104, 33, 13, aligned ? '#fff3ac' : '#fff0fa', '#a86bc4');
+            label(c, aligned ? 'HİZALANDIN ↓' : 'HEDEF BURADA ↓', tx, H - 35, 10, '#6c388e', 'center');
+          }
+        }
+        if (run.target.revealed && targetY < H + 100) {
+          const baseX = run.target.x * W;
+          rounded(c, baseX - 95, targetY - 15, 190, 55, 12, '#8d5abc', ink);
+          for (let i = -2; i <= 2; i++) rounded(c, baseX + i * 36 - 12, targetY - 34, 24, 22, 5, '#c38eef', ink);
+          if (run.outcome !== 'success') target(c, baseX, targetY - 23, clock);
+          else { rounded(c, baseX - 47, targetY - 20, 94, 43, 8, '#703678'); label(c, 'İSABET!', baseX, targetY - 65, 22, '#fff38b', 'center'); }
+        }
+        if (run.phase !== 'finished') {
+          const lean = Number.isFinite(run.bank) ? run.bank : Math.max(-.22, Math.min(.22, (run.x - this.previousX) * 25));
+          const falling = run.vy < 0 && run.fuel <= 0;
+          const heading = falling ? Math.PI - lean : lean;
+          if (run.time < .1) this.heading = lean;
+          if (run.phase !== 'paused') this.heading += (heading - this.heading) * Math.min(1, dt * 3.5);
+          rocket(c, run.x * W, this.playerY, tankId, run.fuel > 0, clock, .95, this.heading);
+          if (run.braking) {
+            c.save(); c.translate(run.x * W, this.playerY + 18);
+            c.strokeStyle = '#b8f6ff'; c.lineWidth = 4;
+            c.beginPath(); c.arc(0, 0, 45, .15, Math.PI - .15); c.stroke();
+            c.globalAlpha = .55; c.beginPath(); c.arc(0, 0, 55, .25, Math.PI - .25); c.stroke(); c.restore();
+            rounded(c, run.x * W - 35, this.playerY - 89, 70, 21, 10, '#d6ffff');
+            label(c, 'HAVA FRENİ', run.x * W, this.playerY - 75, 9, '#475a9e', 'center');
+          }
+          if (run.vy < -60) {
+            const heat = Math.min(.55, Math.abs(run.vy) / 650);
+            c.fillStyle = `rgba(255,133,65,${heat})`; c.beginPath(); c.ellipse(run.x * W, this.playerY + 48, 19, 8, 0, 0, Math.PI * 2); c.fill();
+            for (let j = 0; j < 6; j++) {
+              const fade = (clock * 5 + j / 6) % 1;
+              c.fillStyle = `rgba(255,177,82,${1 - fade})`; c.fillRect(run.x * W + Math.sin(j * 5) * (12 + fade * 22), this.playerY - fade * 75, 3, 9);
+            }
+          }
+        }
+        this.previousX = run.x;
+      }
+      for (const ring of this.rings) {
+        ring.life -= dt * 1.5; ring.radius += dt * 230;
+        c.globalAlpha = Math.max(0, ring.life); c.strokeStyle = ring.color; c.lineWidth = 4 * Math.max(0, ring.life);
+        c.beginPath(); c.arc(ring.x, ring.y, ring.radius, 0, Math.PI * 2); c.stroke();
+      }
+      this.rings = this.rings.filter(r => r.life > 0);
+      for (const p of this.particles) {
+        if (!run || run.phase !== 'paused') { p.life -= dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += dt * 65; }
+        c.globalAlpha = Math.max(0, p.life); rounded(c, p.x, p.y, 5, 5, 2, p.color);
+      }
+      c.globalAlpha = 1; this.particles = this.particles.filter(p => p.life > 0);
+      for (const f of this.floats) {
+        if (!run || run.phase !== 'paused') { f.life -= dt; f.y -= dt * 20; }
+        c.globalAlpha = Math.max(0, Math.min(1, f.life * 2));
+        c.font = `900 ${f.size}px system-ui,sans-serif`; c.textAlign = 'center'; c.lineWidth = 4;
+        c.strokeStyle = '#213850bb'; c.strokeText(f.text, f.x, f.y); c.fillStyle = f.color; c.fillText(f.text, f.x, f.y);
+      }
+      this.floats = this.floats.filter(f => f.life > 0); c.globalAlpha = 1;
+      if (this.flash > .005 && !this.reducedMotion) { c.fillStyle = `rgba(255,226,174,${this.flash})`; c.fillRect(0, 0, W, H); this.flash *= Math.max(0, 1 - dt * 12); }
+      c.restore();
+    }
+  }
+  window.RocketRenderer = Renderer;
+})();
+
+</script>
+  <script>
+(() => {
+  const byId = id => document.getElementById(id);
+  const canvas = byId('game-canvas');
+  const renderer = new window.RocketRenderer(canvas);
+  const sim = window.RocketSim;
+  const cards = [...document.querySelectorAll('.tank-card')];
+  let profile = { credits: 0, engine: 0, armor: 0 };
+  try {
+    const saved = JSON.parse(localStorage.getItem('rocketup-workshop-v1'));
+    if (saved) for (const key of Object.keys(profile)) profile[key] = Math.max(0, Math.min(key === 'credits' ? 1000000 : 3, Math.floor(Number(saved[key]) || 0)));
+  } catch { /* The prototype remains playable when storage is unavailable. */ }
+  const descriptions = {
+    compact: ['Kompakt depo', 'Çevik manevra. Kapsülleri topla, daha yükseğe çık. İnişte gövdeni koru.'],
+    large: ['Uzun menzil deposu', 'Daha fazla yakıt ve sağlamlık. Ağır manevra; savunmayı erkenden oku.']
+  };
+  let tank = null, run = null, layout = 0, desiredX = .5;
+  let pointer = null, pointerX = 0, lastFrame = 0, toastUntil = 0, resultTimer;
+  let sound = false, audioContext, brakePointer = null;
+  const banners = []; let bannerUntil = 0;
+  const keys = new Set();
+  // 1M4C: one mechanic (steer) and four staged decisions during ascent.
+  const stageText = {
+    route: ['KARAR 1 · ROTA', 'Yakıt mı, itki mi? Motor açıkken yakıt daha uzun taşır.'],
+    guarded: ['KARAR 2 · KORUNAN HAT', 'Şeritte iki kapsül var. Al ve hemen çık!'],
+    barrier: ['KARAR 3 · BARİYER', 'Aradan geç: iki kapsül. Kenardan geç: bir kapsül, sıfır risk.'],
+    apex: ['KARAR 4 · ZİRVE', 'Şeridine kilitlendi! Şeritteki itki mi, yandaki yakıt mı?']
+  };
+  const outcomeText = {
+    success: ['DARBE RAPORU', 'Gökyüzünden darbe.', 'İrtifa güce dönüştü. Kalan gövde sağlamlığı hedefe ulaştırdığın hasarı belirledi.'],
+    miss: ['HEDEF KAÇTI', 'Iska!', 'Dalışta hedef şeridine sürükle. Hava frenini kısa tutarak nişan almak için zaman kazan.'],
+    destroyed: ['GÖVDE DAYANAMADI', 'Havada parçalandı.', 'Yüksekliğin gücünü taşıyabilmek için zırhı geliştir; savunma roketlerinden kaç.']
+  };
+  function tone(kind) {
+    if (!sound) return;
+    audioContext ||= new (window.AudioContext || window.webkitAudioContext)();
+    if (audioContext.state === 'suspended') audioContext.resume();
+    const start = audioContext.currentTime;
+    const notes = kind === 'success' ? [440, 554, 660] : kind === 'pickup' ? [740, 980] : kind === 'warning' ? [220, 180] : [150];
+    notes.forEach((frequency, i) => {
+      const osc = audioContext.createOscillator(), gain = audioContext.createGain();
+      osc.type = 'sine'; osc.frequency.value = frequency;
+      gain.gain.setValueAtTime(0, start + i * .09);
+      gain.gain.linearRampToValueAtTime(.06, start + i * .09 + .015);
+      gain.gain.exponentialRampToValueAtTime(.001, start + i * .09 + .15);
+      osc.connect(gain); gain.connect(audioContext.destination);
+      osc.start(start + i * .09); osc.stop(start + i * .09 + .16);
+    });
+  }
+  function clearInput() {
+    keys.clear(); pointer = null; brakePointer = null;
+    if (run) desiredX = run.x;
+  }
+  function saveProfile() {
+    try { localStorage.setItem('rocketup-workshop-v1', JSON.stringify(profile)); } catch { /* Session progress still works. */ }
+  }
+  function workshop() {
+    byId('credits-value').textContent = String(profile.credits);
+    for (const key of ['engine', 'armor']) {
+      const cost = 20 * (profile[key] + 1), maxed = profile[key] >= 3;
+      byId(`${key}-level`).textContent = `Sv. ${profile[key]}/3`;
+      byId(`${key}-cost`).textContent = maxed ? 'MAKSİMUM' : `${cost} parça`;
+      byId(`upgrade-${key}`).disabled = maxed || profile.credits < cost;
+    }
+    cards.forEach(card => {
+      const id = card.dataset.tank, capacity = sim.TANKS[id].capacity + profile.engine;
+      card.querySelector('small').textContent = `${capacity.toLocaleString('tr-TR')} sn itiş · ${id === 'compact' ? 'Çevik' : 'Sağlam'}`;
+    });
+  }
+  function upgrade(key) {
+    if (run || profile[key] >= 3) return;
+    const cost = 20 * (profile[key] + 1);
+    if (profile.credits < cost) return;
+    profile.credits -= cost; profile[key]++; saveProfile(); workshop(); tone('pickup');
+    renderer.burst(210, 330, 'pickup'); renderer.pop(key === 'engine' ? 'MOTOR +1' : 'ZIRH +1', 210, 270, '#fff0b2');
+  }
+  function phase(value) {
+    document.body.dataset.phase = value;
+    byId('build-panel').hidden = value !== 'build';
+    byId('flight-hud').hidden = value === 'build';
+    byId('pause-panel').hidden = value !== 'paused';
+    byId('layout-button').disabled = value !== 'build';
+    byId('pause-button').disabled = value === 'finished';
+    byId('brake-button').hidden = true;
+    byId('status-label').textContent = { build: 'YER KONTROL', flying: 'UÇUŞTA', paused: 'UÇUŞ DURAKLATILDI', finished: 'UÇUŞ RAPORU' }[value];
+    byId('controls-caption').textContent = value === 'build' ? 'Depoyu tak. Motoru güçlendir. Göğe fırla!' : 'Sürükle / A D: yön · 4 karar, 1 hamle · Dalışta Space: fren · P: mola';
+  }
+  function selectTank(id) {
+    if (run) return;
+    tank = id;
+    cards.forEach(card => card.setAttribute('aria-pressed', String(card.dataset.tank === tank)));
+    byId('tank-name').textContent = descriptions[id][0];
+    byId('tank-description').textContent = descriptions[id][1];
+    byId('launch-button').disabled = false;
+    byId('launch-button').textContent = 'Roketi fırlat';
+    tone('pickup');
+  }
+  function launch() {
+    if (!tank) return;
+    clearTimeout(resultTimer); clearInput(); renderer.particles = []; renderer.trail = []; renderer.floats = []; renderer.rings = []; renderer.cameraAltitude = 0;
+    banners.length = 0; bannerUntil = 0;
+    run = sim.createRun(tank, layout, { engine: profile.engine, armor: profile.armor }); desiredX = run.x; renderer.previousX = run.x;
+    renderer.burst(run.x * 420, 620, 'launch');
+    byId('result-panel').hidden = true; byId('toast').hidden = true;
+    byId('flight-hint').hidden = false;
+    phase('flying'); updateHud(); tone('launch');
+    canvas.focus({ preventScroll: true });
+    byId('stage').closest('.stage-frame').scrollIntoView({ block: 'start', behavior: 'instant' });
+  }
+  function rebuild() {
+    clearTimeout(resultTimer); clearInput(); run = null; renderer.particles = []; renderer.floats = []; renderer.trail = []; renderer.rings = [];
+    byId('result-panel').hidden = true; byId('toast').hidden = true;
+    byId('flight-hint').hidden = true; phase('build'); workshop();
+    if (tank) cards.find(card => card.dataset.tank === tank).focus({ preventScroll: true });
+  }
+  function pause(value) {
+    if (!run || run.phase === 'finished') return;
+    sim.setPaused(run, value); clearInput(); phase(value ? 'paused' : 'flying');
+    byId('flight-hint').hidden = value || run.time > 3.5;
+    if (value) byId('resume-button').focus({ preventScroll: true });
+    else canvas.focus({ preventScroll: true });
+    updateHud();
+  }
+  function updateHud() {
+    if (!run) return;
+    byId('fuel-value').textContent = `${Math.max(0, run.fuel).toFixed(1)} sn`;
+    byId('fuel-fill').style.width = `${Math.max(0, run.fuel / run.capacity * 100)}%`;
+    byId('fuel-fill').classList.toggle('low', run.fuel / run.capacity < .25);
+    byId('altitude-value').textContent = `${Math.floor(run.altitude).toLocaleString('tr-TR')} m`;
+    byId('progress-fill').style.width = `${Math.min(100, run.altitude / 2200 * 100)}%`;
+    byId('integrity-value').textContent = `${Math.ceil(Math.max(0, run.integrity))} / ${run.maxIntegrity}`;
+    byId('integrity-fill').style.width = `${Math.max(0, run.integrity / run.maxIntegrity * 100)}%`;
+    byId('integrity-fill').classList.toggle('low', run.integrity / run.maxIntegrity < .35);
+    byId('damage-value').textContent = String(run.phase === 'finished' ? run.damage : Math.round(run.potentialDamage * (.25 + .75 * run.integrity / run.maxIntegrity)));
+    const stageChip = run.stage && run.vy >= 0 && run.phase !== 'finished' ? `K${run.stage}/4 · ` : '';
+    byId('flight-phase').textContent = run.phase === 'finished' ? 'DARBE SONUCU' : run.braking ? 'FREN · AŞINMA' : run.vy < 0 ? 'HEDEFE YÖNEL' : stageChip + (run.fuel > 0 ? 'MOTOR AÇIK' : 'SÜZÜLÜŞ');
+    byId('distance-value').textContent = run.phase === 'finished'
+      ? run.outcome === 'success' ? `%${Math.round(run.aimQuality * 100)} isabet` : 'UÇUŞ BİTTİ'
+      : `${Math.round(Math.abs(run.vy))} m/sn ${run.vy < 0 ? '↓' : '↑'}`;
+    const brakeButton = byId('brake-button');
+    brakeButton.hidden = run.phase !== 'flying' || run.vy >= 0;
+    brakeButton.classList.toggle('is-active', run.braking);
+    brakeButton.setAttribute('aria-pressed', String(run.braking));
+    brakeButton.textContent = run.braking ? 'FREN AÇIK · BIRAK' : 'HAVA FRENİ · BASILI TUT';
+  }
+  function finish() {
+    clearInput(); phase('finished'); byId('flight-hint').hidden = true; byId('toast').hidden = true;
+    const texts = outcomeText[run.outcome];
+    byId('result-kicker').textContent = texts[0]; byId('result-title').textContent = texts[1];
+    byId('result-description').textContent = texts[2];
+    if (run.outcome === 'success') {
+      byId('result-title').textContent = run.aimQuality > .9 ? 'Tam merkez!' : 'Hedef vuruldu!';
+      byId('result-description').textContent = `${run.potentialDamage} irtifa gücü × %${Math.round(25 + 75 * run.integrity / run.maxIntegrity)} gövde etkisi × %${Math.round(run.aimQuality * 100)} isabet = ${run.damage} hasar.`;
+    }
+    byId('result-altitude').textContent = `${Math.floor(run.peakAltitude).toLocaleString('tr-TR')} m`;
+    byId('result-pickups').textContent = String(run.collected);
+    byId('result-damage').textContent = String(run.damage);
+    byId('result-integrity').textContent = `${Math.ceil(Math.max(0, run.integrity / run.maxIntegrity * 100))}%`;
+    byId('result-credits').textContent = `+${run.creditsEarned}`;
+    profile.credits += run.creditsEarned; saveProfile(); workshop();
+    byId('result-panel').dataset.outcome = run.outcome;
+    renderer.burst(run.x * 420, renderer.playerY, run.outcome === 'success' ? 'success' : 'damage');
+    renderer.pop(run.outcome === 'success' ? `${run.damage} HASAR!` : run.outcome === 'miss' ? 'HEDEF KAÇTI!' : 'GÖVDE PARÇALANDI', 210, 410, '#ffe25b', run.outcome === 'success' ? 42 : 22);
+    tone(run.outcome === 'success' ? 'success' : 'failure');
+    resultTimer = setTimeout(() => {
+      byId('result-panel').hidden = false; byId('retry-button').focus({ preventScroll: true });
+    }, 1250);
+  }
+  function events() {
+    for (const event of run.events.splice(0)) {
+      if (event.type === 'pickup') {
+        renderer.burst(event.x * 420, renderer.playerY, 'pickup'); tone('pickup');
+        const boost = event.kind === 'boost' || event.itemType === 'boost';
+        const powered = run.fuel > 0;
+        renderer.pop(boost ? (powered ? 'İTKİ · KISA' : `İTKİ +${Math.round(event.amount)} m/sn`) : `+${event.amount.toFixed(1)} YAKIT`, event.x * 420, renderer.playerY - 55, boost ? '#ffd275' : '#b9edff');
+        byId('toast').textContent = boost ? (powered ? 'İtki · motor açıkken kısa sürer' : 'İtki · süzülüşte tam kazanç') : event.amount > 0 ? `+${event.amount.toFixed(1)} sn yakıt · motor sürüyor` : 'Depo dolu';
+        byId('toast').hidden = false; toastUntil = performance.now() + 1500;
+      } else if (event.type === 'damage') {
+        renderer.burst(run.x * 420, renderer.playerY, 'damage'); renderer.pop(`−${Math.round(event.amount)} GÖVDE`, run.x * 420, renderer.playerY - 60, '#ffbb9d'); tone('warning');
+      } else if (event.type === 'near_miss') {
+        renderer.pop('TEĞET!', run.x * 420, renderer.playerY - 50, '#ffe45e', 25); tone('pickup');
+      } else if (event.type === 'altitude_milestone') {
+        renderer.burst(run.x * 420, renderer.playerY, 'pickup');
+        const busy = performance.now() < bannerUntil || banners.length;
+        renderer.pop(`${event.altitude.toLocaleString('tr-TR')} m!`, busy ? run.x * 420 : 210, busy ? renderer.playerY - 70 : 200, '#fff0b1', busy ? 20 : 32); tone('success');
+      } else if (event.type === 'engine_cutoff' || event.type === 'apex') {
+        byId('toast').textContent = event.type === 'apex' ? 'Hedef açıldı! Şeride yönel ↓' : 'Yakıt bitti · süzülmeye devam!';
+        byId('toast').hidden = false; toastUntil = performance.now() + 1900;
+      } else if (event.type === 'stage') {
+        banners.push(stageText[event.id]); byId('flight-hint').hidden = true;
+      } else if (event.type === 'warning') {
+        tone('warning');
+        if (event.stage === 4) renderer.pop('KİLİTLENDİ · YANA KAÇ ↔', 210, renderer.playerY - 130, '#ff9ab5', 17);
+      } else if (event.type === 'finish') finish();
+    }
+  }
+  function showBanners(now) {
+    if (!banners.length || now < bannerUntil || run?.phase !== 'flying') return;
+    const [title, body] = banners.shift();
+    renderer.pop(title, 210, 242, '#ffe45e', 24); tone('warning');
+    byId('toast').textContent = body; byId('toast').hidden = false; toastUntil = now + 2300;
+    bannerUntil = now + 1700;
+  }
+  function frame(now) {
+    const dt = lastFrame ? Math.min((now - lastFrame) / 1000, .1) : 0; lastFrame = now;
+    showBanners(now);
+    if (run?.phase === 'flying') {
+      const axis = Number(keys.has('ArrowRight') || keys.has('KeyD')) - Number(keys.has('ArrowLeft') || keys.has('KeyA'));
+      if (axis) desiredX = run.x + axis * .3;
+      sim.step(run, dt, desiredX, brakePointer !== null || keys.has('Space')); events(); updateHud();
+      byId('flight-hint').textContent = run.target.revealed ? 'Şeride yönel · merkez daha sert vurur' : 'Kapsüle sürükle · 4 karar geliyor!';
+      byId('flight-hint').hidden = run.time > 3.5 || run.phase !== 'flying';
+    }
+    if (now > toastUntil) byId('toast').hidden = true;
+    renderer.draw(run, tank, dt, now); requestAnimationFrame(frame);
+  }
+  cards.forEach(card => card.addEventListener('click', () => selectTank(card.dataset.tank)));
+  byId('launch-button').addEventListener('click', launch);
+  byId('upgrade-engine').addEventListener('click', () => upgrade('engine'));
+  byId('upgrade-armor').addEventListener('click', () => upgrade('armor'));
+  byId('retry-button').addEventListener('click', launch);
+  byId('rebuild-button').addEventListener('click', rebuild);
+  byId('pause-rebuild-button').addEventListener('click', rebuild);
+  byId('pause-button').addEventListener('click', () => pause(true));
+  byId('resume-button').addEventListener('click', () => pause(false));
+  const brakeButton = byId('brake-button');
+  brakeButton.addEventListener('pointerdown', event => {
+    if (run?.phase !== 'flying' || run.vy >= 0) return;
+    event.preventDefault(); brakePointer = event.pointerId; brakeButton.setPointerCapture(event.pointerId);
+  });
+  for (const name of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+    brakeButton.addEventListener(name, event => { if (event.pointerId === brakePointer) brakePointer = null; });
+  }
+  byId('layout-button').addEventListener('click', () => {
+    if (run) return;
+    layout = 1 - layout; byId('layout-button').textContent = `Rota 0${layout + 1}`;
+    byId('route-label').textContent = `CANLI ROTA · 0${layout + 1}`;
+  });
+  byId('sound-button').addEventListener('click', () => {
+    sound = !sound; byId('sound-button').setAttribute('aria-pressed', String(sound));
+    byId('sound-button').setAttribute('aria-label', sound ? 'Sesi kapat' : 'Sesi aç');
+    byId('sound-button').innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z${sound ? ' M16 8q5 4 0 8 M19 5q7 7 0 14' : ' M16 8l5 8m0-8-5 8'}"/></svg>`;
+    if (sound) tone('pickup');
+  });
+  canvas.addEventListener('pointerdown', event => {
+    if (run?.phase !== 'flying') return;
+    event.preventDefault(); pointer = event.pointerId; pointerX = event.clientX;
+    desiredX = run.x; canvas.setPointerCapture(pointer); canvas.focus({ preventScroll: true });
+  });
+  canvas.addEventListener('pointermove', event => {
+    if (pointer !== event.pointerId || run?.phase !== 'flying') return;
+    desiredX = Math.max(.08, Math.min(.92, desiredX + (event.clientX - pointerX) / canvas.getBoundingClientRect().width));
+    pointerX = event.clientX;
+  });
+  function releasePointer(event) {
+    if (event.pointerId !== pointer) return;
+    pointer = null;
+  }
+  canvas.addEventListener('pointerup', releasePointer);
+  canvas.addEventListener('pointercancel', releasePointer);
+  canvas.addEventListener('lostpointercapture', releasePointer);
+  window.addEventListener('keydown', event => {
+    if (!run || run.phase === 'finished') return;
+    if (['KeyP', 'Escape'].includes(event.code) && !event.repeat) {
+      event.preventDefault(); pause(run.phase === 'flying'); return;
+    }
+    if (run.phase === 'flying' && ['ArrowLeft', 'ArrowRight', 'KeyA', 'KeyD', 'Space'].includes(event.code)) { event.preventDefault(); keys.add(event.code); }
+  });
+  window.addEventListener('keyup', event => {
+    keys.delete(event.code);
+    if (!keys.size && pointer === null && run) desiredX = run.x;
+  });
+  window.addEventListener('blur', () => { if (run?.phase === 'flying') pause(true); });
+  document.addEventListener('visibilitychange', () => { if (document.hidden && run?.phase === 'flying') pause(true); });
+  phase('build'); workshop(); requestAnimationFrame(frame);
+})();
+
+</script>
+</body>
+</html>
